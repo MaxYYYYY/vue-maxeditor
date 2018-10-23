@@ -1,30 +1,20 @@
 <template>
   <div>
-    <button @click="print">打印</button>
-    <button @click="getCurrentBoardContent">获取当前编辑框内容（html）</button>
+    <button @click="addSection">addSection</button>
+    <button @click="addSectionWithTitle">addSectionWithTitle</button>
+    <button @click="addTextWithLabel">addTextWithLabel</button>
+    <button @click="addHr">addHr</button>
+    <button @click="addImgBox">addImgBox</button>
+    <button @click="getBoards">getBoards</button>
+    <button @click="setBoards">setBoards</button>
+    <button @click="insertImg">insertImg</button>
+    <button @click="getCurrentBoardContent">getCurrentBoardContent</button>
     <button @click="getBoardContent">getBoardContent</button>
     <button @click="setBoardContent">setBoardContent</button>
-    <button @click="addBoard({id:maxeditor_input_board_id,type:'normal',isFluid:true,z:999})">插入板块</button>
-    <input v-model="maxeditor_input_board_id"/>
-    <button @click="addHr">插入分隔线</button>
-    <button @click="addSection('vue-draggable-resizable-section',input_section_title)">&nbsp;&nbsp;插入带标题多行文本
-    </button>
-    <input v-model="input_section_title"/>
-    <button @click="addLabel('vue-draggable-resizable-label',input_label_title)">&nbsp;&nbsp;插入带签文本</button>
-    <input v-model="input_label_title"/>
-    <br/>
-    <button @click="addImg('vue-draggable-resizable-img',input_img_id)">&nbsp;&nbsp;插入图片容器(需要id)</button>
-    <input v-model="input_img_id"/>
-    <button @click="insertImg(input_img_id)">插入图片(需要id)</button>
-    <br/>
-    <button @click="maxeditor_mode = 'design'">设计模式</button>
-    <button @click="maxeditor_mode = 'edit'">编辑模式</button>
-    <button @click="maxeditor_mode = 'readonly'">只读模式</button>
-    <br/>
-    <button @click="getBoards">getBoards</button>
-    <button @click="setBoards(input_boards)">setBoards</button>
-    <input v-model="input_boards"/>
-    <button @click="insertImg()">insertImg</button>
+    <button @click="setMode('design')">设计模式</button>
+    <button @click="setMode('edit')">编辑模式</button>
+    <button @click="setMode('readonly')">只读模式</button>
+
     <MaxEditor ref="maxeditor"></MaxEditor>
   </div>
 
@@ -43,8 +33,53 @@
       MaxEditor
     },
     methods: {
+      addSection(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.addSection(id);
+      },
+      addSectionWithTitle(){
+        let id = prompt('请输入id');
+        let title = prompt('请输入标题');
+        this.$refs.maxeditor.addSection(id, title);
+      },
+      addTextWithLabel(){
+        let id = prompt('请输入id');
+        let label = prompt('请输入标题');
+        this.$refs.maxeditor.addTextWithLabel(id, label);
+      },
       addHr(){
         this.$refs.maxeditor.addHr();
+      },
+      addImgBox(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.addImgBox(id);
+      },
+      setMode(){
+        this.$refs.maxeditor.setMode();
+      },
+      getBoards(){
+        this.$refs.maxeditor.getBoards();
+      },
+      setBoards(){
+        let boards = prompt('请输入json数组');
+        this.$refs.maxeditor.setBoards(boards);
+      },
+      insertImg(){
+        let id = prompt('请输入id');
+        let imgs = prompt('请输入json数组');
+        this.$refs.maxeditor.insertImg(id, imgs);
+      },
+      getCurrentBoardContent(){
+        this.$refs.maxeditor.getCurrentBoardContent();
+      },
+      getBoardContent(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.getBoardContent(id);
+      },
+      setBoardContent(){
+        let id = prompt('请输入id');
+        let content = prompt('内容');
+        this.$refs.maxeditor.setBoardContent(id, content);
       },
     },
     mounted() {

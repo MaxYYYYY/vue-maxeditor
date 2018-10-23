@@ -206,9 +206,7 @@
                     });
                 })
             },
-            insertImg(/*id,imgs*/){
-                let id = prompt('请输入id');
-                let imgs =prompt('请输入图片json数组');
+            insertImg(id,imgs){
                 let temp = this.maxeditor_boards;
                 let imgdata = JSON.parse(imgs);
                 for (let i = 0; i < temp.length; i++) {
@@ -265,7 +263,6 @@
                 this.maxeditor_boards[index].z -= 1;
             },
             changeFluidState(index) {
-
                 let temp = this.maxeditor_boards;
                 temp[index].isFluid = !temp[index].isFluid;
                 if (temp[index].isFluid) {
@@ -332,8 +329,7 @@
                 //alert(document.getElementById(this.maxeditor_current_id + "_content").innerHTML)
                 alert(this.maxeditor_boards[this.maxeditor_current_index].content)
             },
-            getBoardContent(/*id*/) {
-                let id = prompt('请输入id');
+            getBoardContent(id) {
                 for (let i=0;i<this.maxeditor_boards.length;i++){
                     if (this.maxeditor_boards[i].id ===id) {
                         alert(this.maxeditor_boards[i].content);
@@ -342,9 +338,7 @@
                 }
                 alert('id不存在')
             },
-            setBoardContent(/*id, content*/){
-                let id = prompt('请输入id');
-                let content = prompt('请输入html');
+            setBoardContent(id, content){
                 let temp = this.maxeditor_boards;
                 for (let i=0;i<temp.length;i++){
                     if (temp[i].id ===id) {
@@ -359,7 +353,6 @@
                 alert('id不存在')
             },
             updateBoardContent(index) {
-
             },
             //获取当前选取
             getCurrentSelection(index) {
