@@ -1,0 +1,294 @@
+@font-face {
+    font-family: 'Maxeditor';
+    src: url(./font/Simditor.woff) format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.maxeditor-sigleline {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.maxeditor-body {
+    width: 794px;
+    height: 1123px;
+    margin: 20px auto;
+    padding: 20px;
+    position: relative;
+    left: 0;
+    top: 0;
+    box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;
+    background: white;
+}
+
+.maxeditor-body-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.maxeditor-board-titile {
+    line-height: 30px;
+    font-size: 25px;
+    text-align: left;
+    margin-top: -30px;
+    height: 30px;
+}
+
+.maxeditor-board-toolbar {
+    padding: 10px;
+    min-width: 280px;
+    display: none;
+}
+
+.maxeditor-board-toolbar-active {
+    background-color: #d1d1d1;
+    display: inline-block;
+}
+
+.maxeditor-board-toolbar span {
+    cursor: pointer;
+    font-size: 20px;
+    text-align: center;
+    margin-right: 8px;
+    height: 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.maxeditor-board-fluid {
+    width: 100% !important;
+}
+
+.maxeditor-board-outline {
+    outline: gray auto 5px;
+}
+
+.maxeditor-board-outline:focus {
+    outline: -webkit-focus-ring-color auto 5px;
+}
+
+.maxeditor-toolbar {
+    text-align: left;
+    width: 834px;
+    margin: 20px auto;
+    outline: gray auto 5px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.maxeditor-toolbar-button {
+    display: inline-block;
+    color: #fff;
+    background-color: #39f;
+    border: 0;
+    padding: 6px;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+    margin-left: 15px;
+    margin-bottom: 10px;
+}
+
+.maxeditor-toolbar-button-disable {
+    background-color: gray !important;
+}
+
+.maxeditor-toolbar-item {
+    display: inline-block;
+    width: 46px;
+    height: 40px;
+    outline: none;
+    color: #333333;
+    font-size: 15px;
+    line-height: 40px;
+    vertical-align: middle;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.maxeditor-toolbar-item-active {
+    background-color: #999999;
+}
+
+.maxeditor-toolbar-item-separator {
+    display: inline-block;
+    background: #cfcfcf;
+    width: 1px;
+    height: 18px;
+    margin: 11px 15px;
+    vertical-align: middle;
+}
+
+.maxeditor-icon {
+    display: inline-block;
+    font: normal normal normal 14px/1 'Maxeditor';
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transform: translate(0, 0);
+}
+
+.maxeditor-icon-code:before {
+    content: '\f000';
+}
+
+.maxeditor-icon-bold:before {
+    content: '\f001';
+}
+
+.maxeditor-icon-italic:before {
+    content: '\f002';
+}
+
+.maxeditor-icon-underline:before {
+    content: '\f003';
+}
+
+.maxeditor-icon-times:before {
+    content: '\f004';
+}
+
+.maxeditor-icon-strikethrough:before {
+    content: '\f005';
+}
+
+.maxeditor-icon-list-ol:before {
+    content: '\f006';
+}
+
+.maxeditor-icon-list-ul:before {
+    content: '\f007';
+}
+
+.maxeditor-icon-quote-left:before {
+    content: '\f008';
+}
+
+.maxeditor-icon-table:before {
+    content: '\f009';
+}
+
+.maxeditor-icon-link:before {
+    content: '\f00a';
+}
+
+.maxeditor-icon-picture-o:before {
+    content: '\f00b';
+}
+
+.maxeditor-icon-minus:before {
+    content: '\f00c';
+}
+
+.maxeditor-icon-indent:before {
+    content: '\f00d';
+}
+
+.maxeditor-icon-outdent:before {
+    content: '\f00e';
+}
+
+.maxeditor-icon-unlink:before {
+    content: '\f00f';
+}
+
+.maxeditor-icon-caret-down:before {
+    content: '\f010';
+}
+
+.maxeditor-icon-caret-right:before {
+    content: '\f011';
+}
+
+.maxeditor-icon-upload:before {
+    content: '\f012';
+}
+
+.maxeditor-icon-undo:before {
+    content: '\f013';
+}
+
+.maxeditor-icon-smile-o:before {
+    content: '\f014';
+}
+
+.maxeditor-icon-tint:before {
+    content: '\f015';
+}
+
+.maxeditor-icon-font:before {
+    content: '\f016';
+}
+
+.maxeditor-icon-html5:before {
+    content: '\f017';
+}
+
+.maxeditor-icon-mark:before {
+    content: '\f018';
+}
+
+.maxeditor-icon-align-center:before {
+    content: '\f019';
+}
+
+.maxeditor-icon-align-left:before {
+    content: '\f01a';
+}
+
+.maxeditor-icon-align-right:before {
+    content: '\f01b';
+}
+
+.maxeditor-icon-font-minus:before {
+    content: '\f01c';
+}
+
+.maxeditor-icon-markdown:before {
+    content: '\f01d';
+}
+
+.maxeditor-icon-checklist:before {
+    content: '\f01e';
+}
+
+.maxeditor-icon-delete {
+    content: url('./icon/delete.svg');
+}
+
+.maxeditor-icon-move {
+    content: url('./icon/move.svg');
+}
+
+.maxeditor-icon-font-plus:before {
+    content: '\f020';
+}
+
+.maxeditor-icon-upzindex:before {
+    content: '\f022'
+}
+
+.maxeditor-icon-downzindex:before {
+    content: '\f023'
+}
+
+.maxeditor-icon-uncheck:before {
+    content: '\f024'
+}
