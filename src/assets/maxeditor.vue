@@ -373,25 +373,22 @@
 
       //编辑文本方法
       //将文本复制到剪贴板
-      editCopy(text) {
-        let temp;
-        try {
-          temp = document.createElement("<textarea id='maxeditor-temp-area' style='display:none'></textarea>");
-        } catch (e) {
-          temp = document.createElement('textarea');
-          temp.id = 'maxeditor-temp-area';
-          temp.style.display = 'none'
+
+      //光标处插入下拉框
+      editInsertDatalist(id, values) {
+        values = JSON.parse(values)
+        let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" />';
+        let option = '';
+        for (let i = 0; i < values.length; i++) {
+          option+='<option value="'+values[i].value+'">'
         }
-        temp.value = text;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand('copy', false, null);
-        temp.remove();
+        let datalist = '<datalist id="'+id+'list">'+option+"</datalist>";
+
+        document.execCommand('insertHtml', false, input+datalist);
       },
 
-      //光标处粘贴文本
-      editPaste() {
-        document.execCommand('paste', false, null)
+      editInsertText(text) {
+        document.execCommand('insertText', false, text)
       }
 
     },

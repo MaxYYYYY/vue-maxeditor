@@ -18,7 +18,7 @@ $ npm install --save vue-maxeditor
 
 ```vue
 <template>
-  <div >
+  <div>
     <MaxEditor></MaxEditor>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
 </script>
 ```
 
-##方法
+## 方法
 方法通过钩子调用
 ```vue
 <template>
@@ -96,28 +96,6 @@ this.$refs.maxeditor.addSection(id)
 
 ###
 
-### addBoard(option)
-插入面板，基础方法，插入文本框、图片框、标签等方法是对这个方法的封装
-
-用于向maxeditor_boards数组中push一个新的面板
-
-option内容根据实际情况而定
-
-```js
-this.maxeditor_boards.push({
-          component: 'maxeditor-board',
-          id: option.id,
-          type: option.type,
-          isFluid: option.isFluid,
-          title: option.title !== null && option.title !== undefined ? option.title : null,
-          label: option.label !== null && option.label !== undefined ? option.label : null,
-          x: option.x !== null && option.x !== undefined ? option.x : 0,
-          z: option.z,
-          width: option.width !== null && option.width !== undefined ? option.width : null,
-          height: option.height !== null && option.height !== undefined ? option.height : null,
-          imgs : null,
-        });
-```
 
 ### setMode(mode)
 设置编辑器模式，可选值为'design'、'edit'、 'readonly'
@@ -140,7 +118,7 @@ this.maxeditor_boards.push({
 ### getCurrentBoardContent()
 获取当前编辑面板内容，返回值为html代码
 
-### getCurrentBoardContent()
+### getCurrentBoardId()
 获取当前编辑面板id
 
 ### getBoardContent(id)
@@ -151,6 +129,18 @@ this.maxeditor_boards.push({
 
 ### setBoardContent(id, content)
 设置面版内容，content可为html代码或文本内容
+
+### editInsertText(text)
+在光标处插入文本
+
+### editInsertDatalist(id, values)
+在光标处插入下拉框，values为选项json数组，示例如下
+
+```json
+[{"value":"数据1"},
+{"value":"数据2"},
+{"value":"数据3"}]
+```
 
 
 

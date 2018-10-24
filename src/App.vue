@@ -17,13 +17,13 @@
     <button @click="setMode('edit')">编辑模式</button>
     <button @click="setMode('readonly')">只读模式</button>
     <br/>
-    <a @click="editCopy">editCopy</a>
-    <a @click="editPaste">editPaste</a>
-    <a class="maxeditor-toolbar-item"
-       @click="editPaste"><span
-      class="maxeditor-icon ">editPaste</span></a>
+
+    <button @click="editInsertText">editInsertText</button>
+    <button @click="editInsertDatalist">editInsertDatalist</button>
 
     <MaxEditor ref="maxeditor"></MaxEditor>
+
+
   </div>
 
 </template>
@@ -94,13 +94,17 @@
         let content = prompt('内容');
         this.$refs.maxeditor.setBoardContent(id, content);
       },
-      editCopy() {
+
+
+      editInsertText() {
         let text = prompt('请输入文本');
-        this.$refs.maxeditor.editCopy(text);
+        this.$refs.maxeditor.editInsertText(text)
       },
-      editPaste() {
-        this.$refs.maxeditor.editPaste();
-      },
+      editInsertDatalist() {
+        let id = prompt('请输入id');
+        let values = prompt('请输入数组');
+        this.$refs.maxeditor.editInsertDatalist(id, values)
+      }
     },
     mounted() {
 
