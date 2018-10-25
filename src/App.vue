@@ -20,6 +20,8 @@
 
     <button @click="editInsertText">editInsertText</button>
     <button @click="editInsertDatalist">editInsertDatalist</button>
+    <button @click="activeBoard">activeBoard</button>
+    <button @click="deactiveBoard">deactiveBoard</button>
 
     <MaxEditor ref="maxeditor"></MaxEditor>
 
@@ -94,6 +96,15 @@
         let content = prompt('内容');
         this.$refs.maxeditor.setBoardContent(id, content);
       },
+      activeBoard(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.activeBoard(id);
+      },
+      deactiveBoard(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.deactiveBoard(id);
+      },
+
 
 
       editInsertText() {

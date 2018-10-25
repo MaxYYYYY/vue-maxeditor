@@ -1,294 +1,321 @@
 @font-face {
-    font-family: 'Maxeditor';
-    src: url(./font/Simditor.woff) format("woff");
-    font-weight: normal;
-    font-style: normal;
+  font-family: 'Maxeditor';
+  src: url(./font/Simditor.woff) format("woff");
+  font-weight: normal;
+  font-style: normal;
 }
 
 .maxeditor-sigleline {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .maxeditor-body {
-    width: 794px;
-    height: 1123px;
-    margin: 20px auto;
-    padding: 20px;
-    position: relative;
-    left: 0;
-    top: 0;
-    box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;
-    background: white;
+  width: 794px;
+  height: 1123px;
+  margin: 20px auto;
+  padding: 20px;
+  position: relative;
+  left: 0;
+  top: 0;
+  box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;
+  background: white;
 }
 
 .maxeditor-body-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .maxeditor-board-titile {
-    line-height: 30px;
-    font-size: 25px;
-    text-align: left;
-    margin-top: -30px;
-    height: 30px;
+  line-height: 30px;
+  font-size: 25px;
+  text-align: left;
+  margin-top: -30px;
+  height: 30px;
 }
 
 .maxeditor-board-toolbar {
-    padding: 10px;
-    min-width: 280px;
-    display: none;
+  padding: 10px;
+  min-width: 280px;
+  display: none;
 }
 
 .maxeditor-board-toolbar-active {
-    background-color: #d1d1d1;
-    display: inline-block;
+  background-color: #d1d1d1;
+  display: inline-block;
 }
 
 .maxeditor-board-toolbar span {
-    cursor: pointer;
-    font-size: 20px;
-    text-align: center;
-    margin-right: 8px;
-    height: 20px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  cursor: pointer;
+  font-size: 20px;
+  text-align: center;
+  margin-right: 8px;
+  height: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .maxeditor-board-fluid {
-    width: 100% !important;
+  width: 100% !important;
 }
 
 .maxeditor-board-outline {
-    outline: gray auto 5px;
+  outline: gray auto 5px;
 }
 
 .maxeditor-board-outline:focus {
-    outline: -webkit-focus-ring-color auto 5px;
+  outline: -webkit-focus-ring-color auto 5px;
 }
 
 .maxeditor-toolbar {
-    text-align: left;
-    width: 834px;
-    margin: 20px auto;
-    outline: gray auto 5px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  text-align: left;
+  width: 834px;
+  margin: 20px auto;
+  outline: gray auto 5px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .maxeditor-toolbar-button {
-    display: inline-block;
-    color: #fff;
-    background-color: #39f;
-    border: 0;
-    padding: 6px;
-    text-align: center;
-    font-size: 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    outline: none;
-    position: relative;
-    margin-left: 15px;
-    margin-bottom: 10px;
+  display: inline-block;
+  color: #fff;
+  background-color: #39f;
+  border: 0;
+  padding: 6px;
+  text-align: center;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  margin-left: 15px;
+  margin-bottom: 10px;
 }
 
 .maxeditor-toolbar-button-disable {
-    background-color: gray !important;
+  background-color: gray !important;
+}
+
+.maxeditor-toolbar-input {
+  width: 40px;
+  display: inline-block;
+  border: 0;
+  padding: 6px;
+  text-align: center;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.maxeditor-toolbar-text {
+  padding: 6px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.maxeditor-float-r {
+  float: right;
+}
+
+.maxeditor-m-r-15 {
+  margin-right: 15px;
 }
 
 .maxeditor-toolbar-item {
-    display: inline-block;
-    width: 46px;
-    height: 40px;
-    outline: none;
-    color: #333333;
-    font-size: 15px;
-    line-height: 40px;
-    vertical-align: middle;
-    text-align: center;
-    text-decoration: none;
-    cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+  display: inline-block;
+  width: 46px;
+  height: 40px;
+  outline: none;
+  color: #333333;
+  font-size: 15px;
+  line-height: 40px;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .maxeditor-toolbar-item-active {
-    background-color: #999999;
+  background-color: #999999;
 }
 
 .maxeditor-toolbar-item-separator {
-    display: inline-block;
-    background: #cfcfcf;
-    width: 1px;
-    height: 18px;
-    margin: 11px 15px;
-    vertical-align: middle;
+  display: inline-block;
+  background: #cfcfcf;
+  width: 1px;
+  height: 18px;
+  margin: 11px 15px;
+  vertical-align: middle;
 }
 
 .maxeditor-icon {
-    display: inline-block;
-    font: normal normal normal 14px/1 'Maxeditor';
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
+  display: inline-block;
+  font: normal normal normal 14px/1 'Maxeditor';
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translate(0, 0);
 }
 
 .maxeditor-icon-code:before {
-    content: '\f000';
+  content: '\f000';
 }
 
 .maxeditor-icon-bold:before {
-    content: '\f001';
+  content: '\f001';
 }
 
 .maxeditor-icon-italic:before {
-    content: '\f002';
+  content: '\f002';
 }
 
 .maxeditor-icon-underline:before {
-    content: '\f003';
+  content: '\f003';
 }
 
 .maxeditor-icon-times:before {
-    content: '\f004';
+  content: '\f004';
 }
 
 .maxeditor-icon-strikethrough:before {
-    content: '\f005';
+  content: '\f005';
 }
 
 .maxeditor-icon-list-ol:before {
-    content: '\f006';
+  content: '\f006';
 }
 
 .maxeditor-icon-list-ul:before {
-    content: '\f007';
+  content: '\f007';
 }
 
 .maxeditor-icon-quote-left:before {
-    content: '\f008';
+  content: '\f008';
 }
 
 .maxeditor-icon-table:before {
-    content: '\f009';
+  content: '\f009';
 }
 
 .maxeditor-icon-link:before {
-    content: '\f00a';
+  content: '\f00a';
 }
 
 .maxeditor-icon-picture-o:before {
-    content: '\f00b';
+  content: '\f00b';
 }
 
 .maxeditor-icon-minus:before {
-    content: '\f00c';
+  content: '\f00c';
 }
 
 .maxeditor-icon-indent:before {
-    content: '\f00d';
+  content: '\f00d';
 }
 
 .maxeditor-icon-outdent:before {
-    content: '\f00e';
+  content: '\f00e';
 }
 
 .maxeditor-icon-unlink:before {
-    content: '\f00f';
+  content: '\f00f';
 }
 
 .maxeditor-icon-caret-down:before {
-    content: '\f010';
+  content: '\f010';
 }
 
 .maxeditor-icon-caret-right:before {
-    content: '\f011';
+  content: '\f011';
 }
 
 .maxeditor-icon-upload:before {
-    content: '\f012';
+  content: '\f012';
 }
 
 .maxeditor-icon-undo:before {
-    content: '\f013';
+  content: '\f013';
 }
 
 .maxeditor-icon-smile-o:before {
-    content: '\f014';
+  content: '\f014';
 }
 
 .maxeditor-icon-tint:before {
-    content: '\f015';
+  content: '\f015';
 }
 
 .maxeditor-icon-font:before {
-    content: '\f016';
+  content: '\f016';
 }
 
 .maxeditor-icon-html5:before {
-    content: '\f017';
+  content: '\f017';
 }
 
 .maxeditor-icon-mark:before {
-    content: '\f018';
+  content: '\f018';
 }
 
 .maxeditor-icon-align-center:before {
-    content: '\f019';
+  content: '\f019';
 }
 
 .maxeditor-icon-align-left:before {
-    content: '\f01a';
+  content: '\f01a';
 }
 
 .maxeditor-icon-align-right:before {
-    content: '\f01b';
+  content: '\f01b';
 }
 
 .maxeditor-icon-font-minus:before {
-    content: '\f01c';
+  content: '\f01c';
 }
 
 .maxeditor-icon-markdown:before {
-    content: '\f01d';
+  content: '\f01d';
 }
 
 .maxeditor-icon-checklist:before {
-    content: '\f01e';
+  content: '\f01e';
 }
 
 .maxeditor-icon-delete {
-    content: url('./icon/delete.svg');
+  content: url('./icon/delete.svg');
 }
 
 .maxeditor-icon-move {
-    content: url('./icon/move.svg');
+  content: url('./icon/move.svg');
 }
 
 .maxeditor-icon-font-plus:before {
-    content: '\f020';
+  content: '\f020';
 }
 
 .maxeditor-icon-upzindex:before {
-    content: '\f022'
+  content: '\f022'
 }
 
 .maxeditor-icon-downzindex:before {
-    content: '\f023'
+  content: '\f023'
 }
 
 .maxeditor-icon-uncheck:before {
-    content: '\f024'
+  content: '\f024'
 }

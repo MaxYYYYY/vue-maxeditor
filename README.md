@@ -92,11 +92,6 @@ this.$refs.maxeditor.addSection(id)
 插入单张图片时也需要传入数组，此时图片宽度占满图片容器
 图片数量大于1时宽度为固定值160px
 
-###
-
-###
-
-
 ### setMode(mode)
 设置编辑器模式，可选值为'design'、'edit'、 'readonly'
 
@@ -113,7 +108,7 @@ this.$refs.maxeditor.addSection(id)
 ```
 
 ### setBoards(boards)
-设置面板列表，boards为json数组，结构如上
+设置面板列表，boards为json数组(对象以及字符串皆可)，结构如上
 
 ### getCurrentBoardContent()
 获取当前编辑面板内容，返回值为html代码
@@ -142,5 +137,22 @@ this.$refs.maxeditor.addSection(id)
 {"value":"数据3"}]
 ```
 
+### updateId(oId, nId)
+更改面板id
+
+### updateTitle(id, title)
+更改面板标题（仅文本框可修改）
+
+### updateLabel(id, label)
+更改标签（仅标签文本可用）
+
+### updateZ(id, zindex) 
+更改面板z-index值
+
+### activeBoard(id)
+根据id激活面板
+
+### deactiveBoard(id)
+释放面板焦点
 
 

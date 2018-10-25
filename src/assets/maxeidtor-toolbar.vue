@@ -63,6 +63,28 @@
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
             @click="setMode('readonly')">只读模式
     </button>
+
+    <div class="maxeditor-float-r"
+         v-show="maxeditor_current_board.type==='normal'||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'">
+      <button title="修改z-index"
+              class="maxeditor-toolbar-button maxeditor-float-r  maxeditor-m-r-15"
+              @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
+      </button>
+      <button title="修改title"
+              class="maxeditor-toolbar-button maxeditor-float-r"
+              v-if="maxeditor_current_board.type==='normal'"
+              @click="updateTitle">修改title:{{maxeditor_current_board.title}}
+      </button>
+      <button title="修改label"
+              class="maxeditor-toolbar-button maxeditor-float-r"
+              v-if="maxeditor_current_board.type==='label'"
+              @click="updateLabel">修改title:{{maxeditor_current_board.label}}
+      </button>
+      <button title="修改id"
+              class="maxeditor-toolbar-button maxeditor-float-r"
+              @click="updateId">修改id:{{maxeditor_current_board.id}}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -71,6 +93,14 @@
     name: "maxeidtor-toolbar",
     props: {
       maxeditor_mode: '',
+      maxeditor_current_board: {
+        type: Object,
+        default() {
+          return {
+            type: ''
+          }
+        }
+      }
     },
     data() {
       return {
@@ -122,6 +152,22 @@
       },
       setMode(mode) {
         this.$parent.maxeditor_mode = mode
+      },
+      updateId() {
+        let id = prompt('请输入id','');
+        this.$parent.updateId(this.maxeditor_current_board.id, id);
+      },
+      updateTitle() {
+        let title = prompt('请输入title');
+        this.$parent.updateTitle(this.maxeditor_current_board.id, title);
+      },
+      updateZ() {
+        let z = prompt('请输入z-index');
+        this.$parent.updateZ(this.maxeditor_current_board.z, z);
+      },
+      updateLabel() {
+        let label = prompt('请输入label');
+        this.$parent.updateLabel(this.maxeditor_current_board.id, label);
       }
     },
     mounted() {

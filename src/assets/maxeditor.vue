@@ -1,17 +1,18 @@
 <template>
   <div class="maxeditor-root">
-    <maxeditor-toolbar :current_selection_ancoroffset="this.current_selection.anchorOffset"
-                       :maxeditor_mode="maxeditor_mode"></maxeditor-toolbar>
+    <maxeditor-toolbar :maxeditor_mode="maxeditor_mode"
+                       :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
+    </maxeditor-toolbar>
     <div class="maxeditor-body" id="maxeditor-body">
       <div class="maxeditor-body-inner" ref="maxEditorBodyInner">
         <maxeditor-board
+          class="maxeditor-board"
           v-for="(item, index) in maxeditor_boards"
           :id="item.id"
           :key="item.id"
           :is="item.component"
           :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[25,25]"
           :parent="true"
-          class="maxeditor-board"
           :class="{'maxeditor-board-fluid':item.isFluid}"
           :x="item.x===undefined||item.x===null?0:item.x"
           :y="item.y===undefined||item.y===null?0:item.y"
@@ -20,6 +21,8 @@
           :h="item.height===undefined||item.height===null?item.type==='hr'?20:200:item.height"
           :drag-handle="'.maxeditor-icon-move'"
           :handles="item.type==='hr'?[]:item.isFluid?['tm','bm']:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
+          v-bind:axis="item.type==='hr'?'y':item.isFluid?'y':'both'"
+          @click="onActivated(index)"
           @resizing="onResize"
           @dragging="onDrag"
           @activated="onActivated(index)"
@@ -32,12 +35,13 @@
                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                  :id="item.id+'_content'"
                  :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                 @focus="onActivated(index)"
                  @click="onActivated(index)"
                  @keyup="onActivated(index)">
             </div>
           </template>
           <template v-if="item.type === 'hr'">
-            <div style="height: 40px;width: 100%;padding-top: 20px" @click="onActivated(index)">
+            <div style="height: 20px;width: 100%;padding-top: 20px" @click="onActivated(index)">
               <hr/>
             </div>
           </template>
@@ -206,6 +210,80 @@
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
+      /*updateBoard(id, option) {
+        console.log(option);
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            for (let key in option) {
+              temp[i].key = option[key];
+            }
+
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },*/
+      updateId(oId, nId) {
+        if (nId===undefined||nId===null){
+          return
+        }
+        for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === nId) {
+            console.log('id已存在');
+            return
+          }
+        }
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === oId) {
+            temp[i].id = nId;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateTitle(id, title) {
+        if (title===undefined||title===null){
+          return
+        }
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            temp[i].title = title;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateLabel(id, label) {
+        if (label===undefined||label===null){
+          console.log('请输入id');
+          return
+        }
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            temp[i].label = label;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateZ(id, zindex) {
+        if (zindex===undefined||zindex===null){
+          console.log('请输入id');
+          return
+        }
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            temp[i].z = zindex;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
       setMode(mode) {
         this.maxeditor_mode = mode
       },
@@ -216,7 +294,10 @@
         return JSON.stringify(this.maxeditor_boards)
       },
       setBoards(boards) {
-        this.maxeditor_boards = JSON.parse(boards);
+        if (typeof boards !== "object") {
+          this.maxeditor_boards = JSON.parse(boards);
+        }
+
         this.$nextTick(function () {
           this.maxeditor_boards.forEach(function (item, index) {
             if (item.content !== undefined) {
@@ -263,6 +344,31 @@
         this.maxeditor_current_id = '';
         this.maxeditor_current_index = undefined;
       },
+      //改变面板状态
+      activeBoard(id) {
+        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === id) {
+            if (this.maxeditor_current_id === id) {
+              console.log(id + ' is already activated.');
+            } else {
+              this.onActivated(i)
+            }
+          }
+        }*/
+        document.getElementById(id + '_content').focus();
+      },
+      deactiveBoard(id) {
+        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === id) {
+            if (this.maxeditor_current_id === id) {
+              this.onDeactivated(i);
+            } else {
+              console.log(id + ' is not active already.');
+            }
+          }
+        }*/
+        document.getElementById(id + '_content').blur();
+      },
       upZindex(index) {
         this.maxeditor_boards[index].z += 1;
       },
@@ -270,11 +376,14 @@
         this.maxeditor_boards[index].z -= 1;
       },
       changeFluidState(index) {
-        let temp = this.maxeditor_boards;
-        temp[index].isFluid = !temp[index].isFluid;
-        if (temp[index].isFluid) {
-          temp[index].x = 0;
-          this.$set(this.maxeditor_boards, temp);
+        //面板靠左贴边时才能切换为全屏
+        if (this.maxeditor_boards[index].x===0){
+          let temp = this.maxeditor_boards;
+          temp[index].isFluid = !temp[index].isFluid;
+          if (temp[index].isFluid) {
+            temp[index].x = 0;
+            this.$set(this.maxeditor_boards, temp);
+          }
         }
       },
       print() {
@@ -372,19 +481,18 @@
 
 
       //编辑文本方法
-      //将文本复制到剪贴板
 
       //光标处插入下拉框
       editInsertDatalist(id, values) {
-        values = JSON.parse(values)
+        values = JSON.parse(values);
         let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" />';
         let option = '';
         for (let i = 0; i < values.length; i++) {
-          option+='<option value="'+values[i].value+'">'
+          option += '<option value="' + values[i].value + '">'
         }
-        let datalist = '<datalist id="'+id+'list">'+option+"</datalist>";
+        let datalist = '<datalist id="' + id + 'list">' + option + "</datalist>";
 
-        document.execCommand('insertHtml', false, input+datalist);
+        document.execCommand('insertHtml', false, input + datalist);
       },
 
       editInsertText(text) {
