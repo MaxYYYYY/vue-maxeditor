@@ -27,7 +27,8 @@
           @dragging="onDrag"
           @activated="onActivated(index)"
           @deactivated="onDeactivated(index)">
-          <template v-if="item.title!==null&&item.title!==undefined">
+          <!--面板标题-->
+          <template v-if="item.type==='normal'&&item.title!==null&&item.title!==undefined">
             <div class="maxeditor-board-titile">{{item.title}}:</div>
           </template>
           <template v-if="item.type === 'normal'">
@@ -108,18 +109,6 @@
         maxeditor_current_id: '',//当前编辑面板，值为id
         maxeditor_current_index: undefined,
 
-        //测试用input
-        input_boards: '',
-        maxeditor_input_board_id: '',
-
-        sections: [],
-        input_section_title: '',
-        labels: [],
-        input_label_title: '',
-        imgs: [],
-        input_img_id: '',
-        inset_img_id: '',
-        current_selection: {},
 
       }
     },
@@ -128,6 +117,7 @@
       'maxeditor-board': VueDraggableResizable,
     },
     methods: {
+      //全局方法
       addSection(id) {
         this.addBoard({id: id, type: 'normal', isFluid: true, z: 999})
       },
@@ -210,6 +200,57 @@
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
+      print() {
+        /* //原html代码取出
+         var html = document.getElementById('maxeditor-body').innerHTML;
+
+         //生成iframe
+         var iframe;
+         try {
+             iframe = document.createElement("<iframe id='ifr-max'></iframe>");
+         } catch (e) {
+             iframe = document.createElement("iframe");
+             iframe.id = "ifr-max";
+         }
+         iframe.style.visibility = "hidden";
+
+         //iframe插入
+         document.body.append(iframe);
+
+         var ifrMax = document.getElementById("ifr-max");
+         ifrMax.contentWindow.document.getElementsByTagName("html")[0].innerHTML = html;
+         ifrMax.contentWindow.print();*/
+
+        //获取当前页的html代码
+        var bodyhtml = document.getElementById('maxeditor-body').innerHTML;
+        ;
+
+        // 生成并打印ifrme
+        var iframe;
+        try {
+          iframe = document.createElement("<iframe id='ifr-max'></iframe>");
+        } catch (e) {
+          iframe = document.createElement("iframe");
+          iframe.id = "ifr-max";
+        }
+        //iframe.style.visibility = "hidden";
+        iframe.style.width = "800px";
+
+
+        //iframe插入
+        document.body.append(iframe);
+
+
+        var ifrMax = document.getElementById("ifr-max");
+        ifrMax.contentWindow.document.getElementsByTagName("head")[0].innerHTML = document.getElementsByTagName('head')[0].innerHTML;
+        ifrMax.contentWindow.document.getElementsByTagName("body")[0].innerHTML = bodyhtml;
+        ifrMax.contentWindow.document.getElementsByTagName("body")[0].style.backgroundColor = 'red'
+        //ifrMax.contentWindow.print();
+        window.print()
+
+      },
+
+      //面板方法
       /*updateBoard(id, option) {
         console.log(option);
         let temp = this.maxeditor_boards;
@@ -294,9 +335,10 @@
         return JSON.stringify(this.maxeditor_boards)
       },
       setBoards(boards) {
-        if (typeof boards !== "object") {
+        /*if (typeof boards !== "object") {
           this.maxeditor_boards = JSON.parse(boards);
-        }
+        }*/
+        this.maxeditor_boards = JSON.parse(boards);
 
         this.$nextTick(function () {
           this.maxeditor_boards.forEach(function (item, index) {
@@ -311,12 +353,11 @@
         try {
           this.maxeditor_boards[this.maxeditor_current_index].x = x;
           this.maxeditor_boards[this.maxeditor_current_index].y = y;
-          this.maxeditor_boards[this.maxeditor_current_index].w = width;
-          this.maxeditor_boards[this.maxeditor_current_index].h = height;
+          this.maxeditor_boards[this.maxeditor_current_index].width = width;
+          this.maxeditor_boards[this.maxeditor_current_index].height = height;
         } catch (e) {
 
         }
-
       },
       onDrag(x, y) {
         try {
@@ -386,55 +427,7 @@
           }
         }
       },
-      print() {
-        /* //原html代码取出
-         var html = document.getElementById('maxeditor-body').innerHTML;
 
-         //生成iframe
-         var iframe;
-         try {
-             iframe = document.createElement("<iframe id='ifr-max'></iframe>");
-         } catch (e) {
-             iframe = document.createElement("iframe");
-             iframe.id = "ifr-max";
-         }
-         iframe.style.visibility = "hidden";
-
-         //iframe插入
-         document.body.append(iframe);
-
-         var ifrMax = document.getElementById("ifr-max");
-         ifrMax.contentWindow.document.getElementsByTagName("html")[0].innerHTML = html;
-         ifrMax.contentWindow.print();*/
-
-        //获取当前页的html代码
-        var bodyhtml = document.getElementById('maxeditor-body').innerHTML;
-        ;
-
-        // 生成并打印ifrme
-        var iframe;
-        try {
-          iframe = document.createElement("<iframe id='ifr-max'></iframe>");
-        } catch (e) {
-          iframe = document.createElement("iframe");
-          iframe.id = "ifr-max";
-        }
-        //iframe.style.visibility = "hidden";
-        iframe.style.width = "800px";
-
-
-        //iframe插入
-        document.body.append(iframe);
-
-
-        var ifrMax = document.getElementById("ifr-max");
-        ifrMax.contentWindow.document.getElementsByTagName("head")[0].innerHTML = document.getElementsByTagName('head')[0].innerHTML;
-        ifrMax.contentWindow.document.getElementsByTagName("body")[0].innerHTML = bodyhtml;
-        ifrMax.contentWindow.document.getElementsByTagName("body")[0].style.backgroundColor = 'red'
-        //ifrMax.contentWindow.print();
-        window.print()
-
-      },
       getCurrentBoardContent() {
         let index = this.maxeditor_current_index;
         let id = this.maxeditor_current_id;
