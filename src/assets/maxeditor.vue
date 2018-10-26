@@ -1,6 +1,7 @@
 <template>
   <div class="maxeditor-root">
-    <maxeditor-toolbar :maxeditor_mode="maxeditor_mode"
+    <maxeditor-toolbar ref="maxeditor-toolbar" :class="{'maxeditor-fix2top':toolBarFixed}"
+                       :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
     </maxeditor-toolbar>
     <div class="maxeditor-body" id="maxeditor-body">
@@ -102,13 +103,13 @@
     name: "maxeditor",
     data() {
       return {
+        window: window,
         document: window.document,//
         maxeditor_boards: [],//
-
         maxeditor_mode: 'design',
         maxeditor_current_id: '',//当前编辑面板，值为id
         maxeditor_current_index: undefined,
-
+        toolBarFixed: false,
 
       }
     },
@@ -266,7 +267,7 @@
         }
       },*/
       updateId(oId, nId) {
-        if (nId===undefined||nId===null){
+        if (nId === undefined || nId === null) {
           return
         }
         for (let i = 0; i < this.maxeditor_boards.length; i++) {
@@ -285,7 +286,7 @@
         }
       },
       updateTitle(id, title) {
-        if (title===undefined||title===null){
+        if (title === undefined || title === null) {
           return
         }
         let temp = this.maxeditor_boards;
@@ -298,7 +299,7 @@
         }
       },
       updateLabel(id, label) {
-        if (label===undefined||label===null){
+        if (label === undefined || label === null) {
           console.log('请输入id');
           return
         }
@@ -312,7 +313,7 @@
         }
       },
       updateZ(id, zindex) {
-        if (zindex===undefined||zindex===null){
+        if (zindex === undefined || zindex === null) {
           console.log('请输入id');
           return
         }
@@ -418,7 +419,7 @@
       },
       changeFluidState(index) {
         //面板靠左贴边时才能切换为全屏
-        if (this.maxeditor_boards[index].x===0){
+        if (this.maxeditor_boards[index].x === 0) {
           let temp = this.maxeditor_boards;
           temp[index].isFluid = !temp[index].isFluid;
           if (temp[index].isFluid) {
@@ -490,11 +491,23 @@
 
       editInsertText(text) {
         document.execCommand('insertText', false, text)
+      },
+
+      //其他方法
+      //菜单栏滚动到顶部时固定
+      handleToolbarScroll() {
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        var offsetTop = document.getElementById('maxeditor-toolbar').offsetTop;
+        if (scrollTop > offsetTop) {
+          this.toolBarFixed = true
+        } else {
+          this.toolBarFixed = false
+        }
       }
 
     },
     mounted() {
-
+      window.addEventListener('scroll', this.handleToolbarScroll)
     },
     watch: {}
   }

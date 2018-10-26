@@ -1,5 +1,5 @@
 <template>
-  <div class="maxeditor-toolbar">
+  <div class="maxeditor-toolbar" id="maxeditor-toolbar">
     <a title="粗体" class="maxeditor-toolbar-item"
        @click="document.execCommand('bold', false, null)"><span
       class="maxeditor-icon maxeditor-icon-bold"></span></a>
