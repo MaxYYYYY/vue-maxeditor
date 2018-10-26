@@ -39,7 +39,7 @@
 
   export default {
     name: "app",
-    data() {
+    data() {  
       return {}
     },
     components: {
