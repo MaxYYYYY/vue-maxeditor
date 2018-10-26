@@ -16,6 +16,10 @@
   text-align: justify;
 }
 
+.maxeditor-inner-dropdown {
+  font-size: 16px;
+}
+
 .maxeditor-text-justify::after{
   content:"";
   display: inline-block;

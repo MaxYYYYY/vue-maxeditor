@@ -64,8 +64,8 @@
         let id = prompt('请输入id');
         this.$refs.maxeditor.addImgBox(id);
       },
-      setMode(){
-        this.$refs.maxeditor.setMode();
+      setMode(mode){
+        this.$refs.maxeditor.setMode(mode);
       },
       getBoards(){
         alert(this.$refs.maxeditor.getBoards());

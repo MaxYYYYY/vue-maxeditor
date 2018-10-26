@@ -65,7 +65,7 @@
     </button>
 
     <div class="maxeditor-float-r"
-         v-show="maxeditor_current_board.type==='normal'||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'">
+         v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox')">
       <button title="修改z-index"
               class="maxeditor-toolbar-button maxeditor-float-r  maxeditor-m-r-15"
               @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
@@ -176,7 +176,8 @@
     created() {
 
     },
-    watch: {}
+    watch: {
+    }
   }
 </script>
 

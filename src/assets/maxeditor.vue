@@ -36,7 +36,7 @@
             <div contenteditable="true" style="width: 100%;height: 100%"
                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                  :id="item.id+'_content'"
-                 :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                  @focus="onActivated(index)"
                  @click="onActivated(index)"
                  @keyup="onActivated(index)">
@@ -51,7 +51,7 @@
               <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                     :id="item.id+'_content'"
                     class="maxeditor-single-line"
-                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                    :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                     style="float: left;"
                     :style="{'width':item.width-70+'px'}"
                     @click="onActivated(index)"
@@ -59,7 +59,7 @@
           </template>
           <template v-if="item.type === 'imgBox'">
             <div style="width: 100%;height: 100%"
-                 :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox'">
               <div style="text-align: center">
@@ -484,7 +484,7 @@
       //光标处插入下拉框
       editInsertDatalist(id, values) {
         values = JSON.parse(values);
-        let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" />';
+        let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" class="maxeditor-inner-dropdown" />';
         let option = '';
         for (let i = 0; i < values.length; i++) {
           option += '<option value="' + values[i].value + '">'
@@ -531,7 +531,24 @@
     mounted() {
       window.addEventListener('scroll', this.handleToolbarScroll)
     },
-    watch: {}
+    watch: {
+      maxeditor_mode(n, o){
+        console.log(n+':'+o)
+        if (n==='readonly'){
+          console.log('true')
+          let list = document.getElementsByClassName('maxeditor-inner-dropdown');
+          for(let i=0;i<list.length;i++){
+            list[i].setAttribute('readonly','true')
+          }
+        }else {
+          console.log('false')
+          let list = document.getElementsByClassName('maxeditor-inner-dropdown');
+          for(let i=0;i<list.length;i++){
+            list[i].removeAttribute('readonly')
+          }
+        }
+      }
+    }
   }
 </script>
 
