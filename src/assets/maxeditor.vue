@@ -12,7 +12,7 @@
           :id="item.id"
           :key="item.id"
           :is="item.component"
-          :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[25,25]"
+          :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
           :parent="true"
           :class="{'maxeditor-board-fluid':item.isFluid}"
           :x="item.x===undefined||item.x===null?0:item.x"
@@ -36,7 +36,8 @@
             <div contenteditable="true" style="width: 100%;height: 100%"
                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                  :id="item.id+'_content'"
-                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
+                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly',
+                          'maxeditor-single-line':item.isSingleLine}"
                  @focus="onActivated(index)"
                  @click="onActivated(index)"
                  @keyup="onActivated(index)">
@@ -87,11 +88,17 @@
                   title="上移一层"></span>
             <span class="maxeditor-icon maxeditor-icon-downzindex" @click="downZindex(index)"
                   title="下移一层"></span>
-            <span class="maxeditor-icon" @click="changeFluidState(index)" v-if="item.type!=='hr'&&item.type!=='label'"
+            <span class="maxeditor-icon" @click="changeSingeLineState(index)"
+                  v-if="item.type==='normal'"
+                  :class="{'maxeditor-icon-checklist':item.isSingleLine,
+                           'maxeditor-icon-uncheck':!item.isSingleLine}"
+                  title="单行文本"><span style="font-size: inherit;">单行</span></span>
+            <span class="maxeditor-icon" @click="changeFluidState(index)"
+                  v-if="item.type!=='hr'&&item.type!=='label'"
                   :class="{'maxeditor-icon-checklist':item.isFluid,'maxeditor-icon-uncheck':!item.isFluid}"
-                  title="宽度占满"><span style="font-size: 20px;">宽度占满</span></span>
-            <span class="maxeditor-icon" style="font-size: 20px;">id:{{item.id}}</span>
-            <span class="maxeditor-icon" style="font-size: 20px;">z-index:{{item.z}}</span>
+                  title="宽度占满"><span style="font-size: inherit;">宽度占满</span></span>
+            <span class="maxeditor-icon">id:{{item.id}}</span>
+            <span class="maxeditor-icon">z-index:{{item.z}}</span>
           </div>
         </maxeditor-board>
       </div>
@@ -193,6 +200,7 @@
           id: option.id,
           type: option.type,
           isFluid: option.isFluid,
+          isSingleLine: option.isSingleLine !== null && option.isSingleLine !== undefined ? option.isSingleLine : false,
           title: option.title !== null && option.title !== undefined ? option.title : null,
           label: option.label !== null && option.label !== undefined ? option.label : null,
           x: option.x !== null && option.x !== undefined ? option.x : 0,
@@ -433,6 +441,11 @@
           }
         }
       },
+      changeSingeLineState(index) {
+        let temp = this.maxeditor_boards;
+        temp[index].isSingleLine = !temp[index].isSingleLine;
+        this.$set(this.maxeditor_boards, temp);
+      },
 
       getCurrentBoardContent() {
         let index = this.maxeditor_current_index;
@@ -533,15 +546,12 @@
     },
     watch: {
       maxeditor_mode(n, o){
-        console.log(n+':'+o)
         if (n==='readonly'){
-          console.log('true')
           let list = document.getElementsByClassName('maxeditor-inner-dropdown');
           for(let i=0;i<list.length;i++){
             list[i].setAttribute('readonly','true')
           }
         }else {
-          console.log('false')
           let list = document.getElementsByClassName('maxeditor-inner-dropdown');
           for(let i=0;i<list.length;i++){
             list[i].removeAttribute('readonly')

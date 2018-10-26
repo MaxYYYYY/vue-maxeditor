@@ -9,10 +9,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
 }
 
 .maxeditor-text-justify {
-  display:inline-block;
+  display: inline-block;
   text-align: justify;
 }
 
@@ -20,12 +22,12 @@
   font-size: 16px;
 }
 
-.maxeditor-text-justify::after{
-  content:"";
+.maxeditor-text-justify::after {
+  content: "";
   display: inline-block;
-  width:100%;
-  overflow:hidden;
-  height:0;
+  width: 100%;
+  overflow: hidden;
+  height: 0;
 }
 
 .maxeditor-body {
@@ -46,6 +48,10 @@
   height: 100%;
 }
 
+.maxeditor-board {
+  background-color: white;
+}
+
 .maxeditor-board-titile {
   line-height: 30px;
   font-size: 25px;
@@ -55,7 +61,6 @@
 }
 
 .maxeditor-board-toolbar {
-  padding: 10px;
   min-width: 280px;
   display: none;
 }
@@ -67,10 +72,10 @@
 
 .maxeditor-board-toolbar span {
   cursor: pointer;
-  font-size: 20px;
+  font-size: 12px;
   text-align: center;
-  margin-right: 8px;
-  height: 20px;
+  margin-left: 8px;
+  height: 12px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
