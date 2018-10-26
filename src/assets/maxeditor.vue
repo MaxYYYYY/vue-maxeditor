@@ -72,7 +72,7 @@
             </div>
           </template>
           <template v-if="item.type === 'hr'">
-            <div style="height: 20px;width: 100%;padding-top: 20px" @click="onActivated(index)">
+            <div style="height: 20px;width: 100%" @click="onActivated(index)">
               <hr/>
             </div>
           </template>
@@ -197,7 +197,7 @@
         }
         this.maxeditor_boards.push({
           component: 'maxeditor-board',
-          id: option.id,
+          id: option.id !== null && option.id !== undefined ? option.id : 'maxeditor_default_id_'+this.maxeditor_boards.length+'',
           type: option.type,
           isFluid: option.isFluid,
           isSingleLine: option.isSingleLine !== null && option.isSingleLine !== undefined ? option.isSingleLine : false,
@@ -459,6 +459,9 @@
       },
       getCurrentBoardId() {
         return this.maxeditor_current_id;
+      },
+      getCurrentBoardType() {
+        return this.maxeditor_boards[this.maxeditor_current_index].type;
       },
       getBoardContentText(id) {
         for (let i = 0; i < this.maxeditor_boards.length; i++) {

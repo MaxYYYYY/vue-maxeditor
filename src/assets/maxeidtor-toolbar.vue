@@ -84,6 +84,9 @@
               class="maxeditor-toolbar-button maxeditor-float-r"
               @click="updateId">修改id:{{maxeditor_current_board.id}}
       </button>
+      <button title="面板类型"
+              class="maxeditor-toolbar-button maxeditor-float-r">{{maxeditor_current_board.type}}
+      </button>
     </div>
   </div>
 </template>

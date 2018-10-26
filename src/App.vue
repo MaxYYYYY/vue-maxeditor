@@ -9,7 +9,7 @@
     <button @click="setBoards">setBoards</button>
     <button @click="insertImg">insertImg</button>
     <br/>
-    <button @click="getCurrentBoardContent">getCurrentBoardContent</button>
+
     <button @click="getBoardContent">getBoardContent</button>
     <button @click="getBoardContentText">getBoardContentText</button>
     <button @click="setBoardContent">setBoardContent</button>
@@ -80,7 +80,13 @@
         this.$refs.maxeditor.insertImg(id, imgs);
       },
       getCurrentBoardContent(){
-        this.$refs.maxeditor.getCurrentBoardContent();
+        alert(this.$refs.maxeditor.getCurrentBoardContent())
+      },
+      getCurrentBoardId(){
+        alert(this.$refs.maxeditor.getCurrentBoardId());
+      },
+      getCurrentBoardType(){
+        alert(this.$refs.maxeditor.getCurrentBoardType());
       },
       getBoardContent(){
         let id = prompt('请输入id');
