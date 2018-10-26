@@ -78,7 +78,7 @@
       <button title="修改label"
               class="maxeditor-toolbar-button maxeditor-float-r"
               v-if="maxeditor_current_board.type==='label'"
-              @click="updateLabel">修改title:{{maxeditor_current_board.label}}
+              @click="updateLabel">修改label:{{maxeditor_current_board.label}}
       </button>
       <button title="修改id"
               class="maxeditor-toolbar-button maxeditor-float-r"

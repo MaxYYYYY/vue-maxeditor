@@ -5,10 +5,23 @@
   font-style: normal;
 }
 
-.maxeditor-sigleline {
+.maxeditor-single-line {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.maxeditor-text-justify {
+  display:inline-block;
+  text-align: justify;
+}
+
+.maxeditor-text-justify::after{
+  content:"";
+  display: inline-block;
+  width:100%;
+  overflow:hidden;
+  height:0;
 }
 
 .maxeditor-body {

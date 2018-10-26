@@ -42,19 +42,19 @@
                  @keyup="onActivated(index)">
             </div>
           </template>
-          <template v-if="item.type === 'hr'">
-            <div style="height: 20px;width: 100%;padding-top: 20px" @click="onActivated(index)">
-              <hr/>
-            </div>
-          </template>
           <template v-if="item.type === 'label'">
-            <p style="margin:0"><span class="maxeditor-sigleline"
-                                      style="width: 70px;display: inline-block;margin-left: -75px;">{{item.label}}</span>
+            <p><span style="float: left;width: 65px;"
+                     :class="{'maxeditor-single-line':getCharacterNum(item.label)>3,
+                              'maxeditor-text-justify':getCharacterNum(item.label)<4}">{{item.label}}
+              </span>
               <span style="float: left;">:</span>
-              <span v-bind:contenteditable="maxeditor_mode!=='readonly'"
-                    class="maxeditor-sigleline"
+              <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
+                    :id="item.id+'_content'"
+                    class="maxeditor-single-line"
                     :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                    style="width: 100%;display: inline-block;margin-right: -10px" @click="onActivated(index)"
+                    style="float: left;"
+                    :style="{'width':item.width-70+'px'}"
+                    @click="onActivated(index)"
                     @keyup="onActivated(index)"></span></p>
           </template>
           <template v-if="item.type === 'imgBox'">
@@ -68,6 +68,11 @@
                        :style="{'width':item.imgs.length===1?'100%':'160px','margin':item.imgs.length===1?'0':'4px'}"/>
                 </template>
               </div>
+            </div>
+          </template>
+          <template v-if="item.type === 'hr'">
+            <div style="height: 20px;width: 100%;padding-top: 20px" @click="onActivated(index)">
+              <hr/>
             </div>
           </template>
           <template v-if="item.type === ''">
@@ -503,6 +508,23 @@
         } else {
           this.toolBarFixed = false
         }
+      },
+      //计算文本中汉字个数
+      getCharacterNum(text) {
+        if (text === undefined || text === null) {
+          console.log(text)
+          return 0;
+        }
+        let num = text.match(/[\u4E00-\u9FA5]/g);
+        if (num === undefined || num === null) {
+          //字母和数字两个算一个
+          let tnum = text.match(/[^a-zA-Z0-9\u4e00-\u9fa5]/g);
+          if (tnum !== undefined && tnum !== null) {
+            return tnum/2;
+          }
+          return 0;
+        }
+        return text.match(/[\u4E00-\u9FA5]/g).length;
       }
 
     },
