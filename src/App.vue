@@ -23,6 +23,9 @@
     <button @click="activeBoard">activeBoard</button>
     <button @click="deactiveBoard">deactiveBoard</button>
 
+    <button @click="getBoard">getBoard</button>
+
+
     <MaxEditor ref="maxeditor"></MaxEditor>
 
 
@@ -109,6 +112,15 @@
       deactiveBoard(){
         let id = prompt('请输入id');
         this.$refs.maxeditor.deactiveBoard(id);
+      },
+      getBoard(){
+        let id = prompt('请输入id');
+        console.log(this.$refs.maxeditor.getBoard(id));
+      },
+      setBoard(){
+        let boardObjectStr = prompt('boardObjectStr');
+        //let boardObject = JSON.parse(boardObjectStr);
+        console.log(this.$refs.maxeditor.setBoard(boardObjectStr));
       },
 
 

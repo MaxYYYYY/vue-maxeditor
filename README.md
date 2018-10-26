@@ -155,4 +155,25 @@ this.$refs.maxeditor.addSection(id)
 ### deactiveBoard(id)
 释放面板焦点
 
+### getBoard(id)
+更具id获取面板对象，返回值示例如下
+```
+{
+  component: "maxeditor-board",
+  content: "春眠不觉晓<div>处处闻啼鸟</div>",
+  height: 48,
+  id: "dd",
+  imgs: null,
+  isFluid: false,
+  isSingleLine: false,
+  label: null,
+  title: null,
+  type: "normal",
+  width: 200,
+  x: 168,
+  y: 224,
+  z: 999,
+}
+```
+
 

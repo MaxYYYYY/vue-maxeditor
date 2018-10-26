@@ -447,6 +447,24 @@
         this.$set(this.maxeditor_boards, temp);
       },
 
+      getBoard(id){
+        if (id === undefined || id === null) {
+          return
+        }
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            return temp[i];
+          }
+        }
+      },
+      setBoard(boardObject){
+        let temp = this.maxeditor_boards;
+        boardObject.id = boardObject.id + "_copy" + this.maxeditor_boards.length;
+        temp.push(boardObject);
+        this.$set(this.maxeditor_boards, temp)
+      },
+
       getCurrentBoardContent() {
         let index = this.maxeditor_current_index;
         let id = this.maxeditor_current_id;
