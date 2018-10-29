@@ -9,6 +9,7 @@
         <maxeditor-board
           class="maxeditor-board"
           v-for="(item, index) in maxeditor_boards"
+          :style="{'z-index':index === maxeditor_current_index?'200':''}"
           :id="item.id"
           :key="item.id"
           :is="item.component"
@@ -81,7 +82,6 @@
           </template>
           <div class="maxeditor-board-toolbar"
                v-if="maxeditor_mode==='design'"
-               style="z-index: 200;"
                :style="{'margin-left':item.type==='hr'?'325px':''}"
                :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
             <span class="maxeditor-icon-move"></span>
