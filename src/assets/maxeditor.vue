@@ -56,15 +56,13 @@
                     :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                     style="float: left;display: inline-block"
                     :style="{'width':item.width-70+'px'}"
-                    @focus="maxeditor_current_dropdown = item.id"
-                    @blur="maxeditor_current_dropdown = undefined"
-                    @click="onActivated(index)"
+                    @click="onActivated(index);maxeditor_current_dropdown = item.id"
                     @keyup="onActivated(index)"></span>
             </p>
-            <div class="maxeditor-dropdown" v-show="maxeditor_current_id=== item.id">
+            <div class="maxeditor-dropdown" v-show="maxeditor_current_dropdown===item.id">
               <template v-if="isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist">
-                  <p @click="setDropDownValue(item.id,t.value)">{{t.value}}</p>
+                  <p @click="setDropDownValue(item.id,t.value);maxeditor_current_dropdown = undefined">{{t.value}}</p>
                 </template>
               </template>
 
@@ -241,7 +239,7 @@
           z: option.z,
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
-          datalist: this.isExited(option.datalist)?option.datalist:null,//下拉数组
+          datalist: this.isExited(option.datalist) ? option.datalist : null,//下拉数组
           imgs: null,//图片数组
         });
         this.onActivated(this.maxeditor_boards.length - 1)
