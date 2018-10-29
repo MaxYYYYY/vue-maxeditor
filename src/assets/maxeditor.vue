@@ -81,6 +81,7 @@
           </template>
           <div class="maxeditor-board-toolbar"
                v-if="maxeditor_mode==='design'"
+               style="z-index: 200;"
                :style="{'margin-left':item.type==='hr'?'325px':''}"
                :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
             <span class="maxeditor-icon-move"></span>
@@ -134,14 +135,14 @@
     methods: {
       //全局方法
       addSection(id) {
-        this.addBoard({id: id, type: 'normal', isFluid: true, z: 999})
+        this.addBoard({id: id, type: 'normal', isFluid: true, z: 100})
       },
       addSectionWithTitle(id, title) {
         if (title === undefined || title === null) {
           alert('请输入标题');
           return
         }
-        this.addBoard({id: id, title: title, type: 'normal', isFluid: true, z: 999})
+        this.addBoard({id: id, title: title, type: 'normal', isFluid: true, z: 100})
       },
       addTextWithLabel(id, label) {
         if (label === undefined || label === null) {
@@ -156,14 +157,14 @@
           width: 100,
           height: 25,
           x: 75,
-          z: 1025
+          z: 101
         })
       },
       addHr() {
-        this.addBoard({type: 'hr', isFluid: true, z: 1050})
+        this.addBoard({type: 'hr', isFluid: true, z: 101})
       },
       addImgBox(id) {
-        this.addBoard({id: id, type: 'imgBox', isFluid: false, z: 999})
+        this.addBoard({id: id, type: 'imgBox', isFluid: false, z: 101})
       },
       insertImg(id, imgs) {
         let temp = this.maxeditor_boards;
