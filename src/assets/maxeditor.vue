@@ -59,7 +59,7 @@
                     @click="onActivated(index);maxeditor_current_dropdown = item.id"
                     @keyup="onActivated(index)"></span>
             </p>
-            <div class="maxeditor-dropdown" v-show="maxeditor_current_dropdown===item.id">
+            <div class="maxeditor-dropdown" v-show="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')">
               <template v-if="isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist">
                   <p @click="setDropDownValue(item.id,t.value);maxeditor_current_dropdown = undefined">{{t.value}}</p>
