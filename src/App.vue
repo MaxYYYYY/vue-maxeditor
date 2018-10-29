@@ -8,6 +8,7 @@
     <button @click="getBoards">getBoards</button>
     <button @click="setBoards">setBoards</button>
     <button @click="insertImg">insertImg</button>
+    <button @click="insertQRCode">insertQRCode</button>
     <br/>
 
     <button @click="getBoardContent">getBoardContent</button>
@@ -26,6 +27,7 @@
     <button @click="getBoard">getBoard</button>
 
 
+
     <MaxEditor ref="maxeditor"></MaxEditor>
 
 
@@ -39,7 +41,7 @@
 
   export default {
     name: "app",
-    data() {  
+    data() {
       return {}
     },
     components: {
@@ -121,6 +123,11 @@
         let boardObjectStr = prompt('boardObjectStr');
         //let boardObject = JSON.parse(boardObjectStr);
         console.log(this.$refs.maxeditor.setBoard(boardObjectStr));
+      },
+      insertQRCode(){
+        let id = prompt('请输入id');
+        let url = prompt('请输入url');
+        this.$refs.maxeditor.insertQRCode(id, url)
       },
 
 

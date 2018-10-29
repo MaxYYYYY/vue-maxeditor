@@ -63,12 +63,13 @@
                  :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox'">
-              <div style="text-align: center">
+              <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
                 <template v-for="img in item.imgs">
                   <img :src="img.src"
                        :style="{'width':item.imgs.length===1?'100%':'160px','margin':item.imgs.length===1?'0':'4px'}"/>
                 </template>
               </div>
+              <div :id="item.id+'_imgBox_qrCode'" v-if="item.imgs===null||item.imgs===undefined"></div>
             </div>
           </template>
           <template v-if="item.type === 'hr'">
@@ -110,6 +111,7 @@
 <script>
   import VueDraggableResizable from 'vue-draggable-resizable';
   import MaxEditorToolbar from './maxeidtor-toolbar.vue'
+  import QRCode from './lib/qrcodejs2'
 
   export default {
     name: "maxeditor",
@@ -176,6 +178,11 @@
         console.log(temp);
         this.$set(this.maxeditor_boards, temp);
       },
+      insertQRCode(id, url) {
+        let dom = document.getElementById(id + '_imgBox_qrCode');
+        dom.innerHTML = '';
+        new QRCode(document.getElementById(id + '_imgBox_qrCode'), url);
+      },
       addBoard(option) {
         if (this.maxeditor_mode !== 'design') {
           alert('当前模式不可插入板块');
@@ -197,7 +204,7 @@
         }
         this.maxeditor_boards.push({
           component: 'maxeditor-board',
-          id: option.id !== null && option.id !== undefined ? option.id : 'maxeditor_default_id_'+this.maxeditor_boards.length+'',
+          id: option.id !== null && option.id !== undefined ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
           type: option.type,
           isFluid: option.isFluid,
           isSingleLine: option.isSingleLine !== null && option.isSingleLine !== undefined ? option.isSingleLine : false,
@@ -207,12 +214,21 @@
           z: option.z,
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
-          imgs: null,
+          imgs: null,//图片数组
         });
         this.onActivated(this.maxeditor_boards.length - 1)
       },
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
+      },
+      getIndexById(id) {
+        for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === id) {
+            return i;
+          }
+        }
+        console.log('未找到id:' + id);
+        return -1;
       },
       print() {
         /* //原html代码取出
@@ -447,7 +463,7 @@
         this.$set(this.maxeditor_boards, temp);
       },
 
-      getBoard(id){
+      getBoard(id) {
         if (id === undefined || id === null) {
           return
         }
@@ -458,7 +474,7 @@
           }
         }
       },
-      setBoard(boardObject){
+      setBoard(boardObject) {
         let temp = this.maxeditor_boards;
         boardObject.id = boardObject.id + "_copy" + this.maxeditor_boards.length;
         temp.push(boardObject);
@@ -554,7 +570,7 @@
           //字母和数字两个算一个
           let tnum = text.match(/[^a-zA-Z0-9\u4e00-\u9fa5]/g);
           if (tnum !== undefined && tnum !== null) {
-            return tnum/2;
+            return tnum / 2;
           }
           return 0;
         }
@@ -566,15 +582,15 @@
       window.addEventListener('scroll', this.handleToolbarScroll)
     },
     watch: {
-      maxeditor_mode(n, o){
-        if (n==='readonly'){
+      maxeditor_mode(n, o) {
+        if (n === 'readonly') {
           let list = document.getElementsByClassName('maxeditor-inner-dropdown');
-          for(let i=0;i<list.length;i++){
-            list[i].setAttribute('readonly','true')
+          for (let i = 0; i < list.length; i++) {
+            list[i].setAttribute('readonly', 'true')
           }
-        }else {
+        } else {
           let list = document.getElementsByClassName('maxeditor-inner-dropdown');
-          for(let i=0;i<list.length;i++){
+          for (let i = 0; i < list.length; i++) {
             list[i].removeAttribute('readonly')
           }
         }
