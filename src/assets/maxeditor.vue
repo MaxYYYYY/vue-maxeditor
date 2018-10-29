@@ -138,26 +138,17 @@
         this.addBoard({id: id, type: 'normal', isFluid: true, z: 100})
       },
       addSectionWithTitle(id, title) {
-        if (title === undefined || title === null) {
-          alert('请输入标题');
-          return
+        if (title === undefined || title === null || title === '') {
+          throw new Error('MaxEditor:插入带标题文本框时未得到标题');
         }
         this.addBoard({id: id, title: title, type: 'normal', isFluid: true, z: 100})
       },
       addTextWithLabel(id, label) {
-        if (label === undefined || label === null) {
-          alert('请输入标签');
-          return
+        if (label === undefined || label === null || label === '') {
+          throw new Error('MaxEditor:插入带标签文本时未得到标签');
         }
         this.addBoard({
-          id: id,
-          label: label,
-          type: 'label',
-          isFluid: false,
-          width: 100,
-          height: 25,
-          x: 75,
-          z: 101
+          id: id, label: label, type: 'label', isFluid: false, width: 100, height: 25, x: 75, z: 101
         })
       },
       addHr() {
@@ -168,41 +159,43 @@
       },
       insertImg(id, imgs) {
         let temp = this.maxeditor_boards;
-        let imgdata = JSON.parse(imgs);
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].imgs = imgdata;
-            console.log('find it');
-            break;
-          }
+        let imgdata;
+        if (typeof imgs === 'object') {
+          imgdata = imgs;
+        } else {
+          imgdata = JSON.parse(imgs);
         }
-        console.log(temp);
+        this.checkId(id, function (index) {
+          temp[index].imgs = imgdata;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
+        });
         this.$set(this.maxeditor_boards, temp);
       },
       insertQRCode(id, url) {
-        let dom = document.getElementById(id + '_imgBox_qrCode');
-        dom.innerHTML = '';
-        new QRCode(document.getElementById(id + '_imgBox_qrCode'), url);
+        this.checkId(id, function () {
+          let dom = document.getElementById(id + '_imgBox_qrCode');
+          dom.innerHTML = '';
+          new QRCode(dom, url);
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
+        });
       },
       addBoard(option) {
         if (this.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
-          return
+          throw new Error('MaxEditor:当前模式不可插入板块');
         }
         if (option.id === '' || option.id === null || option.id === undefined) {
           if (option.type === 'hr') {
             option.id = 'maxeditor-board-hr-' + this.maxeditor_boards.length
           } else {
-            alert('请输入id');
-            return
+            throw new Error('MaxEditor:缺少id,无法插入板块');
           }
         }
-        for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === option.id) {
-            alert('id已存在');
-            return
-          }
-        }
+        this.checkId(option.id, function () {
+          throw new Error('MaxEditor:id已存在,无法插入板块');
+        }, function () {
+        });
         this.maxeditor_boards.push({
           component: 'maxeditor-board',
           id: option.id !== null && option.id !== undefined ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
@@ -222,14 +215,52 @@
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
-      getIndexById(id) {
-        for (let i = 0; i < this.maxeditor_boards.length; i++) {
+      getBoards() {
+        return JSON.stringify(this.maxeditor_boards)
+      },
+      setBoards(boards) {
+        /*if (typeof boards !== "object") {
+          this.maxeditor_boards = JSON.parse(boards);
+        }*/
+        this.maxeditor_boards = JSON.parse(boards);
+
+        this.$nextTick(function () {
+          this.maxeditor_boards.forEach(function (item, index) {
+            if (item.content !== undefined) {
+              document.getElementById(item.id + '_content').innerHTML = item.content
+            }
+          });
+        })
+      },
+      setMode(mode) {
+        this.maxeditor_mode = mode
+      },
+      getMode() {
+        return this.maxeditor_mode
+      },
+      activeBoard(id) {
+        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
           if (this.maxeditor_boards[i].id === id) {
-            return i;
+            if (this.maxeditor_current_id === id) {
+              console.log(id + ' is already activated.');
+            } else {
+              this.onActivated(i)
+            }
           }
-        }
-        console.log('未找到id:' + id);
-        return -1;
+        }*/
+        document.getElementById(id + '_content').focus();
+      },
+      deactiveBoard(id) {
+        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === id) {
+            if (this.maxeditor_current_id === id) {
+              this.onDeactivated(i);
+            } else {
+              console.log(id + ' is not active already.');
+            }
+          }
+        }*/
+        document.getElementById(id + '_content').blur();
       },
       print() {
         /* //原html代码取出
@@ -282,104 +313,6 @@
       },
 
       //面板方法
-      /*updateBoard(id, option) {
-        console.log(option);
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            for (let key in option) {
-              temp[i].key = option[key];
-            }
-
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
-      },*/
-      updateId(oId, nId) {
-        if (nId === undefined || nId === null) {
-          return
-        }
-        for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === nId) {
-            console.log('id已存在');
-            return
-          }
-        }
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === oId) {
-            temp[i].id = nId;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
-      },
-      updateTitle(id, title) {
-        if (title === undefined || title === null) {
-          return
-        }
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].title = title;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
-      },
-      updateLabel(id, label) {
-        if (label === undefined || label === null) {
-          console.log('请输入id');
-          return
-        }
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].label = label;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
-      },
-      updateZ(id, zindex) {
-        if (zindex === undefined || zindex === null) {
-          console.log('请输入id');
-          return
-        }
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].z = zindex;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
-      },
-      setMode(mode) {
-        this.maxeditor_mode = mode
-      },
-      getMode() {
-        return this.maxeditor_mode
-      },
-      getBoards() {
-        return JSON.stringify(this.maxeditor_boards)
-      },
-      setBoards(boards) {
-        /*if (typeof boards !== "object") {
-          this.maxeditor_boards = JSON.parse(boards);
-        }*/
-        this.maxeditor_boards = JSON.parse(boards);
-
-        this.$nextTick(function () {
-          this.maxeditor_boards.forEach(function (item, index) {
-            if (item.content !== undefined) {
-              document.getElementById(item.id + '_content').innerHTML = item.content
-            }
-          });
-        })
-      },
-
       onResize(x, y, width, height) {
         try {
           this.maxeditor_boards[this.maxeditor_current_index].x = x;
@@ -416,31 +349,6 @@
         this.maxeditor_current_id = '';
         this.maxeditor_current_index = undefined;
       },
-      //改变面板状态
-      activeBoard(id) {
-        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            if (this.maxeditor_current_id === id) {
-              console.log(id + ' is already activated.');
-            } else {
-              this.onActivated(i)
-            }
-          }
-        }*/
-        document.getElementById(id + '_content').focus();
-      },
-      deactiveBoard(id) {
-        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            if (this.maxeditor_current_id === id) {
-              this.onDeactivated(i);
-            } else {
-              console.log(id + ' is not active already.');
-            }
-          }
-        }*/
-        document.getElementById(id + '_content').blur();
-      },
       upZindex(index) {
         this.maxeditor_boards[index].z += 1;
       },
@@ -463,17 +371,77 @@
         temp[index].isSingleLine = !temp[index].isSingleLine;
         this.$set(this.maxeditor_boards, temp);
       },
-
-      getBoard(id) {
-        if (id === undefined || id === null) {
+      updateId(oId, nId) {
+        if (oId === nId) {
+          return
+        }
+        this.checkId(oId, function () {
+        }, function () {
+          throw new Error('MaxEditor:' + oId + '不存在，无法更新id');
+        });
+        this.checkId(nId, function () {
+          throw new Error('MaxEditor:' + nId + '已存在，无法更新id');
+        }, function () {
+        });
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === oId) {
+            temp[i].id = nId;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateTitle(id, title) {
+        if (!this.isExited(title)) {
+          throw new Error('MaxEditor:未传入标题，无法更新');
+        };
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function () {
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法更新标题');
+        });
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            temp[i].title = title;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateLabel(id, label) {
+        let temp = this.maxeditor_boards;
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].id === id) {
+            temp[i].label = label;
+            this.$set(this.maxeditor_boards, temp);
+            break;
+          }
+        }
+      },
+      updateZ(id, zindex) {
+        if (zindex === undefined || zindex === null) {
+          console.log('请输入id');
           return
         }
         let temp = this.maxeditor_boards;
         for (let i = 0; i < temp.length; i++) {
           if (temp[i].id === id) {
-            return temp[i];
+            temp[i].z = zindex;
+            this.$set(this.maxeditor_boards, temp);
+            break;
           }
         }
+      },
+      getBoard(id) {
+        let temp = this.maxeditor_boards;
+        let index = undefined;
+        this.checkId(id, function (i) {
+          index = i;
+        },function () {
+          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板信息');
+        });
+        return temp[index];
       },
       setBoard(boardObject) {
         let temp = this.maxeditor_boards;
@@ -481,75 +449,80 @@
         temp.push(boardObject);
         this.$set(this.maxeditor_boards, temp)
       },
-
       getCurrentBoardContent() {
         let index = this.maxeditor_current_index;
         let id = this.maxeditor_current_id;
         if (id === null || id === undefined || index === null || index === undefined) {
-          alert('没有正在编辑的面板');
-          return
+          console.log('MaxEditor:没有正在编辑的面板');
+          return null;
         }
         //alert(document.getElementById(this.maxeditor_current_id + "_content").innerHTML)
         return this.maxeditor_boards[this.maxeditor_current_index].content
       },
       getCurrentBoardId() {
+        if(!this.isExited(this.maxeditor_current_id)){
+          console.log('MaxEditor:没有正在编辑的面板')
+          return null
+        }
         return this.maxeditor_current_id;
       },
       getCurrentBoardType() {
         return this.maxeditor_boards[this.maxeditor_current_index].type;
       },
       getBoardContentText(id) {
-        for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            return document.getElementById(id + '_content').innerText;
-          }
-        }
-        alert('id不存在')
+        this.checkId(id, function (i) {
+        }, function () {
+          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板文本内容');
+        });
+        return document.getElementById(id + '_content').innerText;
       },
       getBoardContent(id) {
-        for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            return this.maxeditor_boards[i].content;
-          }
-        }
-        alert('id不存在')
+        let temp = undefined;
+        this.checkId(id,function (i) {
+          temp = i;
+        },function () {
+          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板内容');
+        });
+        return this.maxeditor_boards[temp].content;
       },
       setBoardContent(id, content) {
         let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].content = content;
-            this.$set(this.maxeditor_boards, temp);
-            this.$nextTick(function () {
-              document.getElementById(id + '_content').innerHTML = this.maxeditor_boards[i].content
-            });
-            return
-          }
-        }
-        alert('id不存在')
+        this.checkId(id,function (i) {
+          temp[i].content = content;
+        },function () {
+          throw new Error('MaxEditor:id'+id+'不存在，无法设置面板内容');
+        });
+        this.$set(this.maxeditor_boards, temp);
+        this.$nextTick(function () {
+          document.getElementById(id + '_content').innerHTML = this.maxeditor_boards[i].content
+        });
       },
 
-
-      //编辑文本方法
-
+      //文本编辑方法
       //光标处插入下拉框
       editInsertDatalist(id, values) {
-        values = JSON.parse(values);
+        if (!this.isExited(values)){
+          throw new Error('MaxEditor:未传入选项值，无法插入下拉框');
+        }
+        if(typeof values !== 'object'){
+          values = JSON.parse(values);
+        }
         let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" class="maxeditor-inner-dropdown" />';
         let option = '';
         for (let i = 0; i < values.length; i++) {
           option += '<option value="' + values[i].value + '">'
         }
         let datalist = '<datalist id="' + id + 'list">' + option + "</datalist>";
-
         document.execCommand('insertHtml', false, input + datalist);
       },
-
       editInsertText(text) {
+        if (!this.isExited(text)){
+          throw new Error('MaxEditor:未传入文本，无法插入');
+        }
         document.execCommand('insertText', false, text)
       },
 
-      //其他方法
+      //工具
       //菜单栏滚动到顶部时固定
       handleToolbarScroll() {
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
@@ -576,7 +549,29 @@
           return 0;
         }
         return text.match(/[\u4E00-\u9FA5]/g).length;
-      }
+      },
+      //存在性检验
+      isExited(sth) {
+        if (undefined === sth || null === sth || '' === sth) {
+          return false;
+        } else {
+
+        }
+        return true
+      },
+      //id查询
+      checkId(id, cb1, cb2) {
+        if (!this.isExited(id)){
+          throw new Error('MaxEditor:未传入id');
+        }
+        for (let i = 0; i < this.maxeditor_boards.length; i++) {
+          if (this.maxeditor_boards[i].id === id) {
+            cb1(i);//id存在回调函数
+            return;
+          }
+        }
+        cb2();//id不存在回调函数
+      },
 
     },
     mounted() {

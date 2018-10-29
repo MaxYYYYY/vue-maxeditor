@@ -56,30 +56,26 @@ export default {
 </script>
 ```
 
-### addSection(id)
+## 方法
+
+
+
+#### addSection(id)
 插入多行文本面板，需要传入id
 
-示例：
-```js
-this.$refs.maxeditor.addSection(id)
-```
-
-### addSection(id)
-插入多行文本面板，需要传入id
-
-### addSectionWithTitle(id, title)
+#### addSectionWithTitle(id, title)
 插入带标题多行文本面板
 
-### addTextWithLabel(id, label) 
+#### addTextWithLabel(id, label) 
 插入带标签输入框
 
-### addHr() 
+#### addHr() 
 插入分隔线
 
-### addImgBox(id)
+#### addImgBox(id)
 插入图片容器
 
-### insertImg(id,imgs)
+#### insertImg(id,imgs)
 
 向图片容器中插入图片，imgs为json数组
 
@@ -92,13 +88,11 @@ this.$refs.maxeditor.addSection(id)
 插入单张图片时也需要传入数组，此时图片宽度占满图片容器
 图片数量大于1时宽度为固定值160px
 
-### setMode(mode)
-设置编辑器模式，可选值为'design'、'edit'、 'readonly'
+#### insertQrCode(id, url)
 
-### getMode()
-获取当前模式, 返回值为'design'||'edit'|| 'readonly'
+向图片容器中插入二维码
 
-### getBoards()
+#### getBoards()
 获取面板列表，返回值为json数组，示例如下
 
 ```json
@@ -107,28 +101,41 @@ this.$refs.maxeditor.addSection(id)
 {"component":"maxeditor-board","id":"4","type":"label","isFluid":false,"title":null,"label":"4","x":475,"z":1025,"width":100,"height":25,"y":75,"w":100,"h":50}]
 ```
 
-### setBoards(boards)
+#### setBoards(boards)
 设置面板列表，boards为json数组(对象以及字符串皆可)，结构如上
 
-### getCurrentBoardContent()
+#### setMode(mode)
+设置编辑器模式，可选值为'design'、'edit'、 'readonly'
+
+#### getMode()
+获取当前模式, 返回值为'design'||'edit'|| 'readonly'
+
+#### activeBoard(id)
+根据id激活面板
+
+#### deactiveBoard(id)
+释放面板焦点
+
+
+#### getCurrentBoardContent()
 获取当前编辑面板内容，返回值为html代码
 
-### getCurrentBoardId()
+#### getCurrentBoardId()
 获取当前编辑面板id
 
-### getBoardContent(id)
+#### getBoardContent(id)
 根据id获取面板内容，返回值为html代码
 
-### getBoardContentText(id)
+#### getBoardContentText(id)
 根据id获取面板内容，innerText
 
-### setBoardContent(id, content)
+#### setBoardContent(id, content)
 设置面版内容，content可为html代码或文本内容
 
-### editInsertText(text)
+#### editInsertText(text)
 在光标处插入文本
 
-### editInsertDatalist(id, values)
+#### editInsertDatalist(id, values)
 在光标处插入下拉框，values为选项json数组，示例如下
 
 ```json
@@ -137,25 +144,19 @@ this.$refs.maxeditor.addSection(id)
 {"value":"数据3"}]
 ```
 
-### updateId(oId, nId)
+#### updateId(oId, nId)
 更改面板id
 
-### updateTitle(id, title)
+#### updateTitle(id, title)
 更改面板标题（仅文本框可修改）
 
-### updateLabel(id, label)
+#### updateLabel(id, label)
 更改标签（仅标签文本可用）
 
-### updateZ(id, zindex) 
+#### updateZ(id, zindex) 
 更改面板z-index值
 
-### activeBoard(id)
-根据id激活面板
-
-### deactiveBoard(id)
-释放面板焦点
-
-### getBoard(id)
+#### getBoard(id)
 更具id获取面板对象，返回值示例如下
 ```
 {
