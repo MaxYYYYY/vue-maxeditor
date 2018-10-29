@@ -69,6 +69,13 @@ export default {
 #### addTextWithLabel(id, label) 
 插入带标签输入框
 
+#### addDropDownWithLabel(id, label, datalist) 
+插入带标签下拉框，datalist示例如下
+
+```json
+[{"value":"球部变形"},{"value":"扩张都好"},{"value":"嘿嘿"}]
+```
+
 #### addHr() 
 插入分隔线
 

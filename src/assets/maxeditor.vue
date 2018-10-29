@@ -54,10 +54,24 @@
                     :id="item.id+'_content'"
                     class="maxeditor-single-line"
                     :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
-                    style="float: left;"
+                    style="float: left;display: inline-block"
                     :style="{'width':item.width-70+'px'}"
+                    @focus="maxeditor_current_dropdown = item.id"
+                    @blur="maxeditor_current_dropdown = undefined"
                     @click="onActivated(index)"
-                    @keyup="onActivated(index)"></span></p>
+                    @keyup="onActivated(index)"></span>
+            </p>
+            <div class="maxeditor-dropdown" v-show="maxeditor_current_id=== item.id">
+              <template v-if="isExited(item.datalist)">
+                <template v-for="(t, i) in item.datalist">
+                  <p @click="setDropDownValue(item.id,t.value)">{{t.value}}</p>
+                </template>
+              </template>
+
+            </div>
+
+            <div></div>
+
           </template>
           <template v-if="item.type === 'imgBox'">
             <div style="width: 100%;height: 100%"
@@ -124,6 +138,7 @@
         maxeditor_mode: 'design',
         maxeditor_current_id: '',//当前编辑面板，值为id
         maxeditor_current_index: undefined,
+        maxeditor_current_dropdown: undefined,
         toolBarFixed: false,
 
       }
@@ -144,12 +159,30 @@
         this.addBoard({id: id, title: title, type: 'normal', isFluid: true, z: 100})
       },
       addTextWithLabel(id, label) {
-        if (label === undefined || label === null || label === '') {
+        if (!this.isExited(label)) {
           throw new Error('MaxEditor:插入带标签文本时未得到标签');
         }
         this.addBoard({
-          id: id, label: label, type: 'label', isFluid: false, width: 100, height: 25, x: 75, z: 101
+          id: id, label: label, type: 'label', isFluid: false, width: 125, height: 25, x: 75, z: 101
         })
+      },
+      addDropDownWithLabel(id, label, datalist) {
+        if (!this.isExited(label)) {
+          throw new Error('MaxEditor:插入带标签下拉框时未得到标签');
+        }
+        if (!this.isExited(datalist)) {
+          throw new Error('MaxEditor:插入带标签下拉框时未得到列表');
+        }
+        if (typeof datalist !== 'object') {
+          datalist = JSON.parse(datalist)
+        }
+        this.addBoard({
+          id: id, label: label, type: 'label', isFluid: false, width: 125, height: 25, x: 75, z: 101, datalist: datalist
+        })
+      },
+      setDropDownValue(id, value) {
+        console.log('setdorpdown');
+        document.getElementById(id + '_content').innerText = value
       },
       addHr() {
         this.addBoard({type: 'hr', isFluid: true, z: 101})
@@ -208,6 +241,7 @@
           z: option.z,
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
+          datalist: this.isExited(option.datalist)?option.datalist:null,//下拉数组
           imgs: null,//图片数组
         });
         this.onActivated(this.maxeditor_boards.length - 1)
@@ -395,7 +429,8 @@
       updateTitle(id, title) {
         if (!this.isExited(title)) {
           throw new Error('MaxEditor:未传入标题，无法更新');
-        };
+        }
+        ;
         let temp = this.maxeditor_boards;
         this.checkId(id, function () {
         }, function () {
@@ -438,8 +473,8 @@
         let index = undefined;
         this.checkId(id, function (i) {
           index = i;
-        },function () {
-          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板信息');
+        }, function () {
+          throw new Error('MaxEditor:id' + id + '不存在，无法获取面板信息');
         });
         return temp[index];
       },
@@ -460,7 +495,7 @@
         return this.maxeditor_boards[this.maxeditor_current_index].content
       },
       getCurrentBoardId() {
-        if(!this.isExited(this.maxeditor_current_id)){
+        if (!this.isExited(this.maxeditor_current_id)) {
           console.log('MaxEditor:没有正在编辑的面板')
           return null
         }
@@ -472,25 +507,25 @@
       getBoardContentText(id) {
         this.checkId(id, function (i) {
         }, function () {
-          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板文本内容');
+          throw new Error('MaxEditor:id' + id + '不存在，无法获取面板文本内容');
         });
         return document.getElementById(id + '_content').innerText;
       },
       getBoardContent(id) {
         let temp = undefined;
-        this.checkId(id,function (i) {
+        this.checkId(id, function (i) {
           temp = i;
-        },function () {
-          throw new Error('MaxEditor:id'+id+'不存在，无法获取面板内容');
+        }, function () {
+          throw new Error('MaxEditor:id' + id + '不存在，无法获取面板内容');
         });
         return this.maxeditor_boards[temp].content;
       },
       setBoardContent(id, content) {
         let temp = this.maxeditor_boards;
-        this.checkId(id,function (i) {
+        this.checkId(id, function (i) {
           temp[i].content = content;
-        },function () {
-          throw new Error('MaxEditor:id'+id+'不存在，无法设置面板内容');
+        }, function () {
+          throw new Error('MaxEditor:id' + id + '不存在，无法设置面板内容');
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
@@ -501,10 +536,10 @@
       //文本编辑方法
       //光标处插入下拉框
       editInsertDatalist(id, values) {
-        if (!this.isExited(values)){
+        if (!this.isExited(values)) {
           throw new Error('MaxEditor:未传入选项值，无法插入下拉框');
         }
-        if(typeof values !== 'object'){
+        if (typeof values !== 'object') {
           values = JSON.parse(values);
         }
         let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" class="maxeditor-inner-dropdown" />';
@@ -516,7 +551,7 @@
         document.execCommand('insertHtml', false, input + datalist);
       },
       editInsertText(text) {
-        if (!this.isExited(text)){
+        if (!this.isExited(text)) {
           throw new Error('MaxEditor:未传入文本，无法插入');
         }
         document.execCommand('insertText', false, text)
@@ -561,7 +596,7 @@
       },
       //id查询
       checkId(id, cb1, cb2) {
-        if (!this.isExited(id)){
+        if (!this.isExited(id)) {
           throw new Error('MaxEditor:未传入id');
         }
         for (let i = 0; i < this.maxeditor_boards.length; i++) {
