@@ -18,7 +18,7 @@
           :class="{'maxeditor-board-fluid':item.isFluid}"
           :x="item.x===undefined||item.x===null?0:item.x"
           :y="item.y===undefined||item.y===null?0:item.y"
-          :z="item.z"
+          :z="isExited(item.z)?item.z:100"
           :w="item.width===undefined||item.width===null?200:item.width"
           :h="item.height===undefined||item.height===null?item.type==='hr'?20:200:item.height"
           :drag-handle="'.maxeditor-icon-move'"
@@ -77,7 +77,7 @@
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox'">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
-                <template v-for="img in item.imgs">
+                <template v-for="img in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
                   <img :src="img.src"
                        :style="{'width':item.imgs.length===1?'100%':'160px','margin':item.imgs.length===1?'0':'4px'}"/>
                 </template>
@@ -179,7 +179,6 @@
         })
       },
       setDropDownValue(id, value) {
-        console.log('setdorpdown');
         document.getElementById(id + '_content').innerText = value
       },
       addHr() {
@@ -197,9 +196,27 @@
           imgdata = JSON.parse(imgs);
         }
         this.checkId(id, function (index) {
+          //TODO 此处不要写死，后期必改
+          try{
+            document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
+          }catch (e) {
+          }
           temp[index].imgs = imgdata;
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
+        });
+        this.$set(this.maxeditor_boards, temp);
+      },
+      clearImgBoxContent(id) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (i) {
+          try{
+            document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
+          }catch (e) {
+          }
+          temp[i].imgs = null;
+        },function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法清空图片容器');
         });
         this.$set(this.maxeditor_boards, temp);
       },
@@ -236,7 +253,7 @@
           title: option.title !== null && option.title !== undefined ? option.title : null,
           label: option.label !== null && option.label !== undefined ? option.label : null,
           x: option.x !== null && option.x !== undefined ? option.x : 0,
-          z: option.z,
+          z: this.isExited(option.z)?option.z:100,
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
           datalist: this.isExited(option.datalist) ? option.datalist : null,//下拉数组
@@ -246,6 +263,9 @@
       },
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
+      },
+      clearBoards() {
+        this.maxeditor_boards = [];
       },
       getBoards() {
         return JSON.stringify(this.maxeditor_boards)
@@ -404,10 +424,13 @@
         this.$set(this.maxeditor_boards, temp);
       },
       updateId(oId, nId) {
+        let temp = this.maxeditor_boards;
+        let index;
         if (oId === nId) {
           return
         }
-        this.checkId(oId, function () {
+        this.checkId(oId, function (i) {
+          index = i;
         }, function () {
           throw new Error('MaxEditor:' + oId + '不存在，无法更新id');
         });
@@ -415,56 +438,48 @@
           throw new Error('MaxEditor:' + nId + '已存在，无法更新id');
         }, function () {
         });
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === oId) {
-            temp[i].id = nId;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
+        temp[index].id = nId;
+        this.$set(this.maxeditor_boards, temp);
       },
       updateTitle(id, title) {
         if (!this.isExited(title)) {
           throw new Error('MaxEditor:未传入标题，无法更新');
         }
-        ;
         let temp = this.maxeditor_boards;
-        this.checkId(id, function () {
+        let index;
+        this.checkId(id, function (i) {
+          index = i;
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法更新标题');
         });
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].title = title;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
+        temp[index].title = title;
+        this.$set(this.maxeditor_boards, temp);
       },
       updateLabel(id, label) {
-        let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].label = label;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
+        if (!this.isExited(label)) {
+          throw new Error('MaxEditor:未传入标签，无法更新');
         }
+        let temp = this.maxeditor_boards;
+        let index;
+        this.checkId(id, function (i) {
+          index = i;
+        },function () {});
+        temp[index].label = label;
+        this.$set(this.maxeditor_boards, temp);
       },
       updateZ(id, zindex) {
-        if (zindex === undefined || zindex === null) {
-          console.log('请输入id');
-          return
+        if (!this.isExited(zindex)) {
+          throw new Error('MaxEditor:未传入z-index值，无法更新');
         }
         let temp = this.maxeditor_boards;
-        for (let i = 0; i < temp.length; i++) {
-          if (temp[i].id === id) {
-            temp[i].z = zindex;
-            this.$set(this.maxeditor_boards, temp);
-            break;
-          }
-        }
+        let index;
+        this.checkId(id, function (i) {
+          index = i;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法更新z-index值');
+        });
+        temp[index].z = zindex;
+        this.$set(this.maxeditor_boards, temp);
       },
       getBoard(id) {
         let temp = this.maxeditor_boards;
@@ -510,24 +525,26 @@
         return document.getElementById(id + '_content').innerText;
       },
       getBoardContent(id) {
-        let temp = undefined;
+        let index;
         this.checkId(id, function (i) {
-          temp = i;
+          index = i;
         }, function () {
           throw new Error('MaxEditor:id' + id + '不存在，无法获取面板内容');
         });
-        return this.maxeditor_boards[temp].content;
+        return this.maxeditor_boards[index].content;
       },
       setBoardContent(id, content) {
         let temp = this.maxeditor_boards;
+        let index = undefined;
         this.checkId(id, function (i) {
           temp[i].content = content;
+          index = i;
         }, function () {
           throw new Error('MaxEditor:id' + id + '不存在，无法设置面板内容');
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
-          document.getElementById(id + '_content').innerHTML = this.maxeditor_boards[i].content
+          document.getElementById(id + '_content').innerHTML = this.maxeditor_boards[index].content
         });
       },
 

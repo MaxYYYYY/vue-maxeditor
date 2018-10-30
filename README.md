@@ -95,6 +95,9 @@ export default {
 插入单张图片时也需要传入数组，此时图片宽度占满图片容器
 图片数量大于1时宽度为固定值160px
 
+#### clearImgBoxContent(id)
+清空图片容器内容
+
 #### insertQrCode(id, url)
 
 向图片容器中插入二维码
@@ -110,6 +113,9 @@ export default {
 
 #### setBoards(boards)
 设置面板列表，boards为json数组(对象以及字符串皆可)，结构如上
+
+#### clearBoards()
+清除所有面板
 
 #### setMode(mode)
 设置编辑器模式，可选值为'design'、'edit'、 'readonly'

@@ -51,6 +51,9 @@
     <button title="插入图片容器" class="maxeditor-toolbar-button"
             @click="addImgBox">图片容器
     </button>
+    <button title="清空编辑器" class="maxeditor-toolbar-button"
+            @click="clearBoards">清空编辑器
+    </button>
 
 
     <br/>
@@ -179,12 +182,15 @@
       },
       updateZ() {
         let z = prompt('请输入z-index');
-        this.$parent.updateZ(this.maxeditor_current_board.z, z);
+        this.$parent.updateZ(this.maxeditor_current_board.id, z);
       },
       updateLabel() {
         let label = prompt('请输入label');
         this.$parent.updateLabel(this.maxeditor_current_board.id, label);
-      }
+      },
+      clearBoards(){
+        this.$parent.clearBoards();
+      },
     },
     mounted() {
 

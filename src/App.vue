@@ -8,6 +8,7 @@
     <button @click="getBoards">getBoards</button>
     <button @click="setBoards">setBoards</button>
     <button @click="insertImg">insertImg</button>
+    <button @click="clearImgBoxContent">clearImgBoxContent</button>
     <button @click="insertQRCode">insertQRCode</button>
     <br/>
 
@@ -95,7 +96,7 @@
       },
       getBoardContent(){
         let id = prompt('请输入id');
-        this.$refs.maxeditor.getBoardContent(id);
+        console.log(this.$refs.maxeditor.getBoardContent(id));
       },
       getBoardContentText(){
         let id = prompt('请输入id');
@@ -128,6 +129,10 @@
         let id = prompt('请输入id');
         let url = prompt('请输入url');
         this.$refs.maxeditor.insertQRCode(id, url)
+      },
+      clearImgBoxContent (){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.clearImgBoxContent(id);
       },
 
 
