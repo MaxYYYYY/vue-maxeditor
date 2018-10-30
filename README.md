@@ -76,6 +76,9 @@ export default {
 [{"value":"球部变形"},{"value":"扩张都好"},{"value":"嘿嘿"}]
 ```
 
+#### updateDropDownList(id, datalist)
+更新下拉面板的选项列表，datalist如上所示
+
 #### addHr() 
 插入分隔线
 

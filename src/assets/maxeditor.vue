@@ -4,7 +4,7 @@
                        :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
     </maxeditor-toolbar>
-    <div class="maxeditor-body" id="maxeditor-body">
+    <div class="maxeditor-body" id="maxeditor-body" @click="handleBodyClick">
       <div class="maxeditor-body-inner" ref="maxEditorBodyInner">
         <maxeditor-board
           class="maxeditor-board"
@@ -44,33 +44,36 @@
                  @keyup="onActivated(index)">
             </div>
           </template>
+
           <template v-if="item.type === 'label'">
-            <p><span style="float: left;width: 65px;"
-                     :class="{'maxeditor-single-line':getCharacterNum(item.label)>3,
-                              'maxeditor-text-justify':getCharacterNum(item.label)<4}">{{item.label}}
+            <p style="height: 25px;margin: 0;position: relative">
+              <span style="float: left;width: 65px;height: 25px"
+                    class="maxeditor-single-line"
+                    @click="onActivated(index)">{{item.label}}
               </span>
-              <span style="float: left;">:</span>
+              <span style="float: left;margin-right: 5px">:</span>
               <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                     :id="item.id+'_content'"
                     class="maxeditor-single-line"
                     :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
                     style="float: left;display: inline-block"
-                    :style="{'width':item.width-70+'px'}"
+                    :style="{'width':item.width-75+'px'}"
                     @click="onActivated(index);maxeditor_current_dropdown = item.id"
                     @keyup="onActivated(index)"></span>
+              <span class="maxeditor-icon maxeditor-icon-caret-down"
+                    style="position: absolute;right: -10px;top: 4px;"
+                    v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
+                    @click="changeDropDownState(item.id)"></span>
             </p>
-            <div class="maxeditor-dropdown" v-show="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')">
-              <template v-if="isExited(item.datalist)">
-                <template v-for="(t, i) in item.datalist">
-                  <p @click="setDropDownValue(item.id,t.value);maxeditor_current_dropdown = undefined">{{t.value}}</p>
-                </template>
+            <div class="maxeditor-dropdown"
+                 v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
+              <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
+                <p class="maxeditor-noselect"
+                   @click="setDropDownValue(item.id,t.value);maxeditor_current_dropdown = undefined">{{t.value}}</p>
               </template>
-
             </div>
-
-            <div></div>
-
           </template>
+
           <template v-if="item.type === 'imgBox'">
             <div style="width: 100%;height: 100%"
                  :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
@@ -138,7 +141,6 @@
         maxeditor_current_index: undefined,
         maxeditor_current_dropdown: undefined,
         toolBarFixed: false,
-
       }
     },
     components: {
@@ -175,8 +177,33 @@
           datalist = JSON.parse(datalist)
         }
         this.addBoard({
-          id: id, label: label, type: 'label', isFluid: false, width: 125, height: 25, x: 75, z: 101, datalist: datalist
+          id: id, label: label, type: 'label', isFluid: false, width: 150, height: 25, x: 75, z: 101, datalist: datalist
         })
+      },
+      updateDropDownList(id, datalist) {
+        if (!this.isExited(datalist)) {
+          throw new Error('MaxEditor:未传入下拉列表，无法更新下拉框');
+        }
+        if (typeof datalist !== "object") {
+          datalist = JSON.parse(datalist)
+        }
+        let temp = this.maxeditor_boards;
+        let index;
+        this.checkId(id, function (i) {
+          index = i;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法更新下拉框');
+        });
+        temp[index].datalist = datalist;
+        document.getElementById(id + '_content').innerText = '';
+        this.$set(this.maxeditor_boards, temp);
+      },
+      changeDropDownState(id) {
+        if (this.isExited(this.maxeditor_current_dropdown)) {
+          this.maxeditor_current_dropdown = undefined
+        } else {
+          this.maxeditor_current_dropdown = id;
+        }
       },
       setDropDownValue(id, value) {
         document.getElementById(id + '_content').innerText = value
@@ -197,9 +224,9 @@
         }
         this.checkId(id, function (index) {
           //TODO 此处不要写死，后期必改
-          try{
+          try {
             document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
-          }catch (e) {
+          } catch (e) {
           }
           temp[index].imgs = imgdata;
         }, function () {
@@ -210,12 +237,12 @@
       clearImgBoxContent(id) {
         let temp = this.maxeditor_boards;
         this.checkId(id, function (i) {
-          try{
+          try {
             document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
-          }catch (e) {
+          } catch (e) {
           }
           temp[i].imgs = null;
-        },function () {
+        }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法清空图片容器');
         });
         this.$set(this.maxeditor_boards, temp);
@@ -253,7 +280,7 @@
           title: option.title !== null && option.title !== undefined ? option.title : null,
           label: option.label !== null && option.label !== undefined ? option.label : null,
           x: option.x !== null && option.x !== undefined ? option.x : 0,
-          z: this.isExited(option.z)?option.z:100,
+          z: this.isExited(option.z) ? option.z : 100,
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
           datalist: this.isExited(option.datalist) ? option.datalist : null,//下拉数组
@@ -400,6 +427,7 @@
         console.log('onDeactivated' + index);
         this.maxeditor_current_id = '';
         this.maxeditor_current_index = undefined;
+        this.maxeditor_current_dropdown = undefined;
       },
       upZindex(index) {
         this.maxeditor_boards[index].z += 1;
@@ -463,7 +491,8 @@
         let index;
         this.checkId(id, function (i) {
           index = i;
-        },function () {});
+        }, function () {
+        });
         temp[index].label = label;
         this.$set(this.maxeditor_boards, temp);
       },
@@ -609,7 +638,7 @@
         }
         return true
       },
-      //id查询
+      //id检查
       checkId(id, cb1, cb2) {
         if (!this.isExited(id)) {
           throw new Error('MaxEditor:未传入id');
@@ -622,10 +651,18 @@
         }
         cb2();//id不存在回调函数
       },
-
+      //焦点释放
+      handleBodyClick(event) {
+        if (event.target.className === 'maxeditor-body-inner') {
+          console.log('释放焦点');
+          this.maxeditor_current_dropdown = undefined;
+          this.maxeditor_current_id = undefined;
+          this.maxeditor_current_index = undefined;
+        }
+      },
     },
     mounted() {
-      window.addEventListener('scroll', this.handleToolbarScroll)
+      window.addEventListener('scroll', this.handleToolbarScroll);
     },
     watch: {
       maxeditor_mode(n, o) {

@@ -27,6 +27,9 @@
 
     <button @click="getBoard">getBoard</button>
 
+    <br/>
+    <button @click="updateDropDownList">updateDropDownList</button>
+
 
 
     <MaxEditor ref="maxeditor"></MaxEditor>
@@ -133,6 +136,11 @@
       clearImgBoxContent (){
         let id = prompt('请输入id');
         this.$refs.maxeditor.clearImgBoxContent(id);
+      },
+      updateDropDownList(){
+        let id = prompt('请输入id');
+        let datalist = prompt('请输入list');
+        this.$refs.maxeditor.updateDropDownList(id, datalist)
       },
 
 

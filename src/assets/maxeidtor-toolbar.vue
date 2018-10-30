@@ -1,5 +1,5 @@
 <template>
-  <div class="maxeditor-toolbar" id="maxeditor-toolbar">
+  <div class="maxeditor-toolbar maxeditor-p-b-10" id="maxeditor-toolbar">
     <a title="粗体" class="maxeditor-toolbar-item"
        @click="document.execCommand('bold', false, null)"><span
       class="maxeditor-icon maxeditor-icon-bold"></span></a>
@@ -11,6 +11,7 @@
       class="maxeditor-icon maxeditor-icon-underline"></span></a>
     <a title="删除线" class="maxeditor-toolbar-item">
       <span class="maxeditor-icon maxeditor-icon-strikethrough"></span></a>
+    <a class="maxeditor-toolbar-item-separator"></a>
     <a title="字体大小" class="maxeditor-toolbar-item"
        @click="document.execCommand('formatblock', false, '<h1>')"><span
       class="maxeditor-icon maxeditor-icon-font"></span></a>
@@ -33,7 +34,7 @@
 
 
     <br/>
-    <button title="插入分隔线" class="maxeditor-toolbar-button"
+    <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
             @click="addHr">分隔线
     </button>
     <button title="插入文本框" class="maxeditor-toolbar-button"
@@ -54,44 +55,45 @@
     <button title="清空编辑器" class="maxeditor-toolbar-button"
             @click="clearBoards">清空编辑器
     </button>
-
-
     <br/>
-    <button title="设计模式" class="maxeditor-toolbar-button"
+
+
+    <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='design'}"
             @click="setMode('design')">设计模式
     </button>
-    <button title="编辑模式" class="maxeditor-toolbar-button"
+    <button title="编辑模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='edit'}"
             @click="setMode('edit')">编辑模式
     </button>
-    <button title="只读模式" class="maxeditor-toolbar-button"
+    <button title="只读模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
             @click="setMode('readonly')">只读模式
     </button>
 
-    <div class="maxeditor-float-r"
+
+    <div class="maxeditor-float-r maxeditor-m-t-10"
          v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox')">
-      <button title="修改z-index"
-              class="maxeditor-toolbar-button maxeditor-float-r  maxeditor-m-r-15"
-              @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
-      </button>
-      <button title="修改title"
+     <!-- <button title="修改z-index"
               class="maxeditor-toolbar-button maxeditor-float-r"
+              @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
+      </button>-->
+      <button title="修改title"
+              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
               v-if="maxeditor_current_board.type==='normal'"
               @click="updateTitle">修改title:{{maxeditor_current_board.title}}
       </button>
       <button title="修改label"
-              class="maxeditor-toolbar-button maxeditor-float-r"
+              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
               v-if="maxeditor_current_board.type==='label'"
               @click="updateLabel">修改label:{{maxeditor_current_board.label}}
       </button>
       <button title="修改id"
-              class="maxeditor-toolbar-button maxeditor-float-r"
+              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
               @click="updateId">修改id:{{maxeditor_current_board.id}}
       </button>
       <button title="面板类型"
-              class="maxeditor-toolbar-button maxeditor-float-r">面板类型:{{maxeditor_current_board.type}}
+              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">面板类型:{{maxeditor_current_board.type}}
       </button>
     </div>
   </div>

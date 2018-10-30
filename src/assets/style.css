@@ -9,7 +9,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  display: -webkit-box;
+  display: inline-block;
   -webkit-line-clamp: 1;
 }
 
@@ -31,7 +31,6 @@
 }
 
 .maxeditor-dropdown {
-  margin-top: 36px;
   margin-left: 70px;
   font-size: 12px;
   background-color: #fff;
@@ -43,6 +42,15 @@
   cursor: pointer;
   padding: 6px;
   margin: 0;
+}
+
+.maxeditor-noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .maxeditor-body {
@@ -142,8 +150,6 @@
   cursor: pointer;
   outline: none;
   position: relative;
-  margin-left: 15px;
-  margin-bottom: 10px;
 }
 
 .maxeditor-toolbar-button-disable {
@@ -173,8 +179,28 @@
   float: right;
 }
 
+.maxeditor-float-l {
+  float: left;
+}
+
 .maxeditor-m-r-15 {
   margin-right: 15px;
+}
+
+.maxeditor-m-l-15 {
+  margin-left: 15px
+}
+
+.maxeditor-m-t-10 {
+  margin-top: 10px;
+}
+
+.maxeditor-m-b-10 {
+  margin-bottom: 10px;
+}
+
+.maxeditor-p-b-10 {
+  padding-bottom: 10px;
 }
 
 .maxeditor-toolbar-item {
