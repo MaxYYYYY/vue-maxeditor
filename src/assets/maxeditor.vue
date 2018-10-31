@@ -86,7 +86,9 @@
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
                 <template v-for="img in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
                   <img :src="img.src"
-                       :style="{'width':item.imgs.length===1?'100%':'160px','margin':item.imgs.length===1?'0':'4px'}"/>
+                       :style="{'width':item.imgs.length===1?'':'160px',
+                                'height':item.imgs.length===1?item.height+'px':'',
+                                'margin':item.imgs.length===1?'0':'4px'}"/>
                 </template>
               </div>
               <div :id="item.id+'_imgBox_qrCode'" v-if="item.imgs===null||item.imgs===undefined"></div>
