@@ -56,7 +56,7 @@
                     @click="onActivated(index)">{{item.label}}
               </span>
               <span style="float: left;margin-right: 5px">:</span>
-              <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
+              <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
                     :id="item.id+'_content'"
                     class="maxeditor-single-line"
                     :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
@@ -73,7 +73,9 @@
                  v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
               <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
                 <p class="maxeditor-noselect"
-                   @click="setDropDownValue(item.id,t.value);maxeditor_current_dropdown = undefined">{{t.value}}</p>
+                   @click="setDropDownValue(item.id,t.value);
+                   maxeditor_current_dropdown = undefined;
+                   maxeditor_boards[index].datalist_current = t.id;">{{t.value}}</p>
               </template>
             </div>
           </template>
@@ -225,11 +227,32 @@
           return list;
         }
       },
+      getDropDownCurrentItem(id) {
+        let item;
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          for (let i = 0; i < temp[index].datalist.length; i++) {
+            if (temp[index].datalist[i].id === temp[index].datalist_current) {
+              item = temp[index].datalist[i];
+              break;
+            }
+          }
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法获取下拉列表当前选项');
+        });
+        if (this.isExited(item)) {
+          return item;
+        } else {
+          console.log('MaxEditor:下拉框当前未选中选项')
+        }
+      },
       setDropDownCurrentItem(id, itemId) {
         let temp = this.maxeditor_boards;
         let dItem;
         let list;
+        let index;
         this.checkId(id, function (i) {
+          index = i;
           list = temp[i].datalist;
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法设置下拉框值');
@@ -242,6 +265,7 @@
           })
         }
         if (this.isExited(dItem)) {
+          this.maxeditor_boards[i].datalist_current = dItem.id;
           this.setDropDownValue(id, dItem.value);
           return;
         }
@@ -326,6 +350,7 @@
           width: option.width !== null && option.width !== undefined ? option.width : null,
           height: option.height !== null && option.height !== undefined ? option.height : null,
           datalist: this.isExited(option.datalist) ? option.datalist : null,//下拉数组
+          datalist_current: null,//当前选中项
           imgs: null,//图片数组
         });
         this.onActivated(this.maxeditor_boards.length - 1)
@@ -580,7 +605,7 @@
       },
       getCurrentBoardId() {
         if (!this.isExited(this.maxeditor_current_id)) {
-          console.log('MaxEditor:没有正在编辑的面板')
+          console.log('MaxEditor:没有正在编辑的面板');
           return null
         }
         return this.maxeditor_current_id;

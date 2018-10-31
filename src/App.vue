@@ -31,6 +31,7 @@
     <button @click="updateDropDownList">updateDropDownList</button>
     <button @click="getDropDownList">getDropDownList</button>
     <button @click="setDropDownCurrentItem">setDropDownCurrentItem</button>
+    <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
 
     <MaxEditor ref="maxeditor"></MaxEditor>
     <div id="temp"></div>
@@ -146,6 +147,10 @@
       getDropDownList() {
         let id = prompt('请输入id');
         console.log(this.$refs.maxeditor.getDropDownList(id))
+      },
+      getDropDownCurrentItem() {
+        let id = prompt('请输入id');
+        console.log( this.$refs.maxeditor.getDropDownCurrentItem(id))
       },
       setDropDownCurrentItem() {
         let id = prompt('请输入id');

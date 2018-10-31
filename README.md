@@ -185,6 +185,12 @@ export default {
 #### getDropDownList(id)
 获取下拉框选项列表
 
+#### getDropDownCurrentItem(id)
+获取下拉框当前选中项，返回值为对象
+```json
+{"value":"张三","id":"doctor_1"}
+```
+
 #### setDropDownCurrentItem(id, itemId)
 设置下拉框选中选项，itemId为选项的id
 
