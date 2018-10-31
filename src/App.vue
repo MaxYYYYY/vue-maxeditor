@@ -29,8 +29,8 @@
 
     <br/>
     <button @click="updateDropDownList">updateDropDownList</button>
-
-
+    <button @click="getDropDownList">getDropDownList</button>
+    <button @click="setDropDownCurrentItem">setDropDownCurrentItem</button>
 
     <MaxEditor ref="maxeditor"></MaxEditor>
     <div id="temp"></div>
@@ -53,96 +53,106 @@
       MaxEditor
     },
     methods: {
-      addSection(){
+      addSection() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.addSection(id);
       },
-      addSectionWithTitle(){
+      addSectionWithTitle() {
         let id = prompt('请输入id');
         let title = prompt('请输入标题');
         this.$refs.maxeditor.addSection(id, title);
       },
-      addTextWithLabel(){
+      addTextWithLabel() {
         let id = prompt('请输入id');
         let label = prompt('请输入标题');
         this.$refs.maxeditor.addTextWithLabel(id, label);
       },
-      addHr(){
+      addHr() {
         this.$refs.maxeditor.addHr();
       },
-      addImgBox(){
+      addImgBox() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.addImgBox(id);
       },
-      setMode(mode){
+      setMode(mode) {
         this.$refs.maxeditor.setMode(mode);
       },
-      getBoards(){
+      getBoards() {
         document.getElementById('temp').innerText = this.$refs.maxeditor.getBoards()
       },
-      setBoards(){
+      setBoards() {
         let boards = prompt('请输入json数组');
         this.$refs.maxeditor.setBoards(boards);
       },
-      insertImg(){
+      insertImg() {
         let id = prompt('请输入id');
         let imgs = prompt('请输入json数组');
         this.$refs.maxeditor.insertImg(id, imgs);
       },
-      getCurrentBoardContent(){
+      getCurrentBoardContent() {
         alert(this.$refs.maxeditor.getCurrentBoardContent())
       },
-      getCurrentBoardId(){
+      getCurrentBoardId() {
         alert(this.$refs.maxeditor.getCurrentBoardId());
       },
-      getCurrentBoardType(){
+      getCurrentBoardType() {
         alert(this.$refs.maxeditor.getCurrentBoardType());
       },
-      getBoardContent(){
+      getBoardContent() {
         let id = prompt('请输入id');
         console.log(this.$refs.maxeditor.getBoardContent(id));
       },
-      getBoardContentText(){
+      getBoardContentText() {
         let id = prompt('请输入id');
         console.log(this.$refs.maxeditor.getBoardContentText(id))
 
       },
-      setBoardContent(){
+      setBoardContent() {
         let id = prompt('请输入id');
         let content = prompt('内容');
         this.$refs.maxeditor.setBoardContent(id, content);
       },
-      activeBoard(){
+      activeBoard() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.activeBoard(id);
       },
-      deactiveBoard(){
+      deactiveBoard() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.deactiveBoard(id);
       },
-      getBoard(){
+      getBoard() {
         let id = prompt('请输入id');
         console.log(this.$refs.maxeditor.getBoard(id));
       },
-      setBoard(){
+      setBoard() {
         let boardObjectStr = prompt('boardObjectStr');
         //let boardObject = JSON.parse(boardObjectStr);
         console.log(this.$refs.maxeditor.setBoard(boardObjectStr));
       },
-      insertQRCode(){
+      insertQRCode() {
         let id = prompt('请输入id');
         let url = prompt('请输入url');
         this.$refs.maxeditor.insertQRCode(id, url)
       },
-      clearImgBoxContent (){
+      clearImgBoxContent() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.clearImgBoxContent(id);
       },
-      updateDropDownList(){
+      updateDropDownList() {
         let id = prompt('请输入id');
         let datalist = prompt('请输入list');
         this.$refs.maxeditor.updateDropDownList(id, datalist)
       },
+      getDropDownList() {
+        let id = prompt('请输入id');
+        console.log(this.$refs.maxeditor.getDropDownList(id))
+      },
+      setDropDownCurrentItem() {
+        let id = prompt('请输入id');
+        let itemId = prompt('请输入itemId');
+        this.$refs.maxeditor.setDropDownCurrentItem(id, itemId)
+      },
+
 
       editInsertText() {
         let text = prompt('请输入文本');

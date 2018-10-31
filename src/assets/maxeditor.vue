@@ -211,6 +211,42 @@
           this.maxeditor_current_dropdown = id;
         }
       },
+      getDropDownList(id) {
+        let temp = this.maxeditor_boards;
+        let list;
+        this.checkId(id, function (i) {
+          list = temp[i].datalist;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法获取下拉列表');
+        });
+        if (!this.isExited(list)) {
+          throw new Error('MaxEditor:没有下拉列表，可能这个面板不是下拉框~');
+        } else {
+          return list;
+        }
+      },
+      setDropDownCurrentItem(id, itemId) {
+        let temp = this.maxeditor_boards;
+        let dItem;
+        let list;
+        this.checkId(id, function (i) {
+          list = temp[i].datalist;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法设置下拉框值');
+        });
+        if (this.isExited(list)) {
+          list.forEach(function (item, index) {
+            if (item.id === itemId) {
+              dItem = item;
+            }
+          })
+        }
+        if (this.isExited(dItem)) {
+          this.setDropDownValue(id, dItem.value);
+          return;
+        }
+        throw new Error('MaxEditor:下拉列表中找到不' + itemId);
+      },
       setDropDownValue(id, value) {
         document.getElementById(id + '_content').innerText = value
       },
