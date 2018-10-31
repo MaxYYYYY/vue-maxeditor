@@ -1,10 +1,14 @@
 <template>
   <div class="maxeditor-root">
-    <maxeditor-toolbar ref="maxeditor-toolbar" :class="{'maxeditor-fix2top':toolBarFixed}"
+    <maxeditor-toolbar ref="maxeditor-toolbar"
+                       :class="{'maxeditor-fix2top':toolBarFixed}"
                        :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
     </maxeditor-toolbar>
-    <div class="maxeditor-body" id="maxeditor-body" @click="handleBodyClick">
+    <div class="maxeditor-body"
+         id="maxeditor-body"
+         :style="{'margin-top':toolBarFixed?'136px':'20px'}"
+         @click="handleBodyClick">
       <div class="maxeditor-body-inner" ref="maxEditorBodyInner">
         <maxeditor-board
           class="maxeditor-board"
@@ -604,13 +608,9 @@
       //工具
       //菜单栏滚动到顶部时固定
       handleToolbarScroll() {
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        var offsetTop = document.getElementById('maxeditor-toolbar').offsetTop;
-        if (scrollTop > offsetTop) {
-          this.toolBarFixed = true
-        } else {
-          this.toolBarFixed = false
-        }
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        let offsetTop = document.getElementById('maxeditor-toolbar').offsetTop;
+        this.toolBarFixed = scrollTop > offsetTop;
       },
       //计算文本中汉字个数
       getCharacterNum(text) {

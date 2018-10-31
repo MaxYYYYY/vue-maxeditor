@@ -33,6 +33,7 @@
 
 
     <MaxEditor ref="maxeditor"></MaxEditor>
+    <div id="temp"></div>
 
 
   </div>
@@ -77,7 +78,7 @@
         this.$refs.maxeditor.setMode(mode);
       },
       getBoards(){
-        alert(this.$refs.maxeditor.getBoards());
+        document.getElementById('temp').innerText = this.$refs.maxeditor.getBoards()
       },
       setBoards(){
         let boards = prompt('请输入json数组');
@@ -142,8 +143,6 @@
         let datalist = prompt('请输入list');
         this.$refs.maxeditor.updateDropDownList(id, datalist)
       },
-
-
 
       editInsertText() {
         let text = prompt('请输入文本');
