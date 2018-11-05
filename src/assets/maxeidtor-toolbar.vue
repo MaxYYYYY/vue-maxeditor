@@ -52,6 +52,9 @@
     <button title="插入图片容器" class="maxeditor-toolbar-button"
             @click="addImgBox">图片容器
     </button>
+    <button title="插入表格" class="maxeditor-toolbar-button"
+            @click="addTable">表格
+    </button>
     <button title="清空编辑器" class="maxeditor-toolbar-button"
             @click="clearBoards">清空编辑器
     </button>
@@ -73,7 +76,8 @@
 
 
     <div class="maxeditor-float-r maxeditor-m-t-10"
-         v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox')">
+         v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
+         ||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'||maxeditor_current_board.type==='table')">
      <!-- <button title="修改z-index"
               class="maxeditor-toolbar-button maxeditor-float-r"
               @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
@@ -120,6 +124,9 @@
       }
     },
     methods: {
+      //表格
+
+
       addHr() {
         if (this.$parent.maxeditor_mode !== 'design') {
           alert('当前模式不可插入板块');
@@ -170,6 +177,14 @@
         }
         let id = prompt('请输入id');
         this.$parent.addImgBox(id)
+      },
+      addTable() {
+        if (this.$parent.maxeditor_mode !== 'design') {
+          alert('当前模式不可插入板块');
+          return
+        }
+        let id = prompt('请输入id');
+        this.$parent.addTable(id);
       },
       setMode(mode) {
         this.$parent.maxeditor_mode = mode

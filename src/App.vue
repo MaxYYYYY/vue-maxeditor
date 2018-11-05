@@ -32,6 +32,7 @@
     <button @click="getDropDownList">getDropDownList</button>
     <button @click="setDropDownCurrentItem">setDropDownCurrentItem</button>
     <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
+    <button @click="test">test</button>
 
     <MaxEditor ref="maxeditor"></MaxEditor>
     <div id="temp"></div>
@@ -54,6 +55,12 @@
       MaxEditor
     },
     methods: {
+      test() {
+        document.execCommand('insertHTML',false,'<span></span><span contenteditable="false">RVDd:</span>' +
+          '<span contenteditable="true">hahaha</span>' +
+          '<span style="float: right" contenteditable="false">cm</span>')
+      },
+
       addSection() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.addSection(id);
@@ -150,7 +157,7 @@
       },
       getDropDownCurrentItem() {
         let id = prompt('请输入id');
-        console.log( this.$refs.maxeditor.getDropDownCurrentItem(id))
+        console.log(this.$refs.maxeditor.getDropDownCurrentItem(id))
       },
       setDropDownCurrentItem() {
         let id = prompt('请输入id');

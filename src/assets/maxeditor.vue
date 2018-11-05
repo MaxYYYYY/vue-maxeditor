@@ -26,7 +26,7 @@
           :w="item.width===undefined||item.width===null?200:item.width"
           :h="item.height===undefined||item.height===null?item.type==='hr'?20:200:item.height"
           :drag-handle="'.maxeditor-icon-move'"
-          :handles="item.type==='hr'?[]:item.isFluid?['tm','bm']:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
+          :handles="(item.type==='hr'||item.type==='table')?[]:item.isFluid?['tm','bm']:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
           v-bind:axis="item.type==='hr'?'y':item.isFluid?'y':'both'"
           @click="onActivated(index)"
           @resizing="onResize"
@@ -37,18 +37,19 @@
           <template v-if="item.type==='normal'&&item.title!==null&&item.title!==undefined">
             <div class="maxeditor-board-titile">{{item.title}}:</div>
           </template>
+          <!--normal面板-->
           <template v-if="item.type === 'normal'">
-            <div contenteditable="true" style="width: 100%;height: 100%"
+            <div style="width: 100%;height: 100%"
                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                  :id="item.id+'_content'"
-                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly',
+                 :class="{'maxeditor-board-outline':maxeditor_mode==='design',
                           'maxeditor-single-line':item.isSingleLine}"
                  @focus="onActivated(index)"
                  @click="onActivated(index)"
                  @keyup="onActivated(index)">
             </div>
           </template>
-
+          <!--label标题-->
           <template v-if="item.type === 'label'">
             <p style="height: 25px;margin: 0;position: relative">
               <span style="float: left;width: 65px;height: 25px"
@@ -59,7 +60,7 @@
               <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
                     :id="item.id+'_content'"
                     class="maxeditor-single-line"
-                    :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
+                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                     style="float: left;display: inline-block"
                     :style="{'width':item.width-75+'px'}"
                     @click="onActivated(index);maxeditor_current_dropdown = item.id"
@@ -67,7 +68,7 @@
               <span class="maxeditor-icon maxeditor-icon-caret-down"
                     style="position: absolute;right: -10px;top: 4px;"
                     v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
-                    @click="changeDropDownState(item.id)"></span>
+                    @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
             </p>
             <div class="maxeditor-dropdown"
                  v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
@@ -79,10 +80,10 @@
               </template>
             </div>
           </template>
-
+          <!--imgBox面板-->
           <template v-if="item.type === 'imgBox'">
             <div style="width: 100%;height: 100%"
-                 :class="{'maxeditor-board-outline':maxeditor_mode!=='readonly'}"
+                 :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox'">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
@@ -96,13 +97,32 @@
               <div :id="item.id+'_imgBox_qrCode'" v-if="item.imgs===null||item.imgs===undefined"></div>
             </div>
           </template>
+          <!--表格面板-->
+          <template v-if="item.type === 'table'">
+            <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
+              <tbody>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </template>
+          <!--hr面板-->
           <template v-if="item.type === 'hr'">
             <div style="height: 20px;width: 100%" @click="onActivated(index)">
               <hr/>
             </div>
           </template>
-          <template v-if="item.type === ''">
-          </template>
+          <!--面板工具栏-->
           <div class="maxeditor-board-toolbar"
                v-if="maxeditor_mode==='design'"
                :style="{'margin-left':item.type==='hr'?'325px':''}"
@@ -173,6 +193,9 @@
         this.addBoard({
           id: id, label: label, type: 'label', isFluid: false, width: 125, height: 25, x: 75, z: 101
         })
+      },
+      addTable(id) {
+        this.addBoard({id: id, type: 'table', isFluid: true,width:600,z: 100})
       },
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {
@@ -265,8 +288,9 @@
           })
         }
         if (this.isExited(dItem)) {
-          this.maxeditor_boards[i].datalist_current = dItem.id;
+          this.maxeditor_boards[index].datalist_current = dItem.id;
           this.setDropDownValue(id, dItem.value);
+          this.maxeditor_current_index = index; //设置值后置顶
           return;
         }
         throw new Error('MaxEditor:下拉列表中找到不' + itemId);

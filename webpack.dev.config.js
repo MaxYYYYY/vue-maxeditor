@@ -35,8 +35,12 @@ var config = {
         })
       },
       {
-        test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,
+        test: /\.(gif|jpg|png|svg|eot|ttf)\??.*$/,
         loader: 'url-loader?limit=1024'
+      },
+      {
+        test: /\.woff(\?t=\d+\.\d+\.\d+)?$/,
+        use: 'url-loader?limit=100000&mimetype=application/font-woff'
       }
     ]
   },

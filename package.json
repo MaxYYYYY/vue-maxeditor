@@ -1,7 +1,7 @@
 {
   "name": "vue-maxeditor",
   "description": "基于vue-draggable-resizable的病历编辑器",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "author": "Zhao Yue <z_max_y@163.com>",
   "main": "dist/vue-maxeditor.js",
   "license": "MIT",
