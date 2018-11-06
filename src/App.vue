@@ -33,6 +33,9 @@
     <button @click="setDropDownCurrentItem">setDropDownCurrentItem</button>
     <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
     <button @click="test">test</button>
+    <button @click="insertImgTab">insertImgTab</button>
+    <button @click="clearImgTab">clearImgTab</button>
+
 
     <MaxEditor ref="maxeditor"></MaxEditor>
     <div id="temp"></div>
@@ -55,6 +58,20 @@
       MaxEditor
     },
     methods: {
+      clearImgTab(){
+        let id = prompt('请输入id');
+        this.$refs.maxeditor.clearImgTab(id);
+      },
+      insertImgTab() {
+        let id = prompt('请输入id');
+        let size = prompt('请输入标记个数');
+        let num = undefined;
+        if (parseInt(size) === 1){
+          num = prompt('请输入标记数字')
+        }
+        this.$refs.maxeditor.insertImgTab(id, parseInt(size), num);
+      },
+
       test() {
         document.execCommand('insertHTML',false,'<span></span><span contenteditable="false">RVDd:</span>' +
           '<span contenteditable="true">hahaha</span>' +
@@ -86,11 +103,11 @@
         this.$refs.maxeditor.setMode(mode);
       },
       getBoards() {
-        document.getElementById('temp').innerText = this.$refs.maxeditor.getBoards()
+        document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getBoards())
       },
       setBoards() {
         let boards = prompt('请输入json数组');
-        this.$refs.maxeditor.setBoards(boards);
+        this.$refs.maxeditor.setBoards(JSON.parse(boards));
       },
       insertImg() {
         let id = prompt('请输入id');

@@ -219,6 +219,13 @@ export default {
 
 向图片容器中插入二维码
 
+#### insertImgTab(id, size, num)
+插入标记，size为标记个数，超过一个时不必传入num，标记值从1开始
+当size为1时，需要传入num， num为自定义标记值
+
+#### clearImgTab(id)
+清空图片容器的标记
+
 ## 其他方法
 
 #### editInsertText(text)

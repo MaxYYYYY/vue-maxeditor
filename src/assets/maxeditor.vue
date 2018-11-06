@@ -57,14 +57,15 @@
                     @click="onActivated(index)">{{item.label}}
               </span>
               <span style="float: left;margin-right: 5px">:</span>
-              <span v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
-                    :id="item.id+'_content'"
-                    class="maxeditor-single-line"
-                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                    style="float: left;display: inline-block"
-                    :style="{'width':item.width-75+'px'}"
-                    @click="onActivated(index);maxeditor_current_dropdown = item.id"
-                    @keyup="onActivated(index)"></span>
+              <span
+                v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
+                :id="item.id+'_content'"
+                class="maxeditor-single-line"
+                :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                style="float: left;display: inline-block"
+                :style="{'width':item.width-75+'px'}"
+                @click="onActivated(index);maxeditor_current_dropdown = item.id"
+                @keyup="onActivated(index)"></span>
               <span class="maxeditor-icon maxeditor-icon-caret-down"
                     style="position: absolute;right: -10px;top: 4px;"
                     v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
@@ -95,24 +96,41 @@
                 </template>
               </div>
               <div :id="item.id+'_imgBox_qrCode'" v-if="item.imgs===null||item.imgs===undefined"></div>
+              <!--图片标签-->
+              <maxeditor-tab v-if="isExited(item.imgTabs)" v-for="(i, idx) in item.imgTabs"
+                             :x="isExited(i.x)?i.x:0"
+                             :y="isExited(i.y)?i.y:0"
+                             :w="isExited(i.width)?i.width:20"
+                             :h="isExited(i.height)?i.height:20"
+                             :minh="15"
+                             :minw="15"
+                             :parent="true"
+                             :handles="[]"
+                             @click="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
+                             @dragging="onImgTabDrag"
+                             @resizing="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;onImgTabResize()">
+                <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;">
+                  {{item.imgTabs.length>1?idx+1:item.imgTabNum}}
+                </div>
+              </maxeditor-tab>
             </div>
           </template>
           <!--表格面板-->
           <template v-if="item.type === 'table'">
             <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
               <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
               </tbody>
             </table>
           </template>
@@ -154,8 +172,8 @@
 
 <script>
   import VueDraggableResizable from 'vue-draggable-resizable';
-  import MaxEditorToolbar from './maxeidtor-toolbar.vue'
-  import QRCode from './lib/qrcodejs2'
+  import MaxEditorToolbar from './maxeidtor-toolbar.vue';
+  import QRCode from './lib/qrcodejs2';
 
   export default {
     name: "maxeditor",
@@ -168,12 +186,14 @@
         maxeditor_current_id: '',//当前编辑面板，值为id
         maxeditor_current_index: undefined,
         maxeditor_current_dropdown: undefined,
+        maxeditor_current_tabImg_index: undefined,//维持带数字标记的图片当前操作的标记的索引
         toolBarFixed: false,
       }
     },
     components: {
       'maxeditor-toolbar': MaxEditorToolbar,
       'maxeditor-board': VueDraggableResizable,
+      'maxeditor-tab': VueDraggableResizable
     },
     methods: {
       //全局方法
@@ -195,7 +215,7 @@
         })
       },
       addTable(id) {
-        this.addBoard({id: id, type: 'table', isFluid: true,width:600,z: 100})
+        this.addBoard({id: id, type: 'table', isFluid: true, width: 600, z: 100})
       },
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {
@@ -346,6 +366,30 @@
           throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
         });
       },
+      insertImgTab(id, size, num) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          temp[index].imgTabs = [];
+          if (size === 1) {
+            temp[index].imgTabNum = num;
+          }
+          for (let i = 0; i < size; i++) {
+            temp[index].imgTabs.push({})
+          }
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法插入图片标记');
+        });
+        this.$set(this.maxeditor_boards, temp);
+      },
+      clearImgTab(id) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id,function (index) {
+          temp[index].imgTabs = [];
+        },function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法清空图片标记');
+        });
+        this.$set(this.maxeditor_boards, temp);
+      },
       addBoard(option) {
         if (this.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:当前模式不可插入板块');
@@ -361,22 +405,41 @@
           throw new Error('MaxEditor:id已存在,无法插入板块');
         }, function () {
         });
-        this.maxeditor_boards.push({
+
+        let common = {
           component: 'maxeditor-board',
-          id: option.id !== null && option.id !== undefined ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
+          id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
           type: option.type,
           isFluid: option.isFluid,
-          isSingleLine: option.isSingleLine !== null && option.isSingleLine !== undefined ? option.isSingleLine : false,
-          title: option.title !== null && option.title !== undefined ? option.title : null,
-          label: option.label !== null && option.label !== undefined ? option.label : null,
-          x: option.x !== null && option.x !== undefined ? option.x : 0,
+          x: this.isExited(option.x) ? option.x : 0,
+          y: this.isExited(option.y) ? option.y : 0,
           z: this.isExited(option.z) ? option.z : 100,
-          width: option.width !== null && option.width !== undefined ? option.width : null,
-          height: option.height !== null && option.height !== undefined ? option.height : null,
-          datalist: this.isExited(option.datalist) ? option.datalist : null,//下拉数组
-          datalist_current: null,//当前选中项
-          imgs: null,//图片数组
-        });
+          width: this.isExited(option.width) ? option.width : null,
+          height: this.isExited(option.height) ? option.height : null,
+        };
+
+        if (option.type === 'normal') {
+          common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
+          common.title = this.isExited(option.title) ? option.title : null;
+        }
+
+        if (option.type === 'label') {
+          common.label = this.isExited(option.label) ? option.label : null;
+          common.datalist = this.isExited(option.datalist) ? option.datalist : null;//下拉数组
+          common.datalist_current = null;//当前选中项
+        }
+
+        if (option.type === 'imgBox') {
+          common.imgs = this.isExited(option.imgs) ? option.imgs : null;
+          common.imgTabNum = this.isExited(option.imgTabNum) ? option.imgTabNum : null;//当只有一个标记时需要传入标记号
+          common.imgTabs = this.isExited(option.imgTabs) ? option.imgTabs : null;
+        }
+
+        if (option.type === 'table') {
+
+        }
+
+        this.maxeditor_boards.push(common);
         this.onActivated(this.maxeditor_boards.length - 1)
       },
       deleteBoard(index) {
@@ -386,14 +449,16 @@
         this.maxeditor_boards = [];
       },
       getBoards() {
-        return JSON.stringify(this.maxeditor_boards)
+        return this.maxeditor_boards;
       },
       setBoards(boards) {
-        /*if (typeof boards !== "object") {
-          this.maxeditor_boards = JSON.parse(boards);
-        }*/
-        this.maxeditor_boards = JSON.parse(boards);
-
+        try {
+          if (typeof JSON.parse(boards) === "object") {
+            boards = JSON.parse(boards)
+          }
+        } catch (e) {
+        }
+        this.maxeditor_boards = boards;
         this.$nextTick(function () {
           this.maxeditor_boards.forEach(function (item, index) {
             if (item.content !== undefined) {
@@ -476,10 +541,22 @@
         var ifrMax = document.getElementById("ifr-max");
         ifrMax.contentWindow.document.getElementsByTagName("head")[0].innerHTML = document.getElementsByTagName('head')[0].innerHTML;
         ifrMax.contentWindow.document.getElementsByTagName("body")[0].innerHTML = bodyhtml;
-        ifrMax.contentWindow.document.getElementsByTagName("body")[0].style.backgroundColor = 'red'
+        ifrMax.contentWindow.document.getElementsByTagName("body")[0].style.backgroundColor = 'red';
         //ifrMax.contentWindow.print();
         window.print()
 
+      },
+
+      //图片数字标记拖动时位置大小信息记录
+      onImgTabDrag(x, y) {
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].x = x;
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].y = y;
+      },
+      onImgTabResize(x, y, width, height) {
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].x = x;
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].y = y;
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].width = width;
+        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].height = height;
       },
 
       //面板方法
@@ -745,6 +822,7 @@
           this.maxeditor_current_dropdown = undefined;
           this.maxeditor_current_id = undefined;
           this.maxeditor_current_index = undefined;
+          this.maxeditor_current_tabImg_index = undefined;
         }
       },
     },
