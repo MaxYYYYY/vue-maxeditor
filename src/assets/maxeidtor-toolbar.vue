@@ -1,5 +1,5 @@
 <template>
-  <div class="maxeditor-toolbar maxeditor-p-b-10" id="maxeditor-toolbar">
+  <div class="maxeditor-toolbar maxeditor-p-b-10" id="maxeditor-toolbar" ref="maxEditorToolbar">
     <a title="粗体" class="maxeditor-toolbar-item"
        @click="document.execCommand('bold', false, null)"><span
       class="maxeditor-icon maxeditor-icon-bold"></span></a>
@@ -210,7 +210,7 @@
       },
     },
     mounted() {
-
+      this.$parent.toolBarLeft = this.$refs.maxEditorToolbar.getBoundingClientRect().left;
     },
     created() {
 

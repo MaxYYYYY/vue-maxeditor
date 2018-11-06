@@ -137,12 +137,11 @@
   position: fixed !important;
   top: 0 !important;
   z-index: 2000;
-  left: 50%;
-  margin-left: -417px !important;
   margin-top: 0 !important;
 }
 
 .maxeditor-toolbar {
+  transition: 0.3s;
   text-align: left;
   width: 834px;
   margin: 20px auto;

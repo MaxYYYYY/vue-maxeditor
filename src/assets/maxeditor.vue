@@ -1,10 +1,10 @@
 <template>
   <div class="maxeditor-root">
-    <maxeditor-toolbar ref="maxeditor-toolbar"
-                       :class="{'maxeditor-fix2top':toolBarFixed}"
+    <maxeditor-toolbar :class="{'maxeditor-fix2top':toolBarFixed}"
+                       :style="{'left':toolBarFixed?toolBarLeft+'px':''}"
                        :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
-    </maxeditor-toolbar>
+    </maxeditor-toolbar >
     <div class="maxeditor-body"
          id="maxeditor-body"
          :style="{'margin-top':toolBarFixed?'136px':'20px'}"
@@ -188,6 +188,7 @@
         maxeditor_current_dropdown: undefined,
         maxeditor_current_tabImg_index: undefined,//维持带数字标记的图片当前操作的标记的索引
         toolBarFixed: false,
+        toolBarLeft: 0,
       }
     },
     components: {
@@ -383,9 +384,9 @@
       },
       clearImgTab(id) {
         let temp = this.maxeditor_boards;
-        this.checkId(id,function (index) {
+        this.checkId(id, function (index) {
           temp[index].imgTabs = [];
-        },function () {
+        }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法清空图片标记');
         });
         this.$set(this.maxeditor_boards, temp);
@@ -828,6 +829,9 @@
     },
     mounted() {
       window.addEventListener('scroll', this.handleToolbarScroll);
+      window.onresize = () => {
+        this.toolBarLeft = this.$refs.maxEditorBodyInner.getBoundingClientRect().left - 20;
+      }
     },
     watch: {
       maxeditor_mode(n, o) {
