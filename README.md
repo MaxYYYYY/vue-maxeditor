@@ -246,10 +246,10 @@ export default {
 向图片容器中插入图片，imgs为json数组
 
 ```json
-[{"src":"http://dmt.upload.streakingman.com/test01.jpg"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg"}]
+[{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签1"},
+{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签2"},
+{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签3"},
+{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签4"}]
 ```
 插入单张图片时也需要传入数组，此时图片大小根据容器高度而定
 图片数量大于1时宽度为固定值160px

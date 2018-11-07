@@ -96,14 +96,17 @@
                  :id="item.id+'_imgBox'">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
                 <template v-for="img in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
-                  <img :src="img.src"
-                       :style="{'width':item.imgs.length===1?'':'160px',
+                  <div style="display: inline-grid">
+                    <img :src="img.src"
+                         :style="{'width':item.imgs.length===1?'':'160px',
                                 'height':item.imgs.length===1?item.height+'px':'',
                                 'margin':item.imgs.length===1?'0':'4px'}"/>
+                    <p style="text-align: center; margin: 0;">{{isExited(img.label)?img.label:''}}</p>
+                  </div>
                 </template>
               </div>
               <div :id="item.id+'_imgBox_qrCode'" v-if="!isExited(item.imgs)"></div>
-              <!--图片标签-->
+              <!--图片标记-->
               <maxeditor-tab v-if="isExited(item.imgTabs)" v-for="(i, idx) in item.imgTabs"
                              :x="isExited(i.x)?i.x:0"
                              :y="isExited(i.y)?i.y:0"
