@@ -2,6 +2,20 @@
 
 > 基于vue-draggable-resizable的电子病历编辑器
 
+* [功能](#功能)
+* [功能](#使用方法)
+* [属性](#属性)
+* [全局方法](#全局方法)
+* [面板方法](#面板方法)
+  * [通用方法](#通用方法)
+  * [分隔线](#分隔线)
+  * [文本框](#文本框)
+  * [标签文本](#标签文本)
+  * [下拉框](#分隔线)
+  * [图片容器](#图片容器)
+* [其他](#其他方法)
+
+
 ## 功能
 
 * 通过新增拖拽面板编辑编辑内容
@@ -9,12 +23,20 @@
 
 
 ## 使用方法
-
+安装vue-draggable-resizable
 ``` bash
-$ npm install --save vue-maxeditor
+$ npm install --save vue-draggable-resizable
 ```
-
-使用组件
+安装qrcodeautojs,在package.json中写入配置后进行安装
+```json
+"dependencies":{
+  "qrcodeautojs": "git+https://github.com/MaxYYYYY/qrcodejs.git"
+}
+```
+```bash
+npm install 
+```
+最后将assets中所有文件拷贝到你的项目中，在Vue通过import引入
 
 ```vue
 <template>
@@ -24,7 +46,7 @@ $ npm install --save vue-maxeditor
 </template>
 
 <script>
-import MaxEditor from 'vue-maxeditor'
+import MaxEditor from './your/dir/maxeditor/assets'
 
 export default {
   components:{ MaxEditor}
@@ -32,7 +54,39 @@ export default {
 </script>
 ```
 
-## 方法调用
+## 属性 
+#### width
+Type: `Number`<br>
+Required: `false`<br>
+Default: `794`
+
+#### height
+Type: `Number`<br>
+Required: `false`<br>
+Default: `1124`
+
+#### paddingX
+Type: `Number`<br>
+Required: `false`<br>
+Default: `20`
+
+左右边距
+
+#### paddingY
+Type: `Number`<br>
+Required: `false`<br>
+Default: `20`
+
+上下边距
+
+#### isModeBtnShow
+Type: `Boolean`<br>
+Required: `false`<br>
+Default: `false`
+
+模式按钮是否可见
+
+## 方法
 方法通过钩子调用
 ```vue
 <template>
@@ -55,18 +109,6 @@ export default {
 }
 </script>
 ```
-
-## 方法
-
-* [全局方法](#全局方法)
-* [面板方法](#面板方法)
-  * [通用方法](#通用方法)
-  * [分隔线](#分隔线)
-  * [文本框](#文本框)
-  * [标签文本](#标签文本)
-  * [下拉框](#分隔线)
-  * [图片容器](#图片容器)
-* [其他](#其他方法)
 
 ## 全局方法
 

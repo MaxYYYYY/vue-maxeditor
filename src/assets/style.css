@@ -70,8 +70,7 @@
 }
 
 .maxeditor-body {
-  width: 794px;
-  height: 1123px;
+
   margin: 20px auto;
   padding: 20px;
   position: relative;
@@ -141,9 +140,9 @@
 }
 
 .maxeditor-toolbar {
+  min-height: 106px;
   transition: 0.3s;
   text-align: left;
-  width: 834px;
   margin: 20px auto;
   outline: gray auto 5px;
   -webkit-user-select: none;

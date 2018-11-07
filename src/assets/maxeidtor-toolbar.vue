@@ -1,5 +1,8 @@
 <template>
-  <div class="maxeditor-toolbar maxeditor-p-b-10" id="maxeditor-toolbar" ref="maxEditorToolbar">
+  <div class="maxeditor-toolbar maxeditor-p-b-10"
+       id="maxeditor-toolbar"
+       ref="maxEditorToolbar"
+       :style="{'width': width+paddingX*2+'px'}">
     <a title="粗体" class="maxeditor-toolbar-item"
        @click="document.execCommand('bold', false, null)"><span
       class="maxeditor-icon maxeditor-icon-bold"></span></a>
@@ -60,16 +63,15 @@
     </button>
     <br/>
 
-
-    <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
+    <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10" v-show="isModeBtnShow"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='design'}"
             @click="setMode('design')">设计模式
     </button>
-    <button title="编辑模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
+    <button title="编辑模式" class="maxeditor-toolbar-button maxeditor-m-t-10" v-show="isModeBtnShow"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='edit'}"
             @click="setMode('edit')">编辑模式
     </button>
-    <button title="只读模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
+    <button title="只读模式" class="maxeditor-toolbar-button maxeditor-m-t-10" v-show="isModeBtnShow"
             :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
             @click="setMode('readonly')">只读模式
     </button>
@@ -78,10 +80,10 @@
     <div class="maxeditor-float-r maxeditor-m-t-10"
          v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
          ||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'||maxeditor_current_board.type==='table')">
-     <!-- <button title="修改z-index"
-              class="maxeditor-toolbar-button maxeditor-float-r"
-              @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
-      </button>-->
+      <!-- <button title="修改z-index"
+               class="maxeditor-toolbar-button maxeditor-float-r"
+               @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
+       </button>-->
       <button title="修改title"
               class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
               v-if="maxeditor_current_board.type==='normal'"
@@ -107,7 +109,10 @@
   export default {
     name: "maxeidtor-toolbar",
     props: {
+      width: '',
+      paddingX:'',
       maxeditor_mode: '',
+      isModeBtnShow: '',
       maxeditor_current_board: {
         type: Object,
         default() {
@@ -205,7 +210,7 @@
         let label = prompt('请输入label');
         this.$parent.updateLabel(this.maxeditor_current_board.id, label);
       },
-      clearBoards(){
+      clearBoards() {
         this.$parent.clearBoards();
       },
     },

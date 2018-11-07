@@ -2,12 +2,18 @@
   <div class="maxeditor-root">
     <maxeditor-toolbar :class="{'maxeditor-fix2top':toolBarFixed}"
                        :style="{'left':toolBarFixed?toolBarLeft+'px':''}"
+                       :width="width"
+                       :padding-x="paddingX"
                        :maxeditor_mode="maxeditor_mode"
-                       :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]">
-    </maxeditor-toolbar >
+                       :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]"
+                       :is-mode-btn-show="isModeBtnShow">
+    </maxeditor-toolbar>
     <div class="maxeditor-body"
          id="maxeditor-body"
-         :style="{'margin-top':toolBarFixed?'136px':'20px'}"
+         :style="{'margin-top':toolBarFixed?'136px':'20px',
+                  'width':width+'px','height':height+'px',
+                  'padding-left':paddingX+'px','padding-right':paddingX+'px',
+                  'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
          @click="handleBodyClick">
       <div class="maxeditor-body-inner" ref="maxEditorBodyInner">
         <maxeditor-board
@@ -25,6 +31,7 @@
           :z="isExited(item.z)?item.z:100"
           :w="item.width===undefined||item.width===null?200:item.width"
           :h="item.height===undefined||item.height===null?item.type==='hr'?20:200:item.height"
+          :minh="14"
           :drag-handle="'.maxeditor-icon-move'"
           :handles="(item.type==='hr'||item.type==='table')?[]:item.isFluid?['tm','bm']:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
           v-bind:axis="item.type==='hr'?'y':item.isFluid?'y':'both'"
@@ -177,6 +184,13 @@
 
   export default {
     name: "maxeditor",
+    props: {
+      width: {default: 794},
+      height: {default: 1124},
+      paddingX: {default: 20},
+      paddingY: {default: 20},
+      isModeBtnShow: false,//模式控制按钮显示
+    },
     data() {
       return {
         window: window,
