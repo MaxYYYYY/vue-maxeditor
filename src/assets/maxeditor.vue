@@ -95,7 +95,7 @@
                                 'margin':item.imgs.length===1?'0':'4px'}"/>
                 </template>
               </div>
-              <div :id="item.id+'_imgBox_qrCode'" v-if="item.imgs===null||item.imgs===undefined"></div>
+              <div :id="item.id+'_imgBox_qrCode'" v-if="!isExited(item.imgs)"></div>
               <!--图片标签-->
               <maxeditor-tab v-if="isExited(item.imgTabs)" v-for="(i, idx) in item.imgTabs"
                              :x="isExited(i.x)?i.x:0"
@@ -173,7 +173,7 @@
 <script>
   import VueDraggableResizable from 'vue-draggable-resizable';
   import MaxEditorToolbar from './maxeidtor-toolbar.vue';
-  import QRCode from './lib/qrcodejs2';
+  import QRCode from 'qrcodeautojs';
 
   export default {
     name: "maxeditor",

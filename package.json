@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "npm": "^6.4.1",
+    "qrcodeautojs": "git+https://github.com/MaxYYYYY/qrcodejs.git",
     "vue": "^2.5.11",
     "vue-draggable-resizable": "^1.7.2"
   },
