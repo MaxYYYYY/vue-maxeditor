@@ -56,6 +56,12 @@ export default {
 ```
 
 ## 属性 
+#### maxEditorRootId
+Type: `String`<br>
+Required: `true`<br>
+Default: `maxEditor_00`
+编辑器id，多tab下需要传入
+
 #### width
 Type: `Number`<br>
 Required: `false`<br>

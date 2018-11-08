@@ -1,15 +1,15 @@
 <template>
-  <div class="maxeditor-root">
-    <maxeditor-toolbar :class="{'maxeditor-fix2top':toolBarFixed}"
+  <div class="maxeditor-root" :id="maxEditorRootId">
+    <maxeditor-toolbar ref="maxEditorToolbar" :class="{'maxeditor-fix2top':toolBarFixed}"
                        :style="{'left':toolBarFixed?toolBarLeft+'px':''}"
                        :width="width"
                        :padding-x="paddingX"
                        :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]"
-                       :is-mode-btn-show="isModeBtnShow">
+                       :is-mode-btn-show="isModeBtnShow"
+                       :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
     <div class="maxeditor-body"
-         id="maxeditor-body"
          :style="{'margin-top':toolBarFixed?'136px':'20px',
                   'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
@@ -19,7 +19,7 @@
         <maxeditor-board
           class="maxeditor-board"
           v-for="(item, index) in maxeditor_boards"
-          :style="{'z-index':index === maxeditor_current_index?'200':''}"
+          :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
           :id="item.id"
           :key="item.id"
           :is="item.component"
@@ -48,7 +48,7 @@
           <template v-if="item.type === 'normal'">
             <div style="width: 100%;height: 100%"
                  v-bind:contenteditable="item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design'"
-                 :id="item.id+'_content'"
+                 :id="item.id+'_content_'+maxEditorRootId"
                  :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
                           'maxeditor-single-line':item.isSingleLine}"
                  @focus="onActivated(index)"
@@ -66,7 +66,7 @@
               <span style="float: left;margin-right: 5px">:</span>
               <span
                 v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
-                :id="item.id+'_content'"
+                :id="item.id+'_content_'+maxEditorRootId"
                 class="maxeditor-single-line"
                 :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                 style="float: left;display: inline-block"
@@ -93,7 +93,7 @@
             <div style="width: 100%;height: 100%"
                  :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                  @click="onActivated(index)"
-                 :id="item.id+'_imgBox'">
+                 :id="item.id+'_imgBox_'+maxEditorRootId">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
                 <template v-for="img in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
                   <div style="display: inline-grid">
@@ -105,7 +105,7 @@
                   </div>
                 </template>
               </div>
-              <div :id="item.id+'_imgBox_qrCode'" v-if="!isExited(item.imgs)"></div>
+              <div :id="item.id+'_imgBox_qrCode_'+maxEditorRootId" v-if="!isExited(item.imgs)"></div>
               <!--图片标记-->
               <maxeditor-tab v-if="isExited(item.imgTabs)" v-for="(i, idx) in item.imgTabs"
                              :x="isExited(i.x)?i.x:0"
@@ -152,7 +152,7 @@
           </template>
           <!--面板工具栏-->
           <div class="maxeditor-board-toolbar"
-               v-if="maxeditor_mode==='design'"
+               v-show="maxeditor_mode==='design'"
                :style="{'margin-left':item.type==='hr'?'325px':''}"
                :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
             <span class="maxeditor-icon-move"></span>
@@ -192,8 +192,8 @@
       height: {default: 1124},
       paddingX: {default: 20},
       paddingY: {default: 20},
-      isModeBtnShow: {default:false},//模式控制按钮显示
-      maxEditorId: {default: 'maxEditor_00'}
+      isModeBtnShow: {default: false},//模式控制按钮显示
+      maxEditorRootId: {type: String, default: 'maxEditor_00'}
     },
     data() {
       return {
@@ -268,7 +268,7 @@
           throw new Error('MaxEditor:' + id + '不存在，无法更新下拉框');
         });
         temp[index].datalist = datalist;
-        document.getElementById(id + '_content').innerText = '';
+        document.getElementById(id + '_content_' + this.maxEditorRootId).innerText = '';
         this.$set(this.maxeditor_boards, temp);
       },
       changeDropDownState(id) {
@@ -338,7 +338,7 @@
         throw new Error('MaxEditor:下拉列表中找到不' + itemId);
       },
       setDropDownValue(id, value) {
-        document.getElementById(id + '_content').innerText = value
+        document.getElementById(id + '_content_' + this.maxEditorRootId).innerText = value
       },
       addHr() {
         this.addBoard({type: 'hr', isFluid: true, z: 101})
@@ -357,7 +357,7 @@
         this.checkId(id, function (index) {
           //TODO 此处不要写死，后期必改
           try {
-            document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
+            document.getElementById(id + '_imgBox_qrCode_' + this.maxEditorRootId).innerHTML = '';//清空容器中二维码
           } catch (e) {
           }
           temp[index].imgs = imgdata;
@@ -368,9 +368,10 @@
       },
       clearImgBoxContent(id) {
         let temp = this.maxeditor_boards;
+        let rootId = this.maxEditorRootId;
         this.checkId(id, function (i) {
           try {
-            document.getElementById(id + '_imgBox_qrCode').innerHTML = '';//清空容器中二维码
+            document.getElementById(id + '_imgBox_qrCode_' + rootId).innerHTML = '';//清空容器中二维码
           } catch (e) {
           }
           temp[i].imgs = null;
@@ -380,8 +381,9 @@
         this.$set(this.maxeditor_boards, temp);
       },
       insertQRCode(id, url) {
+        let rootId = this.maxEditorRootId;
         this.checkId(id, function () {
-          let dom = document.getElementById(id + '_imgBox_qrCode');
+          let dom = document.getElementById(id + '_imgBox_qrCode_' + rootId);
           dom.innerHTML = '';
           new QRCode(dom, url);
         }, function () {
@@ -482,10 +484,11 @@
         } catch (e) {
         }
         this.maxeditor_boards = boards;
+        let rootId = this.maxEditorRootId;
         this.$nextTick(function () {
           this.maxeditor_boards.forEach(function (item, index) {
             if (item.content !== undefined) {
-              document.getElementById(item.id + '_content').innerHTML = item.content
+              document.getElementById(item.id + '_content_' + rootId).innerHTML = item.content
             }
           });
         })
@@ -497,76 +500,13 @@
         return this.maxeditor_mode
       },
       activeBoard(id) {
-        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            if (this.maxeditor_current_id === id) {
-              console.log(id + ' is already activated.');
-            } else {
-              this.onActivated(i)
-            }
-          }
-        }*/
-        document.getElementById(id + '_content').focus();
+        document.getElementById(id + '_content_' + this.maxEditorRootId).focus();
       },
       deactiveBoard(id) {
-        /*for (let i = 0; i < this.maxeditor_boards.length; i++) {
-          if (this.maxeditor_boards[i].id === id) {
-            if (this.maxeditor_current_id === id) {
-              this.onDeactivated(i);
-            } else {
-              console.log(id + ' is not active already.');
-            }
-          }
-        }*/
-        document.getElementById(id + '_content').blur();
+        document.getElementById(id + '_content_' + this.maxEditorRootId).blur();
       },
       print() {
-        /* //原html代码取出
-         var html = document.getElementById('maxeditor-body').innerHTML;
 
-         //生成iframe
-         var iframe;
-         try {
-             iframe = document.createElement("<iframe id='ifr-max'></iframe>");
-         } catch (e) {
-             iframe = document.createElement("iframe");
-             iframe.id = "ifr-max";
-         }
-         iframe.style.visibility = "hidden";
-
-         //iframe插入
-         document.body.append(iframe);
-
-         var ifrMax = document.getElementById("ifr-max");
-         ifrMax.contentWindow.document.getElementsByTagName("html")[0].innerHTML = html;
-         ifrMax.contentWindow.print();*/
-
-        //获取当前页的html代码
-        var bodyhtml = document.getElementById('maxeditor-body').innerHTML;
-        ;
-
-        // 生成并打印ifrme
-        var iframe;
-        try {
-          iframe = document.createElement("<iframe id='ifr-max'></iframe>");
-        } catch (e) {
-          iframe = document.createElement("iframe");
-          iframe.id = "ifr-max";
-        }
-        //iframe.style.visibility = "hidden";
-        iframe.style.width = "800px";
-
-
-        //iframe插入
-        document.body.append(iframe);
-
-
-        var ifrMax = document.getElementById("ifr-max");
-        ifrMax.contentWindow.document.getElementsByTagName("head")[0].innerHTML = document.getElementsByTagName('head')[0].innerHTML;
-        ifrMax.contentWindow.document.getElementsByTagName("body")[0].innerHTML = bodyhtml;
-        ifrMax.contentWindow.document.getElementsByTagName("body")[0].style.backgroundColor = 'red';
-        //ifrMax.contentWindow.print();
-        window.print()
 
       },
 
@@ -609,7 +549,7 @@
         this.maxeditor_current_id = this.maxeditor_boards[index].id;
         this.maxeditor_current_index = index;
         try {
-          this.maxeditor_boards[index].content = document.getElementById(this.maxeditor_current_id + "_content").innerHTML;
+          this.maxeditor_boards[index].content = document.getElementById(this.maxeditor_current_id + "_content_" + this.maxEditorRootId).innerHTML;
         } catch (e) {
 
         }
@@ -742,7 +682,7 @@
         }, function () {
           throw new Error('MaxEditor:id' + id + '不存在，无法获取面板文本内容');
         });
-        return document.getElementById(id + '_content').innerText;
+        return document.getElementById(id + '_content_' + this.maxEditorRootId).innerText;
       },
       getBoardContent(id) {
         let index;
@@ -763,8 +703,9 @@
           throw new Error('MaxEditor:id' + id + '不存在，无法设置面板内容');
         });
         this.$set(this.maxeditor_boards, temp);
+        let rootId = this.maxEditorRootId;
         this.$nextTick(function () {
-          document.getElementById(id + '_content').innerHTML = this.maxeditor_boards[index].content
+          document.getElementById(id + '_content_' + rootId).innerHTML = this.maxeditor_boards[index].content
         });
       },
 
@@ -796,7 +737,7 @@
       //菜单栏滚动到顶部时固定
       handleToolbarScroll() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        let offsetTop = document.getElementById('maxeditor-toolbar').offsetTop;
+        let offsetTop = document.getElementById('maxeditor-toolbar-' + this.maxEditorRootId).offsetTop;
         this.toolBarFixed = scrollTop > offsetTop;
       },
       //计算文本中汉字个数
@@ -841,13 +782,16 @@
       //焦点释放
       handleBodyClick(event) {
         if (event.target.className === 'maxeditor-body-inner') {
-          console.log('释放焦点');
-          this.maxeditor_current_dropdown = undefined;
-          this.maxeditor_current_id = undefined;
-          this.maxeditor_current_index = undefined;
-          this.maxeditor_current_tabImg_index = undefined;
+          this.blurAll()
         }
       },
+      blurAll() {
+        console.log('释放焦点');
+        this.maxeditor_current_dropdown = undefined;
+        this.maxeditor_current_id = undefined;
+        this.maxeditor_current_index = undefined;
+        this.maxeditor_current_tabImg_index = undefined;
+      }
     },
     mounted() {
       window.addEventListener('scroll', this.handleToolbarScroll);
@@ -867,6 +811,10 @@
           for (let i = 0; i < list.length; i++) {
             list[i].removeAttribute('readonly')
           }
+        }
+
+        if (n !== 'design') {
+          this.blurAll()
         }
       }
     }

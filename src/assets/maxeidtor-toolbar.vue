@@ -1,6 +1,6 @@
 <template>
   <div class="maxeditor-toolbar maxeditor-p-b-10"
-       id="maxeditor-toolbar"
+       :id="'maxeditor-toolbar-'+maxeditorRootId"
        ref="maxEditorToolbar"
        :style="{'width': width+paddingX*2+'px'}">
     <a title="粗体" class="maxeditor-toolbar-item"
@@ -116,6 +116,7 @@
       width: '',
       paddingX:'',
       maxeditor_mode: '',
+      maxeditorRootId: '',
       isModeBtnShow: '',
       maxeditor_current_board: {
         type: Object,

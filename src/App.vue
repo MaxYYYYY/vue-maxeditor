@@ -42,7 +42,7 @@
                :width="794"
                :height="1123"
                :padding-x="20"
-               :max-editor-id="'sssss'"></MaxEditor>
+               :max-editor-root-id="'dddd'"></MaxEditor>
     <div id="temp"></div>
 
   </div>
