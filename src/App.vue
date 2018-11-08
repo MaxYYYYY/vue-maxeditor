@@ -37,7 +37,11 @@
     <button @click="clearImgTab">clearImgTab</button>
 
 
-    <MaxEditor ref="maxeditor" :is-mode-btn-show='false' :width="794" :height="1123" padding-x="20" is-mode-btn-show="true"></MaxEditor>
+    <MaxEditor ref="maxeditor" :is-mode-btn-show='false'
+               :width="794"
+               :height="1123"
+               padding-x="20"
+               is-mode-btn-show="true" max-editor-id="shishishi"></MaxEditor>
     <div id="temp"></div>
 
 

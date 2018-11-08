@@ -49,7 +49,7 @@
             <div style="width: 100%;height: 100%"
                  v-bind:contenteditable="item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design'"
                  :id="item.id+'_content'"
-                 :class="{'maxeditor-board-outline':maxeditor_mode==='design',
+                 :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
                           'maxeditor-single-line':item.isSingleLine}"
                  @focus="onActivated(index)"
                  @click="onActivated(index)"
@@ -193,6 +193,7 @@
       paddingX: {default: 20},
       paddingY: {default: 20},
       isModeBtnShow: false,//模式控制按钮显示
+      maxEditorId: {default: 'maxEditor_00'}
     },
     data() {
       return {
