@@ -35,76 +35,77 @@
       class="maxeditor-icon maxeditor-icon-align-right"></span></a>
     <a class="maxeditor-toolbar-item-separator"></a>
 
+    <div v-show="isModeBtnShow">
+      <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
+              @click="addHr">分隔线
+      </button>
+      <button title="插入文本框" class="maxeditor-toolbar-button"
+              @click="addSection">文本框
+      </button>
+      <button title="插入不可编辑文本" class="maxeditor-toolbar-button"
+              @click="addReadOnlySection">不可编辑文本
+      </button>
+      <button title="插入带标题文本框" class="maxeditor-toolbar-button"
+              @click="addSectionWithTitle">文本框（带标题）
+      </button>
+      <button title="插入带标签文本" class="maxeditor-toolbar-button"
+              @click="addTextWithLabel">文本（带标签）
+      </button>
+      <button title="插入带标签下拉框" class="maxeditor-toolbar-button"
+              @click="addDropDownWithLabel">下拉框（带标签）
+      </button>
+      <button title="插入图片容器" class="maxeditor-toolbar-button"
+              @click="addImgBox">图片容器
+      </button>
+      <button title="插入表格" class="maxeditor-toolbar-button"
+              @click="addTable">表格
+      </button>
+      <button title="清空编辑器" class="maxeditor-toolbar-button"
+              @click="clearBoards">清空编辑器
+      </button>
+      <br/>
 
-    <br/>
-    <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
-            @click="addHr">分隔线
-    </button>
-    <button title="插入文本框" class="maxeditor-toolbar-button"
-            @click="addSection">文本框
-    </button>
-    <button title="插入不可编辑文本" class="maxeditor-toolbar-button"
-            @click="addReadOnlySection">不可编辑文本
-    </button>
-    <button title="插入带标题文本框" class="maxeditor-toolbar-button"
-            @click="addSectionWithTitle">文本框（带标题）
-    </button>
-    <button title="插入带标签文本" class="maxeditor-toolbar-button"
-            @click="addTextWithLabel">文本（带标签）
-    </button>
-    <button title="插入带标签下拉框" class="maxeditor-toolbar-button"
-            @click="addDropDownWithLabel">下拉框（带标签）
-    </button>
-    <button title="插入图片容器" class="maxeditor-toolbar-button"
-            @click="addImgBox">图片容器
-    </button>
-    <button title="插入表格" class="maxeditor-toolbar-button"
-            @click="addTable">表格
-    </button>
-    <button title="清空编辑器" class="maxeditor-toolbar-button"
-            @click="clearBoards">清空编辑器
-    </button>
-    <br/>
-
-    <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10" v-show="isModeBtnShow"
-            :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='design'}"
-            @click="setMode('design')">设计模式
-    </button>
-    <button title="编辑模式" class="maxeditor-toolbar-button maxeditor-m-t-10" v-show="isModeBtnShow"
-            :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='edit'}"
-            @click="setMode('edit')">编辑模式
-    </button>
-    <button title="只读模式" class="maxeditor-toolbar-button maxeditor-m-t-10" v-show="isModeBtnShow"
-            :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
-            @click="setMode('readonly')">只读模式
-    </button>
+      <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
+              :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='design'}"
+              @click="setMode('design')">设计模式
+      </button>
+      <button title="编辑模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
+              :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='edit'}"
+              @click="setMode('edit')">编辑模式
+      </button>
+      <button title="只读模式" class="maxeditor-toolbar-button maxeditor-m-t-10"
+              :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
+              @click="setMode('readonly')">只读模式
+      </button>
 
 
-    <div class="maxeditor-float-r maxeditor-m-t-10"
-         v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
+      <div class="maxeditor-float-r maxeditor-m-t-10"
+           v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
          ||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'||maxeditor_current_board.type==='table')">
-      <!-- <button title="修改z-index"
-               class="maxeditor-toolbar-button maxeditor-float-r"
-               @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
-       </button>-->
-      <button title="修改title"
-              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-              v-if="maxeditor_current_board.type==='normal'"
-              @click="updateTitle">修改title:{{maxeditor_current_board.title}}
-      </button>
-      <button title="修改label"
-              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-              v-if="maxeditor_current_board.type==='label'"
-              @click="updateLabel">修改label:{{maxeditor_current_board.label}}
-      </button>
-      <button title="修改id"
-              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-              @click="updateId">修改id:{{maxeditor_current_board.id}}
-      </button>
-      <button title="面板类型"
-              class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">面板类型:{{maxeditor_current_board.type}}
-      </button>
+        <!-- <button title="修改z-index"
+                 class="maxeditor-toolbar-button maxeditor-float-r"
+                 @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
+         </button>-->
+        <button title="修改title"
+                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
+                v-if="maxeditor_current_board.type==='normal'"
+                @click="updateTitle">修改title:{{maxeditor_current_board.title}}
+        </button>
+        <button title="修改label"
+                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
+                v-if="maxeditor_current_board.type==='label'"
+                @click="updateLabel">修改label:{{maxeditor_current_board.label}}
+        </button>
+        <button title="修改id"
+                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
+                @click="updateId">修改id:{{maxeditor_current_board.id}}
+        </button>
+        <button title="面板类型"
+                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">面板类型:{{maxeditor_current_board.type}}
+        </button>
+      </div>
     </div>
+
   </div>
 </template>
 

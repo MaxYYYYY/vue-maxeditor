@@ -85,7 +85,7 @@ Type: `Boolean`<br>
 Required: `false`<br>
 Default: `false`
 
-模式按钮是否可见
+面板相关按钮是否可见
 
 ## 方法
 方法通过钩子调用

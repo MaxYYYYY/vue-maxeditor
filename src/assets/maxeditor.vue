@@ -192,7 +192,7 @@
       height: {default: 1124},
       paddingX: {default: 20},
       paddingY: {default: 20},
-      isModeBtnShow: false,//模式控制按钮显示
+      isModeBtnShow: {default:false},//模式控制按钮显示
       maxEditorId: {default: 'maxEditor_00'}
     },
     data() {
