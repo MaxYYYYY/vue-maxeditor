@@ -47,7 +47,7 @@
           <!--normal面板-->
           <template v-if="item.type === 'normal'">
             <div style="width: 100%;height: 100%"
-                 v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
+                 v-bind:contenteditable="item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design'"
                  :id="item.id+'_content'"
                  :class="{'maxeditor-board-outline':maxeditor_mode==='design',
                           'maxeditor-single-line':item.isSingleLine}"
@@ -217,6 +217,9 @@
       //全局方法
       addSection(id) {
         this.addBoard({id: id, type: 'normal', isFluid: true, z: 100})
+      },
+      addReadOnlySection(id) {
+        this.addBoard({id: id, type: 'normal', isFluid: false, z: 100, writable: false, height: 24, width: 300})
       },
       addSectionWithTitle(id, title) {
         if (title === undefined || title === null || title === '') {
@@ -439,6 +442,7 @@
         if (option.type === 'normal') {
           common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
           common.title = this.isExited(option.title) ? option.title : null;
+          common.writable = this.isExited(option.writable) ? option.writable : true;
         }
 
         if (option.type === 'label') {

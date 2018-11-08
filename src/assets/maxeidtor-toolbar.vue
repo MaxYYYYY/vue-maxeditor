@@ -43,6 +43,9 @@
     <button title="插入文本框" class="maxeditor-toolbar-button"
             @click="addSection">文本框
     </button>
+    <button title="插入不可编辑文本" class="maxeditor-toolbar-button"
+            @click="addReadOnlySection">不可编辑文本
+    </button>
     <button title="插入带标题文本框" class="maxeditor-toolbar-button"
             @click="addSectionWithTitle">文本框（带标题）
     </button>
@@ -146,6 +149,14 @@
         }
         let id = prompt('请输入id');
         this.$parent.addSection(id)
+      },
+      addReadOnlySection() {
+        if (this.$parent.maxeditor_mode !== 'design') {
+          alert('当前模式不可插入板块');
+          return
+        }
+        let id = prompt('请输入id');
+        this.$parent.addReadOnlySection(id)
       },
       addSectionWithTitle() {
         if (this.$parent.maxeditor_mode !== 'design') {
