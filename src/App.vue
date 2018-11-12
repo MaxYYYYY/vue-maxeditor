@@ -36,7 +36,6 @@
     <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
     <button @click="test">test</button>
     <button @click="bindImgTabBox">bindImgTabBox</button>
-    <button @click="clearImgTab">clearImgTab</button>
 
 
     <MaxEditor ref="maxeditor"
@@ -65,7 +64,9 @@
         let id = prompt('请输入id');
         let img = prompt('img');
         let imgJson = JSON.parse(img);
-        this.$refs.maxeditor.addImg(id, imgJson)
+        this.$refs.maxeditor.addImg(id, imgJson, function (imgDom) {
+          console.log(imgDom)
+        })
       },
 
       deleteImg() {
@@ -74,10 +75,6 @@
         this.$refs.maxeditor.deleteImg(id, key)
       },
 
-      clearImgTab() {
-        let id = prompt('请输入id');
-        this.$refs.maxeditor.clearImgTab(id);
-      },
       bindImgTabBox() {
         let sid = prompt('扫描图容器id');
         let tid = prompt('示意图容器id');

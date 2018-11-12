@@ -98,7 +98,7 @@
                 <template v-for="(img, imgIdx) in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
                   <div style="display: inline-grid">
                     <div style="position: relative;">
-                      <img :src="img.src"
+                      <img :src="img.src" :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                            :style="{'width':item.imgs.length===1?'':'160px',
                                 'height':item.imgs.length===1?item.height+'px':'',
                                 'margin':item.imgs.length===1?'0':'4px'}"/>
@@ -479,10 +479,10 @@
           this.$set(this.maxeditor_boards, temp)
         });
       },
-      addImg(id, img) {
+      addImg(id, img, cb) {
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
-          if(temp[index].imgs === null || temp[index].imgs === undefined){
+          if (temp[index].imgs === null || temp[index].imgs === undefined) {
             temp[index].imgs = []
           }
           temp[index].imgs.push(img);
@@ -490,6 +490,10 @@
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
         });
         this.$set(this.maxeditor_boards, temp);
+        this.$nextTick(function () {
+          let imgDom = document.getElementById(id+'_imgDom_'+img.key+'_'+this.maxEditorRootId);
+          cb(imgDom);
+        });
       },
 
       clearImgBoxContent(id) {
@@ -567,16 +571,6 @@
 
         temp[watcherIndex].watchTo = null;
         temp[changerIndex].watchBy = null;
-        this.$set(this.maxeditor_boards, temp);
-      },
-
-      clearImgTab(id) {
-        let temp = this.maxeditor_boards;
-        this.checkId(id, function (index) {
-          temp[index].imgTabs = [];
-        }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法清空图片标记');
-        });
         this.$set(this.maxeditor_boards, temp);
       },
 

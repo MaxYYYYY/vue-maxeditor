@@ -276,21 +276,29 @@ export default {
 
 向图片容器中插入二维码
 
-#### clearImgTab(id)
-清空图片容器的标记
-
-#### addImg(id, img)
+#### addImg(id, img, cb)
 像图片容器中插入单张图片，img格式如下
 ```json
 {
   "src": "http://dmt.upload.streakingman.com/test01.jpg",
   "tab": {
-    "position": "tr", 
+    "position": "br", 
     "color":"green"
   },
   "key": "pic2",
   "label": "pic2"
 }
+```
+tab的position为角标位置，有四个可选值tl、tr、bl、br，分别为左上角、右上角、左下角、右下角。
+
+color为背景颜色，值可为颜色名称或颜色代码（如white、#ff3306）
+
+cb为回掉函数，返回插入图片的dom元素
+```js
+addImg(id, img, function (imgDom) {
+  console.log(imgDom)
+  //DO SOMETHING
+})
 ```
 
 #### deleteImg(id, key)
