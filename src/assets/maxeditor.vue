@@ -95,32 +95,47 @@
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox_'+maxEditorRootId">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
-                <template v-for="img in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
+                <template v-for="(img, imgIdx) in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
                   <div style="display: inline-grid">
-                    <img :src="img.src"
-                         :style="{'width':item.imgs.length===1?'':'160px',
+                    <div style="position: relative;">
+                      <img :src="img.src"
+                           :style="{'width':item.imgs.length===1?'':'160px',
                                 'height':item.imgs.length===1?item.height+'px':'',
                                 'margin':item.imgs.length===1?'0':'4px'}"/>
+                      <!--图片角标-->
+                      <div style="position: absolute;
+                      margin: 4px 4px 8px;height: 20px;width: 20px;"
+                           v-show="isExited(img.tab)"
+                           :style="{'background-color':isExited(img.tab)?isExited(img.tab)?img.tab.color:'white':'white'}"
+                           :class="{'maxeditor-position-tl':isExited(img.tab)&&img.tab.position==='tl',
+                                    'maxeditor-position-tr':isExited(img.tab)&&img.tab.position==='tr',
+                                    'maxeditor-position-bl':isExited(img.tab)&&img.tab.position==='bl',
+                                    'maxeditor-position-br':isExited(img.tab)&&img.tab.position==='br'}">{{imgIdx+1}}
+                      </div>
+                    </div>
                     <p style="text-align: center; margin: 0;">{{isExited(img.label)?img.label:''}}</p>
                   </div>
                 </template>
               </div>
               <div :id="item.id+'_imgBox_qrCode_'+maxEditorRootId" v-if="!isExited(item.imgs)"></div>
               <!--图片标记-->
-              <maxeditor-tab v-if="isExited(item.imgTabs)" v-for="(i, idx) in item.imgTabs"
-                             :x="isExited(i.x)?i.x:0"
-                             :y="isExited(i.y)?i.y:0"
-                             :w="isExited(i.width)?i.width:20"
-                             :h="isExited(i.height)?i.height:20"
+              <maxeditor-tab v-if="isExited(item.watchTo)"
+                             v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
+                             :x="isExited(i.tabX)?i.tabX:0"
+                             :y="isExited(i.tabY)?i.tabY:0"
+                             :w="isExited(i.tabWidth)?i.tabWidth:20"
+                             :h="isExited(i.tabHeight)?i.tabHeight:20"
                              :minh="15"
                              :minw="15"
                              :parent="true"
                              :handles="[]"
                              @click="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
+                             @activated="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
                              @dragging="onImgTabDrag"
-                             @resizing="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;onImgTabResize()">
-                <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;">
-                  {{item.imgTabs.length>1?idx+1:item.imgTabNum}}
+                             @resizing="onImgTabResize">
+                <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;"
+                     :style="{'background-color':isExited(i.color)?i.color:'white'}" :title="i.key">
+                  {{idx+1}}
                 </div>
               </maxeditor-tab>
             </div>
@@ -216,6 +231,83 @@
     },
     methods: {
       //全局方法
+      addBoard(option) {
+        if (this.maxeditor_mode !== 'design') {
+          throw new Error('MaxEditor:当前模式不可插入板块');
+        }
+        if (option.id === '' || option.id === null || option.id === undefined) {
+          if (option.type === 'hr') {
+            option.id = 'maxeditor-board-hr-' + this.maxeditor_boards.length
+          } else {
+            throw new Error('MaxEditor:缺少id,无法插入板块');
+          }
+        }
+        this.checkId(option.id, function () {
+          throw new Error('MaxEditor:id已存在,无法插入板块');
+        }, function () {
+        });
+
+        let common = {
+          component: 'maxeditor-board',
+          id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
+          type: option.type,
+          isFluid: option.isFluid,
+          x: this.isExited(option.x) ? option.x : 0,
+          y: this.isExited(option.y) ? option.y : 0,
+          z: this.isExited(option.z) ? option.z : 100,
+          width: this.isExited(option.width) ? option.width : null,
+          height: this.isExited(option.height) ? option.height : null,
+        };
+
+        if (option.type === 'normal') {
+          common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
+          common.title = this.isExited(option.title) ? option.title : null;
+          common.writable = this.isExited(option.writable) ? option.writable : true;
+        }
+
+        if (option.type === 'label') {
+          common.label = this.isExited(option.label) ? option.label : null;
+          common.datalist = this.isExited(option.datalist) ? option.datalist : null;//下拉数组
+          common.datalist_current = null;//当前选中项
+        }
+
+        if (option.type === 'imgBox') {
+          common.imgs = this.isExited(option.imgs) ? option.imgs : null;
+          common.imgTabs = this.isExited(option.imgTabs) ? option.imgTabs : null;
+          common.watchTo = null;
+          common.watchBy = null;
+        }
+
+        if (option.type === 'table') {
+
+        }
+
+        this.maxeditor_boards.push(common);
+        this.onActivated(this.maxeditor_boards.length - 1)
+      },
+      getBoards() {
+        return this.maxeditor_boards;
+      },
+      setBoards(boards) {
+        try {
+          if (typeof JSON.parse(boards) === "object") {
+            boards = JSON.parse(boards)
+          }
+        } catch (e) {
+        }
+        this.maxeditor_boards = boards;
+        let rootId = this.maxEditorRootId;
+        this.$nextTick(function () {
+          this.maxeditor_boards.forEach(function (item, index) {
+            if (item.content !== undefined) {
+              document.getElementById(item.id + '_content_' + rootId).innerHTML = item.content
+            }
+          });
+        })
+      },
+      clearBoards() {
+        this.maxeditor_boards = [];
+      },
       addSection(id) {
         this.addBoard({id: id, type: 'normal', isFluid: true, z: 100})
       },
@@ -343,6 +435,7 @@
       addHr() {
         this.addBoard({type: 'hr', isFluid: true, z: 101})
       },
+
       addImgBox(id) {
         this.addBoard({id: id, type: 'imgBox', isFluid: false, z: 101})
       },
@@ -366,6 +459,39 @@
         });
         this.$set(this.maxeditor_boards, temp);
       },
+      deleteImg(id, key) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          let isExit = false;
+          temp[index].imgs.forEach(function (img, idx) {
+            if (img.key === key) {
+              temp[index].imgs.splice(idx, 1);
+              isExit = true;
+            }
+          });
+          if (!isExit) {
+            throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
+          }
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
+        });
+        this.$nextTick(function () {
+          this.$set(this.maxeditor_boards, temp)
+        });
+      },
+      addImg(id, img) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          if(temp[index].imgs === null || temp[index].imgs === undefined){
+            temp[index].imgs = []
+          }
+          temp[index].imgs.push(img);
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
+        });
+        this.$set(this.maxeditor_boards, temp);
+      },
+
       clearImgBoxContent(id) {
         let temp = this.maxeditor_boards;
         let rootId = this.maxEditorRootId;
@@ -390,21 +516,60 @@
           throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
         });
       },
-      insertImgTab(id, size, num) {
+      bindImgTabBox(changerBoxId, watcherBoxId) {
         let temp = this.maxeditor_boards;
-        this.checkId(id, function (index) {
-          temp[index].imgTabs = [];
-          if (size === 1) {
-            temp[index].imgTabNum = num;
+        let changerIndex = null;
+        let watcherIndex = null;
+
+        this.checkId(changerBoxId, function (index) {
+          if (temp[index].type !== 'imgBox') {
+            throw new Error('MaxEditor:该方法不可绑定非图片容器');
           }
-          for (let i = 0; i < size; i++) {
-            temp[index].imgTabs.push({})
-          }
+          changerIndex = index;
         }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法插入图片标记');
+          throw new Error('MaxEditor:' + id + '不存在，无法绑定容器');
         });
+        this.checkId(watcherBoxId, function (index) {
+          if (temp[index].type !== 'imgBox') {
+            throw new Error('MaxEditor:该方法不可绑定非图片容器');
+          }
+          watcherIndex = index;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法绑定容器');
+        });
+
+        temp[watcherIndex].watchTo = changerIndex;
+        temp[changerIndex].watchBy = watcherIndex;
+        this.$set(this.maxeditor_boards, temp);
+        console.log('MaxEditor:绑定了' + changerBoxId + '和' + watcherBoxId)
+      },
+      unBindImgTabBox(changerBoxId, watcherBoxId) {
+        let temp = this.maxeditor_boards;
+        let changerIndex = null;
+        let watcherIndex = null;
+
+        this.checkId(changerBoxId, function (index) {
+          if (temp[index].type !== 'imgBox') {
+            throw new Error('MaxEditor:非图片容器');
+          }
+          changerIndex = index;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法解除绑定容器');
+        });
+        this.checkId(watcherBoxId, function (index) {
+          if (temp[index].type !== 'imgBox') {
+            throw new Error('MaxEditor:非图片容器');
+          }
+          watcherIndex = index;
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法解除绑定容器');
+        });
+
+        temp[watcherIndex].watchTo = null;
+        temp[changerIndex].watchBy = null;
         this.$set(this.maxeditor_boards, temp);
       },
+
       clearImgTab(id) {
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
@@ -414,85 +579,12 @@
         });
         this.$set(this.maxeditor_boards, temp);
       },
-      addBoard(option) {
-        if (this.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:当前模式不可插入板块');
-        }
-        if (option.id === '' || option.id === null || option.id === undefined) {
-          if (option.type === 'hr') {
-            option.id = 'maxeditor-board-hr-' + this.maxeditor_boards.length
-          } else {
-            throw new Error('MaxEditor:缺少id,无法插入板块');
-          }
-        }
-        this.checkId(option.id, function () {
-          throw new Error('MaxEditor:id已存在,无法插入板块');
-        }, function () {
-        });
 
-        let common = {
-          component: 'maxeditor-board',
-          id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
-          type: option.type,
-          isFluid: option.isFluid,
-          x: this.isExited(option.x) ? option.x : 0,
-          y: this.isExited(option.y) ? option.y : 0,
-          z: this.isExited(option.z) ? option.z : 100,
-          width: this.isExited(option.width) ? option.width : null,
-          height: this.isExited(option.height) ? option.height : null,
-        };
-
-        if (option.type === 'normal') {
-          common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
-          common.title = this.isExited(option.title) ? option.title : null;
-          common.writable = this.isExited(option.writable) ? option.writable : true;
-        }
-
-        if (option.type === 'label') {
-          common.label = this.isExited(option.label) ? option.label : null;
-          common.datalist = this.isExited(option.datalist) ? option.datalist : null;//下拉数组
-          common.datalist_current = null;//当前选中项
-        }
-
-        if (option.type === 'imgBox') {
-          common.imgs = this.isExited(option.imgs) ? option.imgs : null;
-          common.imgTabNum = this.isExited(option.imgTabNum) ? option.imgTabNum : null;//当只有一个标记时需要传入标记号
-          common.imgTabs = this.isExited(option.imgTabs) ? option.imgTabs : null;
-        }
-
-        if (option.type === 'table') {
-
-        }
-
-        this.maxeditor_boards.push(common);
-        this.onActivated(this.maxeditor_boards.length - 1)
-      },
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
-      clearBoards() {
-        this.maxeditor_boards = [];
-      },
-      getBoards() {
-        return this.maxeditor_boards;
-      },
-      setBoards(boards) {
-        try {
-          if (typeof JSON.parse(boards) === "object") {
-            boards = JSON.parse(boards)
-          }
-        } catch (e) {
-        }
-        this.maxeditor_boards = boards;
-        let rootId = this.maxEditorRootId;
-        this.$nextTick(function () {
-          this.maxeditor_boards.forEach(function (item, index) {
-            if (item.content !== undefined) {
-              document.getElementById(item.id + '_content_' + rootId).innerHTML = item.content
-            }
-          });
-        })
-      },
+
+
       setMode(mode) {
         this.maxeditor_mode = mode
       },
@@ -512,14 +604,18 @@
 
       //图片数字标记拖动时位置大小信息记录
       onImgTabDrag(x, y) {
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].x = x;
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].y = y;
+        if (this.isExited(this.maxeditor_boards[this.maxeditor_current_index].watchTo)) {
+          this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabX = x;
+          this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabY = y;
+        }
       },
       onImgTabResize(x, y, width, height) {
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].x = x;
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].y = y;
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].width = width;
-        this.maxeditor_boards[this.maxeditor_current_index].imgTabs[this.maxeditor_current_tabImg_index].height = height;
+        /* if (this.isExited(this.maxeditor_boards[this.maxeditor_current_index].watchTo)) {
+           this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabX = x;
+           this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabY = y;
+           this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabWidth = width;
+           this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabHeight = height;
+         }*/
       },
 
       //面板方法
@@ -532,6 +628,7 @@
         } catch (e) {
 
         }
+        //动态调整
       },
       onDrag(x, y) {
         try {
@@ -545,7 +642,6 @@
       },
       onActivated(index) {
         console.log('onActivated' + index);
-        this.current_selection = this.document.getSelection();
         this.maxeditor_current_id = this.maxeditor_boards[index].id;
         this.maxeditor_current_index = index;
         try {

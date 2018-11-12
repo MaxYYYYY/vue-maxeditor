@@ -256,10 +256,15 @@ export default {
 向图片容器中插入图片，imgs为json数组
 
 ```json
-[{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签1"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签2"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签3"},
-{"src":"http://dmt.upload.streakingman.com/test01.jpg","label":"标签4"}]
+[{
+   "src": "http://dmt.upload.streakingman.com/test01.jpg",
+   "tab": {
+     "position": "tr", 
+     "color":"green"
+   },
+   "key": "pic2",
+   "label": "pic2"
+ }]
 ```
 插入单张图片时也需要传入数组，此时图片大小根据容器高度而定
 图片数量大于1时宽度为固定值160px
@@ -271,17 +276,37 @@ export default {
 
 向图片容器中插入二维码
 
-#### insertImgTab(id, size, num)
-插入标记，size为标记个数，超过一个时不必传入num，标记值从1开始
-当size为1时，需要传入num， num为自定义标记值
-
 #### clearImgTab(id)
 清空图片容器的标记
+
+#### addImg(id, img)
+像图片容器中插入单张图片，img格式如下
+```json
+{
+  "src": "http://dmt.upload.streakingman.com/test01.jpg",
+  "tab": {
+    "position": "tr", 
+    "color":"green"
+  },
+  "key": "pic2",
+  "label": "pic2"
+}
+```
+
+#### deleteImg(id, key)
+根据key删除图片
+
+#### bindImgTabBox(changerBoxId, watcherBoxId)
+绑定扫描图容器和示意图容器，两个入参分别为扫描图的容器id和示意图的容器id
+被绑定的扫描图容器务必设置tab属性
+
+#### unBindImgTabBox(changerBoxId, watcherBoxId)
+解除绑定
 
 ## 其他方法
 
 #### editInsertText(text)
-在光标处插入文本
+在光标处插入文本，此方法底层为execCommand，所以调用时若焦点转移则无法插入
 
 #### editInsertDatalist(id, values)
 在光标处插入下拉框，values为选项json数组，示例如下

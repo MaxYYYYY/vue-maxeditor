@@ -101,7 +101,8 @@
                 @click="updateId">修改id:{{maxeditor_current_board.id}}
         </button>
         <button title="面板类型"
-                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">面板类型:{{maxeditor_current_board.type}}
+                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">
+          面板类型:{{maxeditor_current_board.type}}
         </button>
       </div>
     </div>
@@ -114,7 +115,7 @@
     name: "maxeidtor-toolbar",
     props: {
       width: '',
-      paddingX:'',
+      paddingX: '',
       maxeditor_mode: '',
       maxeditorRootId: '',
       isModeBtnShow: '',
@@ -231,7 +232,9 @@
       this.$parent.toolBarLeft = this.$refs.maxEditorToolbar.getBoundingClientRect().left;
     },
     created() {
-
+      console.log(this.width)
+      console.log(this.width + this.paddingX * 2)
+      console.log(this.width + this.paddingX * 2 + 'px')
     },
     watch: {}
   }

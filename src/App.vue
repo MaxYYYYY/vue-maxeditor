@@ -8,6 +8,8 @@
     <button @click="getBoards">getBoards</button>
     <button @click="setBoards">setBoards</button>
     <button @click="insertImg">insertImg</button>
+    <button @click="deleteImg">deleteImg</button>
+    <button @click="addImg">addImg</button>
     <button @click="clearImgBoxContent">clearImgBoxContent</button>
     <button @click="insertQRCode">insertQRCode</button>
     <br/>
@@ -33,17 +35,14 @@
     <button @click="setDropDownCurrentItem">setDropDownCurrentItem</button>
     <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
     <button @click="test">test</button>
-    <button @click="insertImgTab">insertImgTab</button>
+    <button @click="bindImgTabBox">bindImgTabBox</button>
     <button @click="clearImgTab">clearImgTab</button>
 
 
     <MaxEditor ref="maxeditor"
                :is-mode-btn-show="true"
-               :width="794"
-               :height="1123"
-               :padding-x="20"
                :max-editor-root-id="'dddd'"></MaxEditor>
-    <div id="temp"></div>
+    <div id="temp" contenteditable="true"></div>
 
   </div>
 
@@ -62,22 +61,31 @@
       MaxEditor
     },
     methods: {
-      clearImgTab(){
+      addImg() {
+        let id = prompt('请输入id');
+        let img = prompt('img');
+        let imgJson = JSON.parse(img);
+        this.$refs.maxeditor.addImg(id, imgJson)
+      },
+
+      deleteImg() {
+        let id = prompt('请输入id');
+        let key = prompt('请输入key');
+        this.$refs.maxeditor.deleteImg(id, key)
+      },
+
+      clearImgTab() {
         let id = prompt('请输入id');
         this.$refs.maxeditor.clearImgTab(id);
       },
-      insertImgTab() {
-        let id = prompt('请输入id');
-        let size = prompt('请输入标记个数');
-        let num = undefined;
-        if (parseInt(size) === 1){
-          num = prompt('请输入标记数字')
-        }
-        this.$refs.maxeditor.insertImgTab(id, parseInt(size), num);
+      bindImgTabBox() {
+        let sid = prompt('扫描图容器id');
+        let tid = prompt('示意图容器id');
+        this.$refs.maxeditor.bindImgTabBox(sid, tid);
       },
 
       test() {
-        document.execCommand('insertHTML',false,'<span></span><span contenteditable="false">RVDd:</span>' +
+        document.execCommand('insertHTML', false, '<span></span><span contenteditable="false">RVDd:</span>' +
           '<span contenteditable="true">hahaha</span>' +
           '<span style="float: right" contenteditable="false">cm</span>')
       },
