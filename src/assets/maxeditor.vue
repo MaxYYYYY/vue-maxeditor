@@ -439,8 +439,11 @@
       addImgBox(id) {
         this.addBoard({id: id, type: 'imgBox', isFluid: false, z: 101})
       },
-      insertImg(id, imgs) {
+      insertImg(id, imgs, cb = (imgDomList) => {
+        console.log(imgDomList)
+      }) {
         let temp = this.maxeditor_boards;
+        let rootId = this.maxEditorRootId;
         let imgdata;
         if (typeof imgs === 'object') {
           imgdata = imgs;
@@ -458,6 +461,17 @@
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
         });
         this.$set(this.maxeditor_boards, temp);
+        let doms = [];
+        this.$nextTick(function () {
+          imgdata.forEach(function (item,idx) {
+            let dom = document.getElementById(id + '_imgDom_' + item.key + '_' + rootId);
+            doms.push(dom)
+          });
+          cb(doms)
+        })
+
+
+
       },
       deleteImg(id, key) {
         let temp = this.maxeditor_boards;
@@ -479,7 +493,9 @@
           this.$set(this.maxeditor_boards, temp)
         });
       },
-      addImg(id, img, cb) {
+      addImg(id, img, cb = (imgDom) => {
+        console.log(imgDom)
+      }) {
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
           if (temp[index].imgs === null || temp[index].imgs === undefined) {
@@ -491,7 +507,7 @@
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
-          let imgDom = document.getElementById(id+'_imgDom_'+img.key+'_'+this.maxEditorRootId);
+          let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
           cb(imgDom);
         });
       },

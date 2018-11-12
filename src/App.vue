@@ -64,9 +64,7 @@
         let id = prompt('请输入id');
         let img = prompt('img');
         let imgJson = JSON.parse(img);
-        this.$refs.maxeditor.addImg(id, imgJson, function (imgDom) {
-          console.log(imgDom)
-        })
+        this.$refs.maxeditor.addImg(id, imgJson)
       },
 
       deleteImg() {

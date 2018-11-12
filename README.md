@@ -251,7 +251,7 @@ export default {
 #### addImgBox(id)
 插入图片容器
 
-#### insertImg(id,imgs)
+#### insertImg(id,imgs,cb)
 
 向图片容器中插入图片，imgs为json数组
 
@@ -267,7 +267,16 @@ export default {
  }]
 ```
 插入单张图片时也需要传入数组，此时图片大小根据容器高度而定
+
 图片数量大于1时宽度为固定值160px
+
+cb为回掉函数（可选），imgDomList为插入的图片dom集合
+```js
+addImg(id, imgs, function (imgDomList) {
+  console.log(imgDomList)
+  //DO SOMETHING
+})
+```
 
 #### clearImgBoxContent(id)
 清空图片容器内容
@@ -293,7 +302,7 @@ tab的position为角标位置，有四个可选值tl、tr、bl、br，分别为�
 
 color为背景颜色，值可为颜色名称或颜色代码（如white、#ff3306）
 
-cb为回掉函数，返回插入图片的dom元素
+cb为回掉函数(可选)，返回插入图片的dom元素
 ```js
 addImg(id, img, function (imgDom) {
   console.log(imgDom)
