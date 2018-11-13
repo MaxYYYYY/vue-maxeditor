@@ -20,8 +20,8 @@
           class="maxeditor-board"
           v-for="(item, index) in maxeditor_boards"
           :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
-          :id="item.id"
-          :key="item.id"
+          :id="item.id+'_'+maxEditorRootId"
+          :key="item.id+'_'+maxEditorRootId"
           :is="item.component"
           :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
           :parent="true"
@@ -257,6 +257,8 @@
           z: this.isExited(option.z) ? option.z : 100,
           width: this.isExited(option.width) ? option.width : null,
           height: this.isExited(option.height) ? option.height : null,
+          minWidth: this.isExited(option.minWidth) ? option.minWidth : null,
+          minHeight: this.isExited(option.minHeight) ? option.minHeight : null,
         };
 
         if (option.type === 'normal') {
@@ -463,13 +465,12 @@
         this.$set(this.maxeditor_boards, temp);
         let doms = [];
         this.$nextTick(function () {
-          imgdata.forEach(function (item,idx) {
+          imgdata.forEach(function (item, idx) {
             let dom = document.getElementById(id + '_imgDom_' + item.key + '_' + rootId);
             doms.push(dom)
           });
           cb(doms)
         })
-
 
 
       },
@@ -496,6 +497,12 @@
       addImg(id, img, cb = (imgDom) => {
         console.log(imgDom)
       }) {
+        try {
+          if (typeof JSON.parse(img) === "object") {
+            img = JSON.parse(img)
+          }
+        } catch (e) {
+        }
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
           if (temp[index].imgs === null || temp[index].imgs === undefined) {
@@ -897,6 +904,70 @@
         this.maxeditor_current_id = undefined;
         this.maxeditor_current_index = undefined;
         this.maxeditor_current_tabImg_index = undefined;
+      },
+      //normal面板适应内容高度
+      wrapContentHeight(boxIndex) {
+        /*let temp = this.maxeditor_boards;
+        //TODO 此处的dom访问可能会造成性能问题
+        let dom =  document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId);
+        let scrollHeight = dom.scrollHeight;
+        let offsetHeight = dom.offsetHeight;
+        if(scrollHeight>offsetHeight+21){
+          console.log('asdfasdf')
+          this.maxeditor_boards[boxIndex].height = scrollHeight;
+
+          document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId).height=scrollHeight;
+          console.log(temp[boxIndex].id + '_' + this.maxEditorRootId)
+         // console.log( document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId))
+         // this.refreshLayout(boxIndex);
+        }*/
+        console.log('wrapContentHeight')
+        let temp = this.maxeditor_boards;
+        temp[boxIndex].height = 400;
+        //
+        this.clearBoards()
+        this.$nextTick(function () {
+          console.log('nextTick')
+          this.setBoards(temp)
+        })
+      },
+      test(){
+        this.refreshLayout(this.maxeditor_current_id)
+      },
+      //刷新排版，向下调整
+      refreshLayout(id) {
+        let baseBoxIndex;
+        this.checkId(id, function (index) {
+          baseBoxIndex = index
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法更新排版');
+        });
+        let temp = this.maxeditor_boards;
+        let dom = document.getElementById(temp[baseBoxIndex].id + '_' + this.maxEditorRootId);
+        let scrollHeight = dom.scrollHeight;
+        let offsetHeight = dom.offsetHeight;
+        if (scrollHeight > offsetHeight + 21) {
+          temp[baseBoxIndex].height = scrollHeight;
+        }
+        let topY = temp[baseBoxIndex].y;
+        let bottomY = topY + temp[baseBoxIndex].height;
+        let transY = 0;
+        temp.forEach(function (item, index) {
+          if (item.y > topY && item.y < bottomY) {
+            let tty = bottomY - item.y;
+            transY = transY > tty ? transY : tty;
+          }
+        });
+        transY += 30;
+        temp.forEach(function (item, index) {
+          if (item.y > topY) {
+            item.y += transY;
+          }
+        });
+        this.clearBoards();
+        this.$nextTick(function () {
+          this.setBoards(temp)
+        })
       }
     },
     mounted() {

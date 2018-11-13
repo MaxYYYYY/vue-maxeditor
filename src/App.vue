@@ -20,6 +20,8 @@
     <button @click="setMode('design')">设计模式</button>
     <button @click="setMode('edit')">编辑模式</button>
     <button @click="setMode('readonly')">只读模式</button>
+    <button @click="refreshLayout">refreshLayout</button>
+    <button @click="wrapContentHeight">wrapContentHeight</button>
     <br/>
 
     <button @click="editInsertText">editInsertText</button>
@@ -36,11 +38,12 @@
     <button @click="getDropDownCurrentItem">getDropDownCurrentItem</button>
     <button @click="test">test</button>
     <button @click="bindImgTabBox">bindImgTabBox</button>
+    <button @click="test2">test2</button>
 
 
     <MaxEditor ref="maxeditor"
                :is-mode-btn-show="true"
-               :max-editor-root-id="'dddd'"></MaxEditor>
+               :max-editor-root-id="'dddd'" :height="2000"></MaxEditor>
     <div id="temp" contenteditable="true"></div>
 
   </div>
@@ -60,6 +63,14 @@
       MaxEditor
     },
     methods: {
+      wrapContentHeight(){
+        let index = prompt('请输入index');
+        this.$refs.maxeditor.wrapContentHeight(index)
+      },
+      refreshLayout(){
+        let index = prompt('请输入index');
+        this.$refs.maxeditor.refreshLayout(index)
+      },
       addImg() {
         let id = prompt('请输入id');
         let img = prompt('img');
@@ -77,6 +88,10 @@
         let sid = prompt('扫描图容器id');
         let tid = prompt('示意图容器id');
         this.$refs.maxeditor.bindImgTabBox(sid, tid);
+      },
+
+      test2(){
+        this.$refs.maxeditor.test();
       },
 
       test() {
@@ -154,7 +169,7 @@
       },
       getBoard() {
         let id = prompt('请输入id');
-        console.log(this.$refs.maxeditor.getBoard(id));
+        document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getBoard(id))
       },
       setBoard() {
         let boardObjectStr = prompt('boardObjectStr');
