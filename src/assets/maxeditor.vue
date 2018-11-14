@@ -123,8 +123,8 @@
                              v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
                              :x="isExited(i.tabX)?i.tabX:0"
                              :y="isExited(i.tabY)?i.tabY:0"
-                             :w="isExited(i.tabWidth)?i.tabWidth:20"
-                             :h="isExited(i.tabHeight)?i.tabHeight:20"
+                             :w="20"
+                             :h="20"
                              :minh="15"
                              :minw="15"
                              :parent="true"
@@ -134,7 +134,7 @@
                              @dragging="onImgTabDrag"
                              @resizing="onImgTabResize">
                 <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;"
-                     :style="{'background-color':isExited(i.color)?i.color:'white'}" :title="i.key">
+                     :style="{'background-color':isExited(i.tab)?isExited(i.tab.color)?i.tab.color:'white':'white'}" :title="i.key">
                   {{idx+1}}
                 </div>
               </maxeditor-tab>
@@ -490,8 +490,10 @@
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
         });
+        //TODO 研究此处是否会有性能问题
+        this.clearBoards();
         this.$nextTick(function () {
-          this.$set(this.maxeditor_boards, temp)
+          this.setBoards(temp)
         });
       },
       addImg(id, img, cb = (imgDom) => {
@@ -531,7 +533,7 @@
           }
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法获取扫描图')
-        })
+        });
         if (isExist) {
           return img;
         }
