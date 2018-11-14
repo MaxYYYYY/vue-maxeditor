@@ -10,6 +10,8 @@
     <button @click="insertImg">insertImg</button>
     <button @click="deleteImg">deleteImg</button>
     <button @click="addImg">addImg</button>
+    <button @click="updateImg">updateImg</button>
+    <button @click="getImg">getImg</button>
     <button @click="clearImgBoxContent">clearImgBoxContent</button>
     <button @click="insertQRCode">insertQRCode</button>
     <br/>
@@ -68,8 +70,19 @@
         this.$refs.maxeditor.wrapContentHeight(index)
       },
       refreshLayout(){
-        let index = prompt('请输入index');
-        this.$refs.maxeditor.refreshLayout(index)
+        let id = prompt('id');
+        this.$refs.maxeditor.refreshLayout(id)
+      },
+      updateImg() {
+        let id = prompt('请输入id');
+        let img = prompt('img');
+        let imgJson = JSON.parse(img);
+        this.$refs.maxeditor.updateImg(id, imgJson)
+      },
+      getImg() {
+        let id = prompt('请输入id');
+        let key = prompt('请输入key');
+        document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getImg(id, key))
       },
       addImg() {
         let id = prompt('请输入id');

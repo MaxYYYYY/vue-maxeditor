@@ -282,7 +282,6 @@ addImg(id, imgs, function (imgDomList) {
 清空图片容器内容
 
 #### insertQrCode(id, url)
-
 向图片容器中插入二维码
 
 #### addImg(id, img, cb)
@@ -294,13 +293,15 @@ addImg(id, imgs, function (imgDomList) {
     "position": "br", 
     "color":"green"
   },
+  "tabX": "30",
+  "tabY": "34",
   "key": "pic2",
   "label": "pic2"
 }
 ```
-tab的position为角标位置，有四个可选值tl、tr、bl、br，分别为左上角、右上角、左下角、右下角。
+tab的position为角标位置，有四个可选值tl、tr、bl、br，分别为左上角、右上角、左下角、右下角。color为背景颜色，值可为颜色名称或颜色代码（如white、#ff3306）
 
-color为背景颜色，值可为颜色名称或颜色代码（如white、#ff3306）
+tabX、tabY为标记在绑定的示意图中的坐标
 
 cb为回掉函数(可选)，返回插入图片的dom元素
 ```js
@@ -309,6 +310,12 @@ addImg(id, img, function (imgDom) {
   //DO SOMETHING
 })
 ```
+
+#### getImg(id, key)
+根据key值获取图片容器中的图片对象
+
+#### updateImg(id, img, cb)
+更新图片容器中的图片对象，更具传入的img对象的key值进行匹配跟新，cb为回掉函数，返回值为更新后的imgDom
 
 #### deleteImg(id, key)
 根据key删除图片

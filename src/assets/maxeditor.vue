@@ -518,6 +518,53 @@
           cb(imgDom);
         });
       },
+      getImg(id, key) {
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          let isExist = false;
+          let imgObj = {};
+          temp[index].imgs.forEach(function (img, idx) {
+            if (img.key === key) {
+              isExist = true;
+              imgObj = temp[index].imgs[idx];
+            }
+          });
+          if (isExist) {
+            console.log(imgObj)
+            return imgObj;
+          } else {
+            throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法获取图片');
+          }
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法获取扫描图')
+        })
+      },
+      //根据key值更新容器内图片
+      updateImg(id, img, cb = (imgDom) => {
+        console.log(imgDom)
+      }) {
+        try {
+          if (typeof JSON.parse(img) === "object") {
+            img = JSON.parse(img)
+          }
+        } catch (e) {
+        }
+        let temp = this.maxeditor_boards;
+        this.checkId(id, function (index) {
+          temp[index].imgs.forEach(function (i, idx) {
+            if (i.key === img.key) {
+              temp[index].imgs.splice(idx, 1, img);
+            }
+          });
+        }, function () {
+          throw new Error('MaxEditor:' + id + '不存在，无法更新图片');
+        });
+        this.$set(this.maxeditor_boards, temp);
+        this.$nextTick(function () {
+          let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
+          cb(imgDom);
+        });
+      },
 
       clearImgBoxContent(id) {
         let temp = this.maxeditor_boards;
@@ -930,9 +977,6 @@
           console.log('nextTick')
           this.setBoards(temp)
         })
-      },
-      test(){
-        this.refreshLayout(this.maxeditor_current_id)
       },
       //刷新排版，向下调整
       refreshLayout(id) {
