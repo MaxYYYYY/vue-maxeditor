@@ -476,24 +476,28 @@
       },
       deleteImg(id, key) {
         let temp = this.maxeditor_boards;
+        let that = this;
         this.checkId(id, function (index) {
           let isExit = false;
+          let ttemp;
           temp[index].imgs.forEach(function (img, idx) {
             if (img.key === key) {
-              temp[index].imgs.splice(idx, 1);
+              ttemp = temp[index].imgs;
+              ttemp.splice(img,1);
+              temp[index].imgs=[];
               isExit = true;
             }
+          });
+          that.$nextTick(function () {
+            ttemp.forEach((item)=>{
+               temp[index].imgs.push(item)
+             })
           });
           if (!isExit) {
             throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
           }
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
-        });
-        //TODO 研究此处是否会有性能问题
-        this.clearBoards();
-        this.$nextTick(function () {
-          this.setBoards(temp)
         });
       },
       addImg(id, img, cb = (imgDom) => {

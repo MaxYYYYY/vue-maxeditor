@@ -1,5 +1,5 @@
 <template>
-  <div class="maxeditor-toolbar maxeditor-p-b-10"
+  <div class="maxeditor-toolbar"
        :id="'maxeditor-toolbar-'+maxeditorRootId"
        ref="maxEditorToolbar"
        :style="{'width': width+paddingX*2+'px'}">
@@ -35,7 +35,7 @@
       class="maxeditor-icon maxeditor-icon-align-right"></span></a>
     <a class="maxeditor-toolbar-item-separator"></a>
 
-    <div v-show="isModeBtnShow">
+    <div v-show="isModeBtnShow" class="maxeditor-p-b-10" >
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
               @click="addHr">分隔线
       </button>
@@ -230,6 +230,7 @@
     },
     mounted() {
       this.$parent.toolBarLeft = this.$refs.maxEditorToolbar.getBoundingClientRect().left;
+      //document.addEventListener('')
     },
     created() {
       console.log(this.width)
