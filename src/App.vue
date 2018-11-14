@@ -65,11 +65,11 @@
       MaxEditor
     },
     methods: {
-      wrapContentHeight(){
+      wrapContentHeight() {
         let index = prompt('请输入index');
         this.$refs.maxeditor.wrapContentHeight(index)
       },
-      refreshLayout(){
+      refreshLayout() {
         let id = prompt('id');
         this.$refs.maxeditor.refreshLayout(id)
       },
@@ -82,7 +82,7 @@
       getImg() {
         let id = prompt('请输入id');
         let key = prompt('请输入key');
-        document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getImg(id, key))
+        document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getImg(id, key));
       },
       addImg() {
         let id = prompt('请输入id');
@@ -103,7 +103,7 @@
         this.$refs.maxeditor.bindImgTabBox(sid, tid);
       },
 
-      test2(){
+      test2() {
         this.$refs.maxeditor.test();
       },
 

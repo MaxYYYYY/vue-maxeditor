@@ -520,24 +520,21 @@
       },
       getImg(id, key) {
         let temp = this.maxeditor_boards;
+        let img = {};
+        let isExist = false;
         this.checkId(id, function (index) {
-          let isExist = false;
-          let imgObj = {};
-          temp[index].imgs.forEach(function (img, idx) {
-            if (img.key === key) {
-              isExist = true;
-              imgObj = temp[index].imgs[idx];
+          for (let i=0; i<temp[index].imgs.length; i++) {
+            if (temp[index].imgs[i].key ===key){
+              img = temp[index].imgs[i];
+              isExist = true
             }
-          });
-          if (isExist) {
-            console.log(imgObj)
-            return imgObj;
-          } else {
-            throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法获取图片');
           }
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法获取扫描图')
         })
+        if (isExist) {
+          return img;
+        }
       },
       //根据key值更新容器内图片
       updateImg(id, img, cb = (imgDom) => {
@@ -647,7 +644,6 @@
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
-
 
       setMode(mode) {
         this.maxeditor_mode = mode
