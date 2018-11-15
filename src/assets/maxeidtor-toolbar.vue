@@ -3,39 +3,42 @@
        :id="'maxeditor-toolbar-'+maxeditorRootId"
        ref="maxEditorToolbar"
        :style="{'width': width+paddingX*2+'px'}">
-    <a title="粗体" class="maxeditor-toolbar-item"
+    <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
        @click="document.execCommand('bold', false, null)"><span
       class="maxeditor-icon maxeditor-icon-bold"></span></a>
-    <a title="斜体" class="maxeditor-toolbar-item"
+    <a title="斜体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.italic}"
        @click="document.execCommand('italic', false, null)"><span
       class="maxeditor-icon maxeditor-icon-italic"></span></a>
-    <a title="下划线" class="maxeditor-toolbar-item"
+    <a title="下划线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.underline}"
        @click="document.execCommand('underline', false, null)"><span
       class="maxeditor-icon maxeditor-icon-underline"></span></a>
-    <a title="删除线" class="maxeditor-toolbar-item">
+    <a title="删除线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.strikeThrough}"
+       @click="document.execCommand('strikeThrough', false, null)">
       <span class="maxeditor-icon maxeditor-icon-strikethrough"></span></a>
     <a class="maxeditor-toolbar-item-separator"></a>
     <a title="字体大小" class="maxeditor-toolbar-item"
        @click="document.execCommand('formatblock', false, '<h1>')"><span
       class="maxeditor-icon maxeditor-icon-font"></span></a>
+    <a title="字体大小" class="maxeditor-toolbar-item"
+       @click="document.execCommand('formatblock', false, '<h1>')"><datalist><option>1</option><option>2</option></datalist></a>
     <a title="增大字体" class="maxeditor-toolbar-item"
        @click=""><span class="maxeditor-icon maxeditor-icon-font-plus"></span></a>
     <a title="减小字体" class="maxeditor-toolbar-item"
        @click=""><span class="maxeditor-icon maxeditor-icon-font-minus"></span></a>
     <a title="字体颜色" class="maxeditor-toolbar-item"><span class="maxeditor-icon maxeditor-icon-tint"></span></a>
     <a class="maxeditor-toolbar-item-separator"></a>
-    <a title="居中对齐" class="maxeditor-toolbar-item"
+    <a title="居中对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifycenter}"
        @click="document.execCommand('justifycenter', false, null)"><span
       class="maxeditor-icon maxeditor-icon-align-center"></span></a>
-    <a title="居左对齐" class="maxeditor-toolbar-item"
+    <a title="居左对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyleft}"
        @click="document.execCommand('justifyleft', false, null)"><span
       class="maxeditor-icon maxeditor-icon-align-left"></span></a>
-    <a title="居右对齐" class="maxeditor-toolbar-item"
+    <a title="居右对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyright}"
        @click="document.execCommand('justifyright', false, null)"><span
       class="maxeditor-icon maxeditor-icon-align-right"></span></a>
     <a class="maxeditor-toolbar-item-separator"></a>
 
-    <div v-show="isModeBtnShow" class="maxeditor-p-b-10" >
+    <div v-show="isModeBtnShow" class="maxeditor-p-b-10 maxeditor-p-t-10" >
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
               @click="addHr">分隔线
       </button>
@@ -132,6 +135,15 @@
       return {
         document: window.document,
         menu_normal_show: false,
+        command:{
+          bold: false,
+          italic: false,
+          underline: false,
+          strikeThrough: false,
+          justifycenter: false,
+          justifyleft: false,
+          justifyright: false,
+        }
       }
     },
     methods: {
@@ -230,7 +242,20 @@
     },
     mounted() {
       this.$parent.toolBarLeft = this.$refs.maxEditorToolbar.getBoundingClientRect().left;
-      //document.addEventListener('')
+      //监听选区改变，高频事件
+      /*if (event.target.className === 'maxeditor-body-inner') {
+        this.blurAll()
+      }*/
+      let command = this.command;
+      document.onselectionchange = function (e) {
+        command.bold = document.queryCommandState('bold');
+        command.italic = document.queryCommandState('italic');
+        command.underline = document.queryCommandState('underline');
+        command.strikeThrough = document.queryCommandState('strikeThrough');
+        command.justifycenter = document.queryCommandState('justifycenter');
+        command.justifyleft = document.queryCommandState('justifyleft');
+        command.justifyright = document.queryCommandState('justifyright');
+      }
     },
     created() {
       console.log(this.width)

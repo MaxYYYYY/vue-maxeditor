@@ -5,6 +5,10 @@
   font-style: normal;
 }
 
+.maxeditor-bgcolor-gainsboro{
+  background-color: gainsboro;
+}
+
 .maxeditor-single-line {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -230,6 +234,10 @@
 
 .maxeditor-m-b-10 {
   margin-bottom: 10px;
+}
+
+.maxeditor-p-t-10 {
+  padding-top: 10px;
 }
 
 .maxeditor-p-b-10 {

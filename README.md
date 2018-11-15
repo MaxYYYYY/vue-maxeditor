@@ -293,8 +293,8 @@ addImg(id, imgs, function (imgDomList) {
     "position": "br", 
     "color":"green"
   },
-  "tabX": "30",
-  "tabY": "34",
+  "tabX": 30,
+  "tabY": 34,
   "key": "pic2",
   "label": "pic2"
 }
@@ -329,8 +329,8 @@ addImg(id, img, function (imgDom) {
 
 ## 其他方法
 
-#### print()
-打印
+#### print(cb)
+打印，cb为回掉函数
 
 #### editInsertText(text)
 在光标处插入文本，此方法底层为execCommand，所以调用时若焦点转移则无法插入

@@ -46,7 +46,7 @@
           <!--normal面板-->
           <template v-if="item.type === 'normal'">
             <div style="width: 100%;height: 100%"
-                 v-bind:contenteditable="item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design'"
+                 v-bind:contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
                  :id="item.id+'_content_'+maxEditorRootId"
                  :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
                           'maxeditor-single-line':item.isSingleLine}"
@@ -94,7 +94,7 @@
                  @click="onActivated(index)"
                  :id="item.id+'_imgBox_'+maxEditorRootId">
               <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
-                <template v-for="(img, imgIdx) in item.imgs" v-if="item.imgs!==undefined&&item.imgs!==null">
+                <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
                   <div style="display: inline-grid">
                     <div style="position: relative;">
                       <img :src="img.src" :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
@@ -868,7 +868,7 @@
 
       //工具
       //菜单栏滚动到顶部时固定
-      print() {
+      print(cb) {
         let oldMode = this.maxeditor_mode;
         this.maxeditor_mode = 'readonly';
         this.$nextTick(function () {
@@ -877,6 +877,7 @@
           for (let i = 0; i < styles.length; i++) {
             str += styles[i].outerHTML;
           }
+          str += '';
           let bodyHtml = document.getElementById('maxeditor-body-inner-' + this.maxEditorRootId).innerHTML;
           let iframe = document.createElement("iframe");
           iframe.id = 'print_iframe' + this.maxEditorRootId;
@@ -889,6 +890,9 @@
           iframe.contentWindow.print();
           document.body.removeChild(iframe);
           this.maxeditor_mode = oldMode;
+          if (cb){
+            cb()
+          }
         });
       },
       createIframe(id, url, width, height, onLoadCallback, timeOut, timeOutCallback) {
