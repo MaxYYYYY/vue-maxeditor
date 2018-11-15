@@ -329,6 +329,9 @@ addImg(id, img, function (imgDom) {
 
 ## 其他方法
 
+#### print()
+打印
+
 #### editInsertText(text)
 在光标处插入文本，此方法底层为execCommand，所以调用时若焦点转移则无法插入
 

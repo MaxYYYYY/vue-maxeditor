@@ -41,6 +41,7 @@
     <button @click="test">test</button>
     <button @click="bindImgTabBox">bindImgTabBox</button>
     <button @click="test2">test2</button>
+    <button @click="print">print</button>
 
 
     <MaxEditor ref="maxeditor"
@@ -65,6 +66,9 @@
       MaxEditor
     },
     methods: {
+      print() {
+        this.$refs.maxeditor.print()
+      },
       wrapContentHeight() {
         let index = prompt('请输入index');
         this.$refs.maxeditor.wrapContentHeight(index)
@@ -236,5 +240,8 @@
 </script>
 
 <style scoped>
-
+  body {
+    margin: 0;
+    padding: 0;
+  }
 </style>

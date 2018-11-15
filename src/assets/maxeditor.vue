@@ -15,7 +15,7 @@
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
          @click="handleBodyClick">
-      <div class="maxeditor-body-inner" ref="maxEditorBodyInner">
+      <div class="maxeditor-body-inner" ref="maxEditorBodyInner" :id="'maxeditor-body-inner-'+maxEditorRootId">
         <maxeditor-board
           class="maxeditor-board"
           v-for="(item, index) in maxeditor_boards"
@@ -25,16 +25,15 @@
           :is="item.component"
           :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
           :parent="true"
-          :class="{'maxeditor-board-fluid':item.isFluid}"
           :x="item.x===undefined||item.x===null?0:item.x"
           :y="item.y===undefined||item.y===null?0:item.y"
           :z="isExited(item.z)?item.z:100"
-          :w="item.width===undefined||item.width===null?200:item.width"
-          :h="item.height===undefined||item.height===null?item.type==='hr'?20:200:item.height"
+          :w="item.type==='hr'?width:isExited(item.width)?item.width:200"
+          :h="item.type==='hr'?20:isExited(item.height)?item.height:200"
           :minh="14"
           :drag-handle="'.maxeditor-icon-move'"
-          :handles="(item.type==='hr'||item.type==='table')?[]:item.isFluid?['tm','bm']:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
-          v-bind:axis="item.type==='hr'?'y':item.isFluid?'y':'both'"
+          :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
+          v-bind:axis="item.type==='hr'?'y':'both'"
           @click="onActivated(index)"
           @resizing="onResize"
           @dragging="onDrag"
@@ -134,7 +133,8 @@
                              @dragging="onImgTabDrag"
                              @resizing="onImgTabResize">
                 <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;"
-                     :style="{'background-color':isExited(i.tab)?isExited(i.tab.color)?i.tab.color:'white':'white'}" :title="i.key">
+                     :style="{'background-color':isExited(i.tab)?isExited(i.tab.color)?i.tab.color:'white':'white'}"
+                     :title="i.key">
                   {{idx+1}}
                 </div>
               </maxeditor-tab>
@@ -176,15 +176,6 @@
                   title="上移一层"></span>
             <span class="maxeditor-icon maxeditor-icon-downzindex" @click="downZindex(index)"
                   title="下移一层"></span>
-            <span class="maxeditor-icon" @click="changeSingeLineState(index)"
-                  v-if="item.type==='normal'"
-                  :class="{'maxeditor-icon-checklist':item.isSingleLine,
-                           'maxeditor-icon-uncheck':!item.isSingleLine}"
-                  title="单行文本"><span style="font-size: inherit;">单行</span></span>
-            <span class="maxeditor-icon" @click="changeFluidState(index)"
-                  v-if="item.type!=='hr'&&item.type!=='label'"
-                  :class="{'maxeditor-icon-checklist':item.isFluid,'maxeditor-icon-uncheck':!item.isFluid}"
-                  title="宽度占满"><span style="font-size: inherit;">宽度占满</span></span>
             <span class="maxeditor-icon">id:{{item.id}}</span>
             <span class="maxeditor-icon">z-index:{{item.z}}</span>
           </div>
@@ -251,7 +242,6 @@
           component: 'maxeditor-board',
           id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
           type: option.type,
-          isFluid: option.isFluid,
           x: this.isExited(option.x) ? option.x : 0,
           y: this.isExited(option.y) ? option.y : 0,
           z: this.isExited(option.z) ? option.z : 100,
@@ -262,7 +252,7 @@
         };
 
         if (option.type === 'normal') {
-          common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
+          //common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
           common.title = this.isExited(option.title) ? option.title : null;
           common.writable = this.isExited(option.writable) ? option.writable : true;
         }
@@ -311,27 +301,27 @@
         this.maxeditor_boards = [];
       },
       addSection(id) {
-        this.addBoard({id: id, type: 'normal', isFluid: true, z: 100})
+        this.addBoard({id: id, type: 'normal', z: 100})
       },
       addReadOnlySection(id) {
-        this.addBoard({id: id, type: 'normal', isFluid: false, z: 100, writable: false, height: 24, width: 300})
+        this.addBoard({id: id, type: 'normal', z: 100, writable: false, height: 24, width: this.width})
       },
       addSectionWithTitle(id, title) {
-        if (title === undefined || title === null || title === '') {
+        if (!this.isExited(title)) {
           throw new Error('MaxEditor:插入带标题文本框时未得到标题');
         }
-        this.addBoard({id: id, title: title, type: 'normal', isFluid: true, z: 100})
+        this.addBoard({id: id, title: title, type: 'normal', width: this.width, height: 200, z: 100})
       },
       addTextWithLabel(id, label) {
         if (!this.isExited(label)) {
           throw new Error('MaxEditor:插入带标签文本时未得到标签');
         }
         this.addBoard({
-          id: id, label: label, type: 'label', isFluid: false, width: 125, height: 25, x: 75, z: 101
+          id: id, label: label, type: 'label', width: 125, height: 25, x: 75, z: 101
         })
       },
       addTable(id) {
-        this.addBoard({id: id, type: 'table', isFluid: true, width: 600, z: 100})
+        this.addBoard({id: id, type: 'table',  width: 600, z: 100})
       },
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {
@@ -344,7 +334,7 @@
           datalist = JSON.parse(datalist)
         }
         this.addBoard({
-          id: id, label: label, type: 'label', isFluid: false, width: 150, height: 25, x: 75, z: 101, datalist: datalist
+          id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 101, datalist: datalist
         })
       },
       updateDropDownList(id, datalist) {
@@ -435,11 +425,11 @@
         document.getElementById(id + '_content_' + this.maxEditorRootId).innerText = value
       },
       addHr() {
-        this.addBoard({type: 'hr', isFluid: true, z: 101})
+        this.addBoard({type: 'hr', z: 101})
       },
 
       addImgBox(id) {
-        this.addBoard({id: id, type: 'imgBox', isFluid: false, z: 101})
+        this.addBoard({id: id, type: 'imgBox', z: 101})
       },
       insertImg(id, imgs, cb = (imgDomList) => {
         console.log(imgDomList)
@@ -483,15 +473,15 @@
           temp[index].imgs.forEach(function (img, idx) {
             if (img.key === key) {
               ttemp = temp[index].imgs;
-              ttemp.splice(img,1);
-              temp[index].imgs=[];
+              ttemp.splice(img, 1);
+              temp[index].imgs = [];
               isExit = true;
             }
           });
           that.$nextTick(function () {
-            ttemp.forEach((item)=>{
-               temp[index].imgs.push(item)
-             })
+            ttemp.forEach((item) => {
+              temp[index].imgs.push(item)
+            })
           });
           if (!isExit) {
             throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
@@ -529,8 +519,8 @@
         let img = {};
         let isExist = false;
         this.checkId(id, function (index) {
-          for (let i=0; i<temp[index].imgs.length; i++) {
-            if (temp[index].imgs[i].key ===key){
+          for (let i = 0; i < temp[index].imgs.length; i++) {
+            if (temp[index].imgs[i].key === key) {
               img = temp[index].imgs[i];
               isExist = true
             }
@@ -663,10 +653,7 @@
       deactiveBoard(id) {
         document.getElementById(id + '_content_' + this.maxEditorRootId).blur();
       },
-      print() {
 
-
-      },
 
       //图片数字标记拖动时位置大小信息记录
       onImgTabDrag(x, y) {
@@ -727,22 +714,6 @@
       },
       downZindex(index) {
         this.maxeditor_boards[index].z -= 1;
-      },
-      changeFluidState(index) {
-        //面板靠左贴边时才能切换为全屏
-        if (this.maxeditor_boards[index].x === 0) {
-          let temp = this.maxeditor_boards;
-          temp[index].isFluid = !temp[index].isFluid;
-          if (temp[index].isFluid) {
-            temp[index].x = 0;
-            this.$set(this.maxeditor_boards, temp);
-          }
-        }
-      },
-      changeSingeLineState(index) {
-        let temp = this.maxeditor_boards;
-        temp[index].isSingleLine = !temp[index].isSingleLine;
-        this.$set(this.maxeditor_boards, temp);
       },
       updateId(oId, nId) {
         let temp = this.maxeditor_boards;
@@ -897,6 +868,55 @@
 
       //工具
       //菜单栏滚动到顶部时固定
+      print() {
+        let oldMode = this.maxeditor_mode;
+        this.maxeditor_mode = 'readonly';
+        this.$nextTick(function () {
+          let str = "",
+            styles = document.querySelectorAll('style,link');
+          for (let i = 0; i < styles.length; i++) {
+            str += styles[i].outerHTML;
+          }
+          let bodyHtml = document.getElementById('maxeditor-body-inner-' + this.maxEditorRootId).innerHTML;
+          let iframe = document.createElement("iframe");
+          iframe.id = 'print_iframe' + this.maxEditorRootId;
+          iframe.width = this.width;
+          iframe.height = this.height;
+          iframe.style.display = 'none';
+          document.body.appendChild(iframe);
+          iframe.contentDocument.body.innerHTML = bodyHtml;
+          iframe.contentDocument.head.innerHTML = str;
+          iframe.contentWindow.print();
+          document.body.removeChild(iframe);
+          this.maxeditor_mode = oldMode;
+        });
+      },
+      createIframe(id, url, width, height, onLoadCallback, timeOut, timeOutCallback) {
+        var timeOutVar = setTimeout(function () {
+          clearTimeout(timeOutVar);
+          timeOutCallback.apply(this, arguments);
+          return;
+        }, timeOut);
+        var iframe = document.createElement("iframe");
+        iframe.id = id;
+        iframe.width = width;
+        iframe.height = height;
+        iframe.src = url;
+        if (iframe.attachEvent) {
+          iframe.attachEvent("onload", function () {
+            clearTimeout(timeOutVar);
+            onLoadCallback.apply(this, arguments);
+          });
+        } else {
+          iframe.onload = function () {
+            clearTimeout(timeOutVar);
+            onLoadCallback.apply(this, arguments);
+          };
+        }
+        document.body.appendChild(iframe);
+        return iframe;
+      },
+
       handleToolbarScroll() {
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         let offsetTop = document.getElementById('maxeditor-toolbar-' + this.maxEditorRootId).offsetTop;
