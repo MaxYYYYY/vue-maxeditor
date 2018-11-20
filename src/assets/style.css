@@ -5,7 +5,31 @@
   font-style: normal;
 }
 
-.maxeditor-bgcolor-gainsboro{
+.maxeditor-hoverable:hover {
+  background-color: gainsboro;
+}
+
+.maxeditor-btn-menu-fontsize {
+  width: 120px;
+  position: relative;
+  z-index: 500;
+  transition: 0.3s;
+  background-color: white;
+  padding: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+}
+
+.maxeditor-btn-menu-textcolor {
+  width: 200px;
+  height: 30px;
+  position: relative;
+  z-index: 500;
+  transition: 0.3s;
+  background-color: white;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
+}
+
+.maxeditor-bgcolor-gainsboro {
   background-color: gainsboro;
 }
 
@@ -74,7 +98,7 @@
 }
 
 .maxeditor-body {
-
+  box-sizing: content-box;
   margin: 20px auto;
   padding: 20px;
   position: relative;
@@ -156,6 +180,8 @@
 }
 
 .maxeditor-toolbar-button {
+  position: relative;
+  z-index:1;
   display: inline-block;
   color: #fff;
   background-color: #39f;
@@ -166,7 +192,6 @@
   border-radius: 4px;
   cursor: pointer;
   outline: none;
-  position: relative;
 }
 
 .maxeditor-toolbar-button-disable {

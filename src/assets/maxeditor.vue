@@ -888,7 +888,7 @@
           iframe.contentDocument.body.innerHTML = bodyHtml;
           iframe.contentDocument.head.innerHTML = str;
           iframe.contentWindow.print();
-          document.body.removeChild(iframe);
+          //document.body.removeChild(iframe);
           this.maxeditor_mode = oldMode;
           if (cb){
             cb()
