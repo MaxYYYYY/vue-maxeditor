@@ -5,6 +5,7 @@
        style="transition: 0.3s; min-height: 40px ;position: absolute; top:0; left:50%"
        :style="{'width': width+paddingX*2+'px','margin-left':-width/2-paddingX+'px'}">
     <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
+      <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
       <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
          @click="document.execCommand('bold', false, null)"><span
         class="maxeditor-icon maxeditor-icon-bold"></span></a>
@@ -101,11 +102,9 @@
          @click="document.execCommand('justifyright', false, null)"><span
         class="maxeditor-icon maxeditor-icon-align-right"></span></a>
       <a class="maxeditor-toolbar-item-separator"></a>
-      <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
     </div>
     <a class="maxeditor-toolbar-item" @click="showMenu" :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        style="width: 100px;display: none">显示菜单</a>
-
     <div v-show="isModeBtnShow"
          class="maxeditor-p-b-10 maxeditor-p-t-10"
          :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
@@ -313,13 +312,14 @@
         this.$parent.clearBoards();
       },
 
-      //
+      //隐藏、显示菜单
       hideMenu() {
         this.isMenuCollapsed = true;
         document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-a').style.display = 'none';
         document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-showbtn').style.display = 'block';
         try {
-          document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-b').style.display = 'none';
+          if (this.isModeBtnShow)
+            document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-b').style.display = 'none';
         } catch (e) {
         }
         document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = '100px';
@@ -332,7 +332,8 @@
           document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-a').style.display = 'block';
           document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-showbtn').style.display = 'none';
           try {
-            document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-b').style.display = 'block';
+            if (this.isModeBtnShow)
+              document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-b').style.display = 'block';
           } catch (e) {
           }
         }, 300)
@@ -430,9 +431,7 @@
       document.addEventListener('click', this.hidePopMenu(event))
     },
     created() {
-      console.log(this.width)
-      console.log(this.width + this.paddingX * 2)
-      console.log(this.width + this.paddingX * 2 + 'px')
+
     },
     watch: {}
   }
