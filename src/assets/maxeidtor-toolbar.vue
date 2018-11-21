@@ -328,11 +328,12 @@
         this.isMenuCollapsed = false;
         document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = this.width + this.paddingX * 2 + 'px';
         let that = this;
+        let isModeBtnShow = this.isModeBtnShow;
         setTimeout(function () {
           document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-a').style.display = 'block';
           document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-showbtn').style.display = 'none';
           try {
-            if (this.isModeBtnShow)
+            if (isModeBtnShow)
               document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-b').style.display = 'block';
           } catch (e) {
           }
