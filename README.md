@@ -72,6 +72,13 @@ Type: `Number`<br>
 Required: `false`<br>
 Default: `1124`
 
+#### viewPortHeight
+Type: `Number`<br>
+Required: `true`<br>
+Default: `500`
+
+视口高度（既编辑器所在容器的高度）
+
 #### paddingX
 Type: `Number`<br>
 Required: `false`<br>

@@ -2,98 +2,113 @@
   <div class="maxeditor-toolbar"
        :id="'maxeditor-toolbar-'+maxeditorRootId"
        ref="maxEditorToolbar"
-       :style="{'width': width+paddingX*2+'px'}">
-    <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
-       @click="document.execCommand('bold', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-bold"></span></a>
-    <a title="斜体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.italic}"
-       @click="document.execCommand('italic', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-italic"></span></a>
-    <a title="下划线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.underline}"
-       @click="document.execCommand('underline', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-underline"></span></a>
-    <a title="删除线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.strikeThrough}"
-       @click="document.execCommand('strikeThrough', false, null)">
-      <span class="maxeditor-icon maxeditor-icon-strikethrough"></span></a>
-    <a class="maxeditor-toolbar-item-separator"></a>
-    <a class="maxeditor-toolbar-item"
-       :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='fontSize'}"
-       @click="current_pop_menu==='fontSize'?current_pop_menu='':current_pop_menu='fontSize'">
-      <span title="字体大小"  class="maxeditor-icon maxeditor-icon-font"></span>
-      <div v-show="current_pop_menu==='fontSize'" class="maxeditor-btn-menu-fontsize">
-        <div @click="document.execCommand('fontsize',false,'7')" class="maxeditor-hoverable"><font size="7">超大</font></div>
-        <div @click="document.execCommand('fontsize',false,'6')" class="maxeditor-hoverable"><font size="6">特大</font></div>
-        <div @click="document.execCommand('fontsize',false,'5')" class="maxeditor-hoverable"><font size="5">比较大</font></div>
-        <div @click="document.execCommand('fontsize',false,'4')" class="maxeditor-hoverable"><font size="4">稍大</font></div>
-        <div @click="document.execCommand('fontsize',false,'3')" class="maxeditor-hoverable"><font size="3">正常</font></div>
-        <div @click="document.execCommand('fontsize',false,'2')" class="maxeditor-hoverable"><font size="2">小</font></div>
-        <div @click="document.execCommand('fontsize',false,'1')" class="maxeditor-hoverable"><font size="1">超小</font></div>
-      </div>
-    </a>
-    <!--<a title="增大字体" class="maxeditor-toolbar-item"
-       @click="increaseFontSize"><span class="maxeditor-icon maxeditor-icon-font-plus"></span></a>
-    <a title="减小字体" class="maxeditor-toolbar-item"
-       @click="decreaseFontSize"><span
-      class="maxeditor-icon maxeditor-icon-font-minus"></span></a>-->
-    <a class="maxeditor-toolbar-item"
-       :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='textColor'}"
-       @click="current_pop_menu==='textColor'?current_pop_menu='':current_pop_menu='textColor'">
-      <span title="字体颜色" class="maxeditor-icon maxeditor-icon-tint"></span>
-      <div v-show="current_pop_menu==='textColor'" class="maxeditor-btn-menu-textcolor">
-        <div @click="changeTextColor('white')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: white;outline: gray auto 1px;"></div>
-        <div @click="changeTextColor('grey')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: grey"></div>
-        <div @click="changeTextColor('black')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: black"></div>
-        <div @click="changeTextColor('red')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: red"></div>
-        <div @click="changeTextColor('yellow')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: yellow"></div>
-        <div @click="changeTextColor('blue')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: blue"></div>
-        <div @click="changeTextColor('green')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: green"></div>
-        <div @click="changeTextColor('brown')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: brown"></div>
-      </div>
-    </a>
-    <a class="maxeditor-toolbar-item"
-       :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='bgColor'}"
-       @click="current_pop_menu==='bgColor'?current_pop_menu='':current_pop_menu='bgColor'">
-      <span title="背景颜色" class="maxeditor-icon maxeditor-icon-tint"></span>
-      <div v-show="current_pop_menu==='bgColor'" class="maxeditor-btn-menu-textcolor">
-        <div @click="changeBgColor('white')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: white;outline: gray auto 1px;"></div>
-        <div @click="changeBgColor('grey')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: grey"></div>
-        <div @click="changeBgColor('black')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: black"></div>
-        <div @click="changeBgColor('red')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: red"></div>
-        <div @click="changeBgColor('yellow')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: yellow"></div>
-        <div @click="changeBgColor('blue')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: blue"></div>
-        <div @click="changeBgColor('green')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: green"></div>
-        <div @click="changeBgColor('brown')"
-             style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: brown"></div>
-      </div>
-    </a>
-    <a class="maxeditor-toolbar-item-separator"></a>
-    <a title="居中对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifycenter}"
-       @click="document.execCommand('justifycenter', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-align-center"></span></a>
-    <a title="居左对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyleft}"
-       @click="document.execCommand('justifyleft', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-align-left"></span></a>
-    <a title="居右对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyright}"
-       @click="document.execCommand('justifyright', false, null)"><span
-      class="maxeditor-icon maxeditor-icon-align-right"></span></a>
-    <a class="maxeditor-toolbar-item-separator"></a>
+       style="transition: 0.3s; min-height: 40px ;position: absolute; top:0; left:50%"
+       :style="{'width': width+paddingX*2+'px','margin-left':-width/2-paddingX+'px'}">
+    <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
+      <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
+         @click="document.execCommand('bold', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-bold"></span></a>
+      <a title="斜体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.italic}"
+         @click="document.execCommand('italic', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-italic"></span></a>
+      <a title="下划线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.underline}"
+         @click="document.execCommand('underline', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-underline"></span></a>
+      <a title="删除线" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.strikeThrough}"
+         @click="document.execCommand('strikeThrough', false, null)">
+        <span class="maxeditor-icon maxeditor-icon-strikethrough"></span></a>
+      <a class="maxeditor-toolbar-item-separator"></a>
+      <a class="maxeditor-toolbar-item"
+         :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='fontSize'}"
+         @click="current_pop_menu==='fontSize'?current_pop_menu='':current_pop_menu='fontSize'">
+        <span title="字体大小" class="maxeditor-icon maxeditor-icon-font"></span>
+        <div v-show="current_pop_menu==='fontSize'" class="maxeditor-btn-menu-fontsize">
+          <div @click="document.execCommand('fontsize',false,'7')" class="maxeditor-hoverable"><font size="7">超大</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'6')" class="maxeditor-hoverable"><font size="6">特大</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'5')" class="maxeditor-hoverable"><font size="5">比较大</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'4')" class="maxeditor-hoverable"><font size="4">稍大</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'3')" class="maxeditor-hoverable"><font size="3">正常</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'2')" class="maxeditor-hoverable"><font size="2">小</font>
+          </div>
+          <div @click="document.execCommand('fontsize',false,'1')" class="maxeditor-hoverable"><font size="1">超小</font>
+          </div>
+        </div>
+      </a>
+      <!--<a title="增大字体" class="maxeditor-toolbar-item"
+         @click="increaseFontSize"><span class="maxeditor-icon maxeditor-icon-font-plus"></span></a>
+      <a title="减小字体" class="maxeditor-toolbar-item"
+         @click="decreaseFontSize"><span
+        class="maxeditor-icon maxeditor-icon-font-minus"></span></a>-->
+      <a class="maxeditor-toolbar-item"
+         :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='textColor'}"
+         @click="current_pop_menu==='textColor'?current_pop_menu='':current_pop_menu='textColor'">
+        <span title="字体颜色" class="maxeditor-icon maxeditor-icon-tint"></span>
+        <div v-show="current_pop_menu==='textColor'" class="maxeditor-btn-menu-textcolor">
+          <div @click="changeTextColor('white')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: white;outline: gray auto 1px;"></div>
+          <div @click="changeTextColor('grey')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: grey"></div>
+          <div @click="changeTextColor('black')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: black"></div>
+          <div @click="changeTextColor('red')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: red"></div>
+          <div @click="changeTextColor('yellow')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: yellow"></div>
+          <div @click="changeTextColor('blue')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: blue"></div>
+          <div @click="changeTextColor('green')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: green"></div>
+          <div @click="changeTextColor('brown')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: brown"></div>
+        </div>
+      </a>
+      <a class="maxeditor-toolbar-item"
+         :class="{'maxeditor-bgcolor-gainsboro':current_pop_menu==='bgColor'}"
+         @click="current_pop_menu==='bgColor'?current_pop_menu='':current_pop_menu='bgColor'">
+        <span title="背景颜色" class="maxeditor-icon maxeditor-icon-tint"></span>
+        <div v-show="current_pop_menu==='bgColor'" class="maxeditor-btn-menu-textcolor">
+          <div @click="changeBgColor('white')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: white;outline: gray auto 1px;"></div>
+          <div @click="changeBgColor('grey')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: grey"></div>
+          <div @click="changeBgColor('black')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: black"></div>
+          <div @click="changeBgColor('red')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: red"></div>
+          <div @click="changeBgColor('yellow')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: yellow"></div>
+          <div @click="changeBgColor('blue')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: blue"></div>
+          <div @click="changeBgColor('green')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: green"></div>
+          <div @click="changeBgColor('brown')"
+               style="width: 20px;height: 20px;position: relative;display: inline-block;background-color: brown"></div>
+        </div>
+      </a>
+      <a class="maxeditor-toolbar-item-separator"></a>
+      <a title="居中对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifycenter}"
+         @click="document.execCommand('justifycenter', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-align-center"></span></a>
+      <a title="居左对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyleft}"
+         @click="document.execCommand('justifyleft', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-align-left"></span></a>
+      <a title="居右对齐" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.justifyright}"
+         @click="document.execCommand('justifyright', false, null)"><span
+        class="maxeditor-icon maxeditor-icon-align-right"></span></a>
+      <a class="maxeditor-toolbar-item-separator"></a>
+      <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
+    </div>
+    <a class="maxeditor-toolbar-item" @click="showMenu" :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
+       style="width: 100px;display: none">显示菜单</a>
 
-    <div v-show="isModeBtnShow" class="maxeditor-p-b-10 maxeditor-p-t-10">
+    <div v-show="isModeBtnShow"
+         class="maxeditor-p-b-10 maxeditor-p-t-10"
+         :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
               @click="addHr">分隔线
       </button>
@@ -186,14 +201,13 @@
         }
       }
     },
-    directives: {
-
-    },
+    directives: {},
     data() {
       return {
         document: window.document,
         menu_normal_show: false,
         current_pop_menu: '',
+        isMenuCollapsed: false,
         command: {
           bold: false,
           italic: false,
@@ -299,13 +313,39 @@
         this.$parent.clearBoards();
       },
 
-      //弹出菜单
-      hidePopMenu(event){
-        try{
-          if (event.target.className !== 'maxeditor-toolbar-item'){
-            this.current_pop_menu='';
+      //
+      hideMenu() {
+        this.isMenuCollapsed = true;
+        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-a').style.display = 'none';
+        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-showbtn').style.display = 'block';
+        try {
+          document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-b').style.display = 'none';
+        } catch (e) {
+        }
+        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = '100px';
+      },
+      showMenu() {
+        this.isMenuCollapsed = false;
+        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = this.width + this.paddingX * 2 + 'px';
+        let that = this;
+        setTimeout(function () {
+          document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-a').style.display = 'block';
+          document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-showbtn').style.display = 'none';
+          try {
+            document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-b').style.display = 'block';
+          } catch (e) {
           }
-        }catch (e) {
+        }, 300)
+
+      },
+
+      //弹出菜单
+      hidePopMenu(event) {
+        try {
+          if (event.target.className !== 'maxeditor-toolbar-item') {
+            this.current_pop_menu = '';
+          }
+        } catch (e) {
 
         }
       },
@@ -375,7 +415,6 @@
       }
     },
     mounted() {
-      this.$parent.toolBarLeft = this.$refs.maxEditorToolbar.getBoundingClientRect().left;
       //监听选区改变，高频事件
       let command = this.command;
       document.onselectionchange = function (e) {

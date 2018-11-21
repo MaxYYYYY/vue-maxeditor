@@ -1,7 +1,6 @@
 <template>
   <div class="maxeditor-root" :id="maxEditorRootId">
-    <maxeditor-toolbar ref="maxEditorToolbar" :class="{'maxeditor-fix2top':toolBarFixed}"
-                       :style="{'left':toolBarFixed?toolBarLeft+'px':''}"
+    <maxeditor-toolbar ref="maxEditorToolbar"
                        :width="width"
                        :padding-x="paddingX"
                        :maxeditor_mode="maxeditor_mode"
@@ -9,179 +8,184 @@
                        :is-mode-btn-show="isModeBtnShow"
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
-    <div class="maxeditor-body"
-         :style="{'margin-top':toolBarFixed?'136px':'20px',
-                  'width':width+'px','height':height+'px',
+    <div class="maxeditor-view-port"
+         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px'}"
+         style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;padding-top: 136px">
+      <div class="maxeditor-body"
+           style="margin:8px"
+           :style="{'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
-         @click="handleBodyClick">
-      <div class="maxeditor-body-inner" ref="maxEditorBodyInner" :id="'maxeditor-body-inner-'+maxEditorRootId">
-        <maxeditor-board
-          class="maxeditor-board"
-          v-for="(item, index) in maxeditor_boards"
-          :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
-          :id="item.id+'_'+maxEditorRootId"
-          :key="item.id+'_'+maxEditorRootId"
-          :is="item.component"
-          :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
-          :parent="true"
-          :x="item.x===undefined||item.x===null?0:item.x"
-          :y="item.y===undefined||item.y===null?0:item.y"
-          :z="isExited(item.z)?item.z:100"
-          :w="item.type==='hr'?width:isExited(item.width)?item.width:200"
-          :h="item.type==='hr'?20:isExited(item.height)?item.height:200"
-          :minh="14"
-          :drag-handle="'.maxeditor-icon-move'"
-          :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
-          v-bind:axis="item.type==='hr'?'y':'both'"
-          @click="onActivated(index)"
-          @resizing="onResize"
-          @dragging="onDrag"
-          @activated="onActivated(index)"
-          @deactivated="onDeactivated(index)">
-          <!--面板标题-->
-          <template v-if="item.type==='normal'&&item.title!==null&&item.title!==undefined">
-            <div class="maxeditor-board-titile">{{item.title}}:</div>
-          </template>
-          <!--normal面板-->
-          <template v-if="item.type === 'normal'">
-            <div style="width: 100%;height: 100%"
-                 v-bind:contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
-                 :id="item.id+'_content_'+maxEditorRootId"
-                 :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
+           @click="handleBodyClick">
+        <div class="maxeditor-body-inner" ref="maxEditorBodyInner" :id="'maxeditor-body-inner-'+maxEditorRootId">
+          <maxeditor-board
+            class="maxeditor-board"
+            v-for="(item, index) in maxeditor_boards"
+            :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
+            :id="item.id+'_'+maxEditorRootId"
+            :key="item.id+'_'+maxEditorRootId"
+            :is="item.component"
+            :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
+            :parent="true"
+            :x="item.x===undefined||item.x===null?0:item.x"
+            :y="item.y===undefined||item.y===null?0:item.y"
+            :z="isExited(item.z)?item.z:100"
+            :w="item.type==='hr'?width:isExited(item.width)?item.width:200"
+            :h="item.type==='hr'?20:isExited(item.height)?item.height:200"
+            :minh="14"
+            :drag-handle="'.maxeditor-icon-move'"
+            :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
+            v-bind:axis="item.type==='hr'?'y':'both'"
+            @click="onActivated(index)"
+            @resizing="onResize"
+            @dragging="onDrag"
+            @activated="onActivated(index)"
+            @deactivated="onDeactivated(index)">
+            <!--面板标题-->
+            <template v-if="item.type==='normal'&&item.title!==null&&item.title!==undefined">
+              <div class="maxeditor-board-titile">{{item.title}}:</div>
+            </template>
+            <!--normal面板-->
+            <template v-if="item.type === 'normal'">
+              <div style="width: 100%;height: 100%"
+                   v-bind:contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
+                   :id="item.id+'_content_'+maxEditorRootId"
+                   :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
                           'maxeditor-single-line':item.isSingleLine}"
-                 @focus="onActivated(index)"
-                 @click="onActivated(index)"
-                 @keyup="onActivated(index)">
-            </div>
-          </template>
-          <!--label标题-->
-          <template v-if="item.type === 'label'">
-            <p style="height: 25px;margin: 0;position: relative">
+                   @focus="onActivated(index)"
+                   @click="onActivated(index)"
+                   @keyup="onActivated(index)">
+              </div>
+            </template>
+            <!--label标题-->
+            <template v-if="item.type === 'label'">
+              <p style="height: 25px;margin: 0;position: relative">
               <span style="float: left;width: 65px;height: 25px"
                     class="maxeditor-single-line"
                     @click="onActivated(index)">{{item.label}}
               </span>
-              <span style="float: left;margin-right: 5px">:</span>
-              <span
-                v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
-                :id="item.id+'_content_'+maxEditorRootId"
-                class="maxeditor-single-line"
-                :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                style="float: left;display: inline-block"
-                :style="{'width':item.width-75+'px'}"
-                @click="onActivated(index);maxeditor_current_dropdown = item.id"
-                @keyup="onActivated(index)"></span>
-              <span class="maxeditor-icon maxeditor-icon-caret-down"
-                    style="position: absolute;right: -10px;top: 4px;"
-                    v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
-                    @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
-            </p>
-            <div class="maxeditor-dropdown"
-                 v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
-              <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
-                <p class="maxeditor-noselect"
-                   @click="setDropDownValue(item.id,t.value);
+                <span style="float: left;margin-right: 5px">:</span>
+                <span
+                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
+                  :id="item.id+'_content_'+maxEditorRootId"
+                  class="maxeditor-single-line"
+                  :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                  style="float: left;display: inline-block"
+                  :style="{'width':item.width-75+'px'}"
+                  @click="onActivated(index);maxeditor_current_dropdown = item.id"
+                  @keyup="onActivated(index)"></span>
+                <span class="maxeditor-icon maxeditor-icon-caret-down"
+                      style="position: absolute;right: -10px;top: 4px;"
+                      v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
+                      @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
+              </p>
+              <div class="maxeditor-dropdown"
+                   v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
+                <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
+                  <p class="maxeditor-noselect"
+                     @click="setDropDownValue(item.id,t.value);
                    maxeditor_current_dropdown = undefined;
                    maxeditor_boards[index].datalist_current = t.id;">{{t.value}}</p>
-              </template>
-            </div>
-          </template>
-          <!--imgBox面板-->
-          <template v-if="item.type === 'imgBox'">
-            <div style="width: 100%;height: 100%"
-                 :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                 @click="onActivated(index)"
-                 :id="item.id+'_imgBox_'+maxEditorRootId">
-              <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
-                <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
-                  <div style="display: inline-grid">
-                    <div style="position: relative;">
-                      <img :src="img.src" :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
-                           :style="{'width':item.imgs.length===1?'':'160px',
+                </template>
+              </div>
+            </template>
+            <!--imgBox面板-->
+            <template v-if="item.type === 'imgBox'">
+              <div style="width: 100%;height: 100%"
+                   :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
+                   @click="onActivated(index)"
+                   :id="item.id+'_imgBox_'+maxEditorRootId">
+                <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
+                  <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
+                    <div style="display: inline-grid">
+                      <div style="position: relative;">
+                        <img :src="img.src" :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
+                             :style="{'width':item.imgs.length===1?'':'160px',
                                 'height':item.imgs.length===1?item.height+'px':'',
                                 'margin':item.imgs.length===1?'0':'4px'}"/>
-                      <!--图片角标-->
-                      <div style="position: absolute;
+                        <!--图片角标-->
+                        <div style="position: absolute;
                       margin: 4px 4px 8px;height: 20px;width: 20px;"
-                           v-show="isExited(img.tab)"
-                           :style="{'background-color':isExited(img.tab)?isExited(img.tab)?img.tab.color:'white':'white'}"
-                           :class="{'maxeditor-position-tl':isExited(img.tab)&&img.tab.position==='tl',
+                             v-show="isExited(img.tab)"
+                             :style="{'background-color':isExited(img.tab)?isExited(img.tab)?img.tab.color:'white':'white'}"
+                             :class="{'maxeditor-position-tl':isExited(img.tab)&&img.tab.position==='tl',
                                     'maxeditor-position-tr':isExited(img.tab)&&img.tab.position==='tr',
                                     'maxeditor-position-bl':isExited(img.tab)&&img.tab.position==='bl',
                                     'maxeditor-position-br':isExited(img.tab)&&img.tab.position==='br'}">{{imgIdx+1}}
+                        </div>
                       </div>
+                      <p style="text-align: center; margin: 0;">{{isExited(img.label)?img.label:''}}</p>
                     </div>
-                    <p style="text-align: center; margin: 0;">{{isExited(img.label)?img.label:''}}</p>
-                  </div>
-                </template>
-              </div>
-              <div :id="item.id+'_imgBox_qrCode_'+maxEditorRootId" v-if="!isExited(item.imgs)"></div>
-              <!--图片标记-->
-              <maxeditor-tab v-if="isExited(item.watchTo)"
-                             v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
-                             :x="isExited(i.tabX)?i.tabX:0"
-                             :y="isExited(i.tabY)?i.tabY:0"
-                             :w="20"
-                             :h="20"
-                             :minh="15"
-                             :minw="15"
-                             :parent="true"
-                             :handles="[]"
-                             @click="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
-                             @activated="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
-                             @dragging="onImgTabDrag"
-                             @resizing="onImgTabResize">
-                <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;"
-                     :style="{'background-color':isExited(i.tab)?isExited(i.tab.color)?i.tab.color:'white':'white'}"
-                     :title="i.key">
-                  {{idx+1}}
+                  </template>
                 </div>
-              </maxeditor-tab>
+                <div :id="item.id+'_imgBox_qrCode_'+maxEditorRootId" v-if="!isExited(item.imgs)"></div>
+                <!--图片标记-->
+                <maxeditor-tab v-if="isExited(item.watchTo)"
+                               v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
+                               :x="isExited(i.tabX)?i.tabX:0"
+                               :y="isExited(i.tabY)?i.tabY:0"
+                               :w="20"
+                               :h="20"
+                               :minh="15"
+                               :minw="15"
+                               :parent="true"
+                               :handles="[]"
+                               @click="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
+                               @activated="maxeditor_current_index=index;maxeditor_current_tabImg_index=idx;"
+                               @dragging="onImgTabDrag"
+                               @resizing="onImgTabResize">
+                  <div style="background-color: white;width: 100%;height: 100%;text-align: center;cursor: pointer;"
+                       :style="{'background-color':isExited(i.tab)?isExited(i.tab.color)?i.tab.color:'white':'white'}"
+                       :title="i.key">
+                    {{idx+1}}
+                  </div>
+                </maxeditor-tab>
+              </div>
+            </template>
+            <!--表格面板-->
+            <template v-if="item.type === 'table'">
+              <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
+                <tbody>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                </tbody>
+              </table>
+            </template>
+            <!--hr面板-->
+            <template v-if="item.type === 'hr'">
+              <div style="height: 20px;width: 100%" @click="onActivated(index)">
+                <hr/>
+              </div>
+            </template>
+            <!--面板工具栏-->
+            <div class="maxeditor-board-toolbar"
+                 v-show="maxeditor_mode==='design'"
+                 :style="{'margin-left':item.type==='hr'?'325px':''}"
+                 :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
+              <span class="maxeditor-icon-move"></span>
+              <span class="maxeditor-icon-delete" @click="deleteBoard(index)"></span>
+              <span class="maxeditor-icon maxeditor-icon-upzindex" @click="upZindex(index)"
+                    title="上移一层"></span>
+              <span class="maxeditor-icon maxeditor-icon-downzindex" @click="downZindex(index)"
+                    title="下移一层"></span>
+              <span class="maxeditor-icon">id:{{item.id}}</span>
+              <span class="maxeditor-icon">z-index:{{item.z}}</span>
             </div>
-          </template>
-          <!--表格面板-->
-          <template v-if="item.type === 'table'">
-            <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
-              <tbody>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              </tbody>
-            </table>
-          </template>
-          <!--hr面板-->
-          <template v-if="item.type === 'hr'">
-            <div style="height: 20px;width: 100%" @click="onActivated(index)">
-              <hr/>
-            </div>
-          </template>
-          <!--面板工具栏-->
-          <div class="maxeditor-board-toolbar"
-               v-show="maxeditor_mode==='design'"
-               :style="{'margin-left':item.type==='hr'?'325px':''}"
-               :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
-            <span class="maxeditor-icon-move"></span>
-            <span class="maxeditor-icon-delete" @click="deleteBoard(index)"></span>
-            <span class="maxeditor-icon maxeditor-icon-upzindex" @click="upZindex(index)"
-                  title="上移一层"></span>
-            <span class="maxeditor-icon maxeditor-icon-downzindex" @click="downZindex(index)"
-                  title="下移一层"></span>
-            <span class="maxeditor-icon">id:{{item.id}}</span>
-            <span class="maxeditor-icon">z-index:{{item.z}}</span>
-          </div>
-        </maxeditor-board>
+          </maxeditor-board>
+        </div>
       </div>
     </div>
+
   </div>
 
 </template>
@@ -196,6 +200,7 @@
     props: {
       width: {default: 794},
       height: {default: 1124},
+      viewPortHeight: {default:500},
       paddingX: {default: 20},
       paddingY: {default: 20},
       isModeBtnShow: {default: false},//模式控制按钮显示
@@ -922,6 +927,8 @@
       },
 
       handleToolbarScroll() {
+        if (this.$refs.maxEditorToolbar.isMenuCollapsed)
+          return;
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         let offsetTop = document.getElementById('maxeditor-toolbar-' + this.maxEditorRootId).offsetTop;
         this.toolBarFixed = scrollTop > offsetTop;
@@ -1041,10 +1048,10 @@
       }
     },
     mounted() {
-      window.addEventListener('scroll', this.handleToolbarScroll);
+     /* window.addEventListener('scroll', this.handleToolbarScroll);
       window.onresize = () => {
         this.toolBarLeft = this.$refs.maxEditorBodyInner.getBoundingClientRect().left - 20;
-      }
+      }*/
     },
     watch: {
       maxeditor_mode(n, o) {

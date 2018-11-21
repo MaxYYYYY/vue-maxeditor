@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="position: relative;">
     <button @click="addSection">addSection</button>
     <button @click="addSectionWithTitle">addSectionWithTitle</button>
     <button @click="addTextWithLabel">addTextWithLabel</button>
@@ -42,7 +42,6 @@
     <button @click="bindImgTabBox">bindImgTabBox</button>
     <button @click="test2">test2</button>
     <button @click="print">print</button>
-
 
     <MaxEditor ref="maxeditor"
                :is-mode-btn-show="true"
