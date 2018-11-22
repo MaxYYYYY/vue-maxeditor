@@ -43,8 +43,8 @@
     <button @click="test2">test2</button>
     <button @click="print">print</button>
 
-    <MaxEditor ref="maxeditor"
-               :is-mode-btn-show="false" :view-port-height="650"
+    <MaxEditor ref="maxeditor" style="margin-top: 20px"
+               :is-mode-btn-show="true" :view-port-height="650"
                :max-editor-root-id="'dddd'" :height="2000"></MaxEditor>
     <div id="temp" contenteditable="true"></div>
 

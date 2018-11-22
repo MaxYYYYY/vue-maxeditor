@@ -200,7 +200,7 @@
     props: {
       width: {default: 794},
       height: {default: 1124},
-      viewPortHeight: {default:500},
+      viewPortHeight: {default: 500},
       paddingX: {default: 20},
       paddingY: {default: 20},
       isModeBtnShow: {default: false},//模式控制按钮显示
@@ -326,7 +326,7 @@
         })
       },
       addTable(id) {
-        this.addBoard({id: id, type: 'table',  width: 600, z: 100})
+        this.addBoard({id: id, type: 'table', width: 600, z: 100})
       },
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {
@@ -880,7 +880,19 @@
           let str = "",
             styles = document.querySelectorAll('style,link');
           for (let i = 0; i < styles.length; i++) {
-            str += styles[i].outerHTML;
+            //开发环境
+            if (styles[i].outerHTML.includes('/dist/main.css')){
+              console.log(styles[i].outerHTML);
+              console.log(styles[i].innerHTML);
+              str += styles[i].outerHTML;
+            }
+            //生产环境
+            if (styles[i].innerHTML.includes('maxeditor的CSS文件')){
+              str += styles[i].outerHTML;
+            }
+            if (styles[i].innerHTML.includes('.vdr[')){
+              str += styles[i].outerHTML;
+            }
           }
           str += '';
           let bodyHtml = document.getElementById('maxeditor-body-inner-' + this.maxEditorRootId).innerHTML;
@@ -893,9 +905,9 @@
           iframe.contentDocument.body.innerHTML = bodyHtml;
           iframe.contentDocument.head.innerHTML = str;
           iframe.contentWindow.print();
-          //document.body.removeChild(iframe);
+          document.body.removeChild(iframe);
           this.maxeditor_mode = oldMode;
-          if (cb){
+          if (cb) {
             cb()
           }
         });
@@ -1048,10 +1060,10 @@
       }
     },
     mounted() {
-     /* window.addEventListener('scroll', this.handleToolbarScroll);
-      window.onresize = () => {
-        this.toolBarLeft = this.$refs.maxEditorBodyInner.getBoundingClientRect().left - 20;
-      }*/
+      /* window.addEventListener('scroll', this.handleToolbarScroll);
+       window.onresize = () => {
+         this.toolBarLeft = this.$refs.maxEditorBodyInner.getBoundingClientRect().left - 20;
+       }*/
     },
     watch: {
       maxeditor_mode(n, o) {
