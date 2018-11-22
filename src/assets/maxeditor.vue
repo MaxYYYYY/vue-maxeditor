@@ -9,8 +9,8 @@
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
     <div class="maxeditor-view-port"
-         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px'}"
-         style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;padding-top: 136px">
+         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px','padding-top':isModeBtnShow?'136px':'48px'}"
+         style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;">
       <div class="maxeditor-body"
            style="margin:8px"
            :style="{'width':width+'px','height':height+'px',
