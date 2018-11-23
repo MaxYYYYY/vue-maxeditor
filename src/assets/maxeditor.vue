@@ -54,7 +54,7 @@
                           'maxeditor-single-line':item.isSingleLine}"
                    @focus="onActivated(index)"
                    @click="onActivated(index)"
-                   @keyup="onActivated(index)">
+                   @keyup="onActivated(index);justifyBoardHeight(index)">
               </div>
             </template>
             <!--label标题-->
@@ -185,7 +185,6 @@
         </div>
       </div>
     </div>
-
   </div>
 
 </template>
@@ -872,7 +871,6 @@
       },
 
       //工具
-      //菜单栏滚动到顶部时固定
       print(cb) {
         let oldMode = this.maxeditor_mode;
         this.maxeditor_mode = 'readonly';
@@ -881,16 +879,16 @@
             styles = document.querySelectorAll('style,link');
           for (let i = 0; i < styles.length; i++) {
             //开发环境
-            if (styles[i].outerHTML.includes('/dist/main.css')){
+            if (styles[i].outerHTML.includes('/dist/main.css')) {
               console.log(styles[i].outerHTML);
               console.log(styles[i].innerHTML);
               str += styles[i].outerHTML;
             }
             //生产环境
-            if (styles[i].innerHTML.includes('maxeditor的CSS文件')){
+            if (styles[i].innerHTML.includes('maxeditor的CSS文件')) {
               str += styles[i].outerHTML;
             }
-            if (styles[i].innerHTML.includes('.vdr[')){
+            if (styles[i].innerHTML.includes('.vdr[')) {
               str += styles[i].outerHTML;
             }
           }
@@ -997,66 +995,76 @@
         this.maxeditor_current_index = undefined;
         this.maxeditor_current_tabImg_index = undefined;
       },
-      //normal面板适应内容高度
-      wrapContentHeight(boxIndex) {
-        /*let temp = this.maxeditor_boards;
-        //TODO 此处的dom访问可能会造成性能问题
-        let dom =  document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId);
-        let scrollHeight = dom.scrollHeight;
-        let offsetHeight = dom.offsetHeight;
-        if(scrollHeight>offsetHeight+21){
-          console.log('asdfasdf')
-          this.maxeditor_boards[boxIndex].height = scrollHeight;
-
-          document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId).height=scrollHeight;
-          console.log(temp[boxIndex].id + '_' + this.maxEditorRootId)
-         // console.log( document.getElementById(temp[boxIndex].id + '_' + this.maxEditorRootId))
-         // this.refreshLayout(boxIndex);
+      //自适应容器高度
+      justifyBoardHeight(index) {
+        /*if (event.key==='Enter'){
+          return;
         }*/
-        console.log('wrapContentHeight')
+        let that = this;
         let temp = this.maxeditor_boards;
-        temp[boxIndex].height = 400;
-        //
-        this.clearBoards()
-        this.$nextTick(function () {
-          console.log('nextTick')
-          this.setBoards(temp)
-        })
+        let boardDom = document.getElementById(temp[index].id + '_' + this.maxEditorRootId);
+        let boardContentDom = document.getElementById(temp[index].id + '_content_' + this.maxEditorRootId);
+        let lastLineDom = boardContentDom.lastElementChild;
+        let boardHeight = temp[index].height;
+        if (lastLineDom !== null) {
+          let contentHeight = lastLineDom.offsetTop + lastLineDom.offsetHeight;
+          if (contentHeight > boardHeight) {
+            temp[index].height = contentHeight;
+            that.$set(that.maxeditor_boards, temp);
+            that.$nextTick(function () {
+              boardDom.style.height = contentHeight + 'px';
+              that.refreshLayout(index);
+            })
+          } else {
+            if (boardHeight > 200) {
+              temp[index].height = contentHeight;
+              that.$set(that.maxeditor_boards, temp);
+              that.$nextTick(function () {
+                boardDom.style.height = contentHeight + 'px';
+                that.refreshLayout(index);
+              })
+            }
+          }
+
+        }
+
       },
       //刷新排版，向下调整
-      refreshLayout(id) {
-        let baseBoxIndex;
-        this.checkId(id, function (index) {
-          baseBoxIndex = index
-        }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法更新排版');
-        });
-        let temp = this.maxeditor_boards;
-        let dom = document.getElementById(temp[baseBoxIndex].id + '_' + this.maxEditorRootId);
-        let scrollHeight = dom.scrollHeight;
-        let offsetHeight = dom.offsetHeight;
-        if (scrollHeight > offsetHeight + 21) {
-          temp[baseBoxIndex].height = scrollHeight;
+      refreshLayout(index) {
+        let that = this;
+        let temp = that.maxeditor_boards;
+        let tX = temp[index].x;
+        let tY = temp[index].y;
+        let tHeight = temp[index].height;
+        let tWidth = temp[index].width;
+        let transHeight = 0; //记录重叠容器的偏移高度，多个重叠时取最大值
+        for (let i = 0; i < temp.length; i++) {
+          if (i === index) {
+            console.log('jumpself');
+            continue;
+          }
+          if (temp[i].y > tY && temp[i].y < tY + tHeight) {
+            if ((tY + tHeight - temp[i].y) > transHeight) {
+              console.log('getTransHeight')
+              transHeight = tY + tHeight - temp[i].y;
+            }
+          }
         }
-        let topY = temp[baseBoxIndex].y;
-        let bottomY = topY + temp[baseBoxIndex].height;
-        let transY = 0;
-        temp.forEach(function (item, index) {
-          if (item.y > topY && item.y < bottomY) {
-            let tty = bottomY - item.y;
-            transY = transY > tty ? transY : tty;
+        for (let i = 0; i < temp.length; i++) {
+          if (i === index) {
+            console.log('jumpself' + temp[i].y + '=====height:' + temp[i].height);
+            console.log(document.getElementById(temp[i].id + '_' + this.maxEditorRootId).style.height);
+            continue;
           }
-        });
-        transY += 30;
-        temp.forEach(function (item, index) {
-          if (item.y > topY) {
-            item.y += transY;
+          if (temp[i].y > tY) {
+            temp[i].y += transHeight;
+            that.$nextTick(function () {
+              console.log('relayout')
+
+              document.getElementById(temp[i].id + '_' + this.maxEditorRootId).style.top = temp[i].y + 'px';
+            })
           }
-        });
-        this.clearBoards();
-        this.$nextTick(function () {
-          this.setBoards(temp)
-        })
+        }
       }
     },
     mounted() {
