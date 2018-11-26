@@ -2,8 +2,8 @@
   <div class="maxeditor-toolbar"
        :id="'maxeditor-toolbar-'+maxeditorRootId"
        ref="maxEditorToolbar"
-       style="transition: 0.3s; min-height: 40px ;position: absolute; top:0; left:50%"
-       :style="{'width': width+paddingX*2+'px','margin-left':-width/2-paddingX+'px'}">
+       style="transition: 0.3s; min-height: 40px ;position: absolute; top:0; right:50%;transform: translate(50%,0);"
+       :style="{'width': width+paddingX*2+'px'}">
     <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
       <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
       <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
