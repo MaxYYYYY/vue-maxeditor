@@ -23,10 +23,11 @@
             v-for="(item, index) in maxeditor_boards"
             :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
             :id="item.id+'_'+maxEditorRootId"
+            :ref="item.id+'_'+maxEditorRootId"
             :key="item.id+'_'+maxEditorRootId"
-            :is="item.component"
             :grid="item.type==='hr'||item.type==='imgBox'?[1,1]:[8,8]"
             :parent="true"
+            :resizable="maxeditor_mode==='design'"
             :x="item.x===undefined||item.x===null?0:item.x"
             :y="item.y===undefined||item.y===null?0:item.y"
             :z="isExited(item.z)?item.z:100"
@@ -35,7 +36,7 @@
             :minh="14"
             :drag-handle="'.maxeditor-icon-move'"
             :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
-            v-bind:axis="item.type==='hr'?'y':'both'"
+            :axis="item.type==='hr'?'y':'both'"
             @click="onActivated(index)"
             @resizing="onResize"
             @dragging="onDrag"
@@ -50,11 +51,11 @@
               <div style="width: 100%;height: 100%"
                    v-bind:contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
                    :id="item.id+'_content_'+maxEditorRootId"
-                   :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title),
-                          'maxeditor-single-line':item.isSingleLine}"
+                   :ref="item.id+'_content_'+maxEditorRootId"
+                   :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title)}"
                    @focus="onActivated(index)"
                    @click="onActivated(index)"
-                   @keyup="onActivated(index);justifyBoardHeight(index)">
+                   @keyup="justifyBoardHeight(index)">
               </div>
             </template>
             <!--label标题-->
@@ -200,7 +201,6 @@
       width: {default: 794},
       height: {default: 1124},
       viewPortHeight: {default: 500},
-      viewPortWidth: {default: 794},
       paddingX: {default: 20},
       paddingY: {default: 20},
       isModeBtnShow: {default: false},//模式控制按钮显示
@@ -244,7 +244,6 @@
         });
 
         let common = {
-          component: 'maxeditor-board',
           id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
           type: option.type,
           x: this.isExited(option.x) ? option.x : 0,
@@ -659,7 +658,6 @@
         document.getElementById(id + '_content_' + this.maxEditorRootId).blur();
       },
 
-
       //图片数字标记拖动时位置大小信息记录
       onImgTabDrag(x, y) {
         if (this.isExited(this.maxeditor_boards[this.maxeditor_current_index].watchTo)) {
@@ -911,31 +909,6 @@
           }
         });
       },
-      createIframe(id, url, width, height, onLoadCallback, timeOut, timeOutCallback) {
-        var timeOutVar = setTimeout(function () {
-          clearTimeout(timeOutVar);
-          timeOutCallback.apply(this, arguments);
-          return;
-        }, timeOut);
-        var iframe = document.createElement("iframe");
-        iframe.id = id;
-        iframe.width = width;
-        iframe.height = height;
-        iframe.src = url;
-        if (iframe.attachEvent) {
-          iframe.attachEvent("onload", function () {
-            clearTimeout(timeOutVar);
-            onLoadCallback.apply(this, arguments);
-          });
-        } else {
-          iframe.onload = function () {
-            clearTimeout(timeOutVar);
-            onLoadCallback.apply(this, arguments);
-          };
-        }
-        document.body.appendChild(iframe);
-        return iframe;
-      },
       handleToolbarScroll() {
         if (this.$refs.maxEditorToolbar.isMenuCollapsed)
           return;
@@ -946,7 +919,7 @@
       //计算文本中汉字个数
       getCharacterNum(text) {
         if (text === undefined || text === null) {
-          console.log(text)
+          console.log(text);
           return 0;
         }
         let num = text.match(/[\u4E00-\u9FA5]/g);
@@ -997,41 +970,26 @@
       },
       //自适应容器高度
       justifyBoardHeight(index) {
-        /*if (event.key==='Enter'){
-          return;
-        }*/
         let that = this;
         let temp = this.maxeditor_boards;
-        let oldHeight = temp[index].height;
-        let boardDom = document.getElementById(temp[index].id + '_' + this.maxEditorRootId);
-        let boardContentDom = document.getElementById(temp[index].id + '_content_' + this.maxEditorRootId);
-        let lastLineDom = boardContentDom.lastElementChild;
+        let oldHeight = temp[index].height;//原始高度
+        let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
+        let boardContentRef = this.$refs[temp[index].id + '_content_' + this.maxEditorRootId];
+        let lastLineDom = boardContentRef[0].lastElementChild;//最后一行
         let boardHeight = temp[index].height;
         if (lastLineDom !== null) {
           let contentHeight = lastLineDom.offsetTop + lastLineDom.offsetHeight;
-          if (contentHeight > boardHeight) {
+          if (contentHeight > boardHeight || ((contentHeight < boardHeight) && boardHeight > 200)) {
             temp[index].height = contentHeight;
-            //that.$set(that.maxeditor_boards, temp);
-            that.$nextTick(function () {
-              boardDom.style.height = contentHeight + 'px';
-              that.refreshLayout(index, contentHeight - oldHeight);
-            })
-          } else {
-            if (boardHeight > 200) {
-              temp[index].height = contentHeight;
-              //that.$set(that.maxeditor_boards, temp);
-              that.$nextTick(function () {
-                boardDom.style.height = contentHeight + 'px';
-                that.refreshLayout(index, contentHeight - oldHeight);
-              })
-            }
+            boardRef[0].height = contentHeight;
+            that.refreshLayout(index, contentHeight - oldHeight);
           }
         }
 
       },
       //刷新排版
       refreshLayout(index, translateY) {
-        console.log('refreshlayout')
+        console.log('refreshlayout');
         let that = this;
         let temp = that.maxeditor_boards;
         let tX = temp[index].x;
@@ -1041,25 +999,20 @@
 
         for (let i = 0; i < temp.length; i++) {
           if (i === index) {
-            console.log('jumpself' + temp[i].y + '=====height:' + temp[i].height);
-            console.log(document.getElementById(temp[i].id + '_' + this.maxEditorRootId).style.height);
             continue;
           }
           if (temp[i].y > tY) {
             //水平方向不做调整
             if (!(temp[i].x < temp[index].x && (temp[i].x + temp[i].width) > (tX + tWidth))) {
               temp[i].y += translateY;
-              that.$set(that.maxeditor_boards, temp);
-              that.$nextTick(function () {
-                console.log('relayout');
-                document.getElementById(temp[i].id + '_' + this.maxEditorRootId).style.top = temp[i].y + 'px';
-
-              })
+              that.$refs[temp[i].id + '_' + this.maxEditorRootId][0].top = temp[i].y;
             }
-
           }
         }
       }
+    },
+    updated () {
+      //console.log(this.maxeditor_boards)
     },
     mounted() {
       /* window.addEventListener('scroll', this.handleToolbarScroll);
