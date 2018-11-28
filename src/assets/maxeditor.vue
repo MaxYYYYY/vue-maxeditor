@@ -55,7 +55,7 @@
                    :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title)}"
                    @focus="onActivated(index)"
                    @click="onActivated(index)"
-                   @keyup="justifyBoardHeight(index)">
+                   @keyup="justifyNormalBoardHeight(index)">
               </div>
             </template>
             <!--label标题-->
@@ -95,8 +95,10 @@
               <div style="width: 100%;height: 100%"
                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                    @click="onActivated(index)"
-                   :id="item.id+'_imgBox_'+maxEditorRootId">
-                <div style="text-align: center" v-if="item.imgs!==null&&item.imgs!==undefined">
+                   :id="item.id+'_imgBox_'+maxEditorRootId"
+                   :ref="item.id+'_imgBox_'+maxEditorRootId">
+                <div style="text-align: center"
+                     v-if="isExited(item.imgs)" :ref="item.id+'_imgBox_imgs_'+maxEditorRootId">
                   <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
                     <div style="display: inline-grid">
                       <div style="position: relative;">
@@ -438,6 +440,8 @@
       insertImg(id, imgs, cb = (imgDomList) => {
         console.log(imgDomList)
       }) {
+        let Tindex;
+        let that = this;
         let temp = this.maxeditor_boards;
         let rootId = this.maxEditorRootId;
         let imgdata;
@@ -452,6 +456,7 @@
             document.getElementById(id + '_imgBox_qrCode_' + this.maxEditorRootId).innerHTML = '';//清空容器中二维码
           } catch (e) {
           }
+          Tindex = index;
           temp[index].imgs = imgdata;
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
@@ -463,21 +468,22 @@
             let dom = document.getElementById(id + '_imgDom_' + item.key + '_' + rootId);
             doms.push(dom)
           });
+          that.justifyImgBoxHeight(Tindex);
           cb(doms)
         })
-
-
       },
       deleteImg(id, key) {
         let temp = this.maxeditor_boards;
         let that = this;
+        let Tindex;
         this.checkId(id, function (index) {
           let isExit = false;
           let ttemp;
+          Tindex = index;
           temp[index].imgs.forEach(function (img, idx) {
             if (img.key === key) {
               ttemp = temp[index].imgs;
-              ttemp.splice(img, 1);
+              ttemp.splice(idx, 1);
               temp[index].imgs = [];
               isExit = true;
             }
@@ -485,7 +491,8 @@
           that.$nextTick(function () {
             ttemp.forEach((item) => {
               temp[index].imgs.push(item)
-            })
+            });
+            this.justifyImgBoxHeight(Tindex);
           });
           if (!isExit) {
             throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
@@ -503,11 +510,14 @@
           }
         } catch (e) {
         }
+        let Tindex;
+        let that = this;
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
           if (temp[index].imgs === null || temp[index].imgs === undefined) {
             temp[index].imgs = []
           }
+          Tindex = index;
           temp[index].imgs.push(img);
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
@@ -515,6 +525,7 @@
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
           let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
+          that.justifyImgBoxHeight(Tindex);
           cb(imgDom);
         });
       },
@@ -546,6 +557,8 @@
           }
         } catch (e) {
         }
+        let that = this;
+        let Tindex;
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
           temp[index].imgs.forEach(function (i, idx) {
@@ -553,17 +566,20 @@
               temp[index].imgs.splice(idx, 1, img);
             }
           });
+          Tindex = index;
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法更新图片');
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
           let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
+          that.justifyImgBoxHeight(Tindex);
           cb(imgDom);
         });
       },
-
       clearImgBoxContent(id) {
+        let that = this;
+        let Tindex;
         let temp = this.maxeditor_boards;
         let rootId = this.maxEditorRootId;
         this.checkId(id, function (i) {
@@ -571,11 +587,13 @@
             document.getElementById(id + '_imgBox_qrCode_' + rootId).innerHTML = '';//清空容器中二维码
           } catch (e) {
           }
+          Tindex = i;
           temp[i].imgs = null;
         }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法清空图片容器');
+          throw new Error('MaxEditodr:' + id + '不存在，无法清空图片容器');
         });
         this.$set(this.maxeditor_boards, temp);
+        this.justifyImgBoxHeight(index)
       },
       insertQRCode(id, url) {
         let rootId = this.maxEditorRootId;
@@ -587,6 +605,7 @@
           throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
         });
       },
+
       bindImgTabBox(changerBoxId, watcherBoxId) {
         let temp = this.maxeditor_boards;
         let changerIndex = null;
@@ -968,8 +987,21 @@
         this.maxeditor_current_index = undefined;
         this.maxeditor_current_tabImg_index = undefined;
       },
-      //自适应容器高度
-      justifyBoardHeight(index) {
+      //自适应图片容器高度
+      justifyImgBoxHeight(index) {
+        this.$nextTick(function () {
+          let temp = this.maxeditor_boards;
+          let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
+          let containerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
+          let oldHeight = temp[index].height;//原始高度
+          let newHeight = containerRef[0].offsetHeight;
+          temp[index].height = newHeight;
+          boardRef[0].height = newHeight;
+          this.refreshLayout(index, newHeight - oldHeight)
+        })
+      },
+      //自适应normal容器高度
+      justifyNormalBoardHeight(index) {
         let that = this;
         let temp = this.maxeditor_boards;
         let oldHeight = temp[index].height;//原始高度
@@ -985,7 +1017,6 @@
             that.refreshLayout(index, contentHeight - oldHeight);
           }
         }
-
       },
       //刷新排版
       refreshLayout(index, translateY) {
@@ -1011,7 +1042,7 @@
         }
       }
     },
-    updated () {
+    updated() {
       //console.log(this.maxeditor_boards)
     },
     mounted() {
