@@ -55,6 +55,7 @@
                    :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title)}"
                    @focus="onActivated(index)"
                    @click="onActivated(index)"
+                   @keydown="onActivated(index)"
                    @keyup="justifyNormalBoardHeight(index)">
               </div>
             </template>
@@ -69,6 +70,7 @@
                 <span
                   v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
                   :id="item.id+'_content_'+maxEditorRootId"
+                  :ref="item.id+'_content_'+maxEditorRootId"
                   class="maxeditor-single-line"
                   :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                   style="float: left;display: inline-block"
@@ -76,7 +78,7 @@
                   @click="onActivated(index);maxeditor_current_dropdown = item.id"
                   @keyup="onActivated(index)"></span>
                 <span class="maxeditor-icon maxeditor-icon-caret-down"
-                      style="position: absolute;right: -10px;top: 4px;"
+                      style="position: absolute;right: 2px;top: 4px;"
                       v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
                       @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
               </p>
@@ -86,7 +88,8 @@
                   <p class="maxeditor-noselect"
                      @click="setDropDownValue(item.id,t.value);
                    maxeditor_current_dropdown = undefined;
-                   maxeditor_boards[index].datalist_current = t.id;">{{t.value}}</p>
+                   maxeditor_boards[index].datalist_current = t.id;
+                   maxeditor_boards[index].content = t.value;">{{t.value}}</p>
                 </template>
               </div>
             </template>
@@ -293,12 +296,19 @@
           }
         } catch (e) {
         }
+        this.maxeditor_boards = [];
         this.maxeditor_boards = boards;
         let rootId = this.maxEditorRootId;
+        let that = this;
         this.$nextTick(function () {
-          this.maxeditor_boards.forEach(function (item, index) {
-            if (item.content !== undefined) {
-              document.getElementById(item.id + '_content_' + rootId).innerHTML = item.content
+          that.maxeditor_boards.forEach(function (item, index) {
+            if (that.isExited(item.content)) {
+              if (item.type === 'normal'){
+                that.$refs[item.id + '_content_' + rootId][0].innerHTML = item.content;
+              }
+              if (item.type === 'label'){
+                that.$refs[item.id + '_content_' + rootId][0].innerText = item.content;
+              }
             }
           });
         })
@@ -334,13 +344,13 @@
           throw new Error('MaxEditor:插入带标签下拉框时未得到标签');
         }
         if (!this.isExited(datalist)) {
-          throw new Error('MaxEditor:插入带标签下拉框时未得到列表');
+          datalist = [];
         }
         if (typeof datalist !== 'object') {
           datalist = JSON.parse(datalist)
         }
         this.addBoard({
-          id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 101, datalist: datalist
+          id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 102, datalist: datalist
         })
       },
       updateDropDownList(id, datalist) {
@@ -358,8 +368,7 @@
           throw new Error('MaxEditor:' + id + '不存在，无法更新下拉框');
         });
         temp[index].datalist = datalist;
-        document.getElementById(id + '_content_' + this.maxEditorRootId).innerText = '';
-        this.$set(this.maxeditor_boards, temp);
+        this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText = ''
       },
       changeDropDownState(id) {
         if (this.isExited(this.maxeditor_current_dropdown)) {
@@ -421,6 +430,7 @@
         }
         if (this.isExited(dItem)) {
           this.maxeditor_boards[index].datalist_current = dItem.id;
+          this.maxeditor_boards[index].content = dItem.value;
           this.setDropDownValue(id, dItem.value);
           this.maxeditor_current_index = index; //设置值后置顶
           return;
