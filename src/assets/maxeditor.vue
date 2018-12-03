@@ -1,5 +1,6 @@
 <template>
   <div class="maxeditor-root" :id="maxEditorRootId" style="overflow-x: scroll">
+    <!--编辑器工具栏-->
     <maxeditor-toolbar v-if="isToolbarShow"
                        :ref="'maxEditorToolbar_'+maxEditorRootId"
                        :width="width"
@@ -9,20 +10,25 @@
                        :is-mode-btn-show="isModeBtnShow"
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
+    <!--视口-->
     <div class="maxeditor-view-port"
-         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px','padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}"
-         style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;">
+         style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;"
+         :style="{'width':width+paddingX*2+30+'px',
+                  'height':viewPortHeight+'px',
+                  'padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}">
       <div class="maxeditor-body"
            style="margin:8px"
            :style="{'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
            @click="handleBodyClick">
-        <div class="maxeditor-body-inner" ref="maxEditorBodyInner" :id="'maxeditor-body-inner-'+maxEditorRootId">
+        <div class="maxeditor-body-inner"
+             :ref="'maxeditor-body-inner-'+maxEditorRootId"
+             :id="'maxeditor-body-inner-'+maxEditorRootId">
           <maxeditor-board
             class="maxeditor-board"
             v-for="(item, index) in maxeditor_boards"
-            :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':'':''}"
+            :style="{'z-index':index === maxeditor_current_index?maxeditor_mode==='design'?'200':item.z:item.z}"
             :id="item.id+'_'+maxEditorRootId"
             :ref="item.id+'_'+maxEditorRootId"
             :key="item.id+'_'+maxEditorRootId"
