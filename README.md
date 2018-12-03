@@ -28,7 +28,7 @@
 ``` bash
 $ npm install --save vue-draggable-resizable
 ```
-安装qrcodeautojs,在package.json中写入配置后进行安装
+安装qrcodeautojs,在package.json中写入配置后进行安装(qrcodeautojs项目fork自qrcodejs，仅修改了两行代码以让生成的二维码自适应容器宽高)
 ```json
 "dependencies":{
   "qrcodeautojs": "git+https://github.com/MaxYYYYY/qrcodejs.git"
@@ -37,6 +37,7 @@ $ npm install --save vue-draggable-resizable
 ```bash
 npm install 
 ```
+
 最后将assets中所有文件拷贝到你的项目中，在Vue通过import引入
 
 ```vue
@@ -93,12 +94,19 @@ Default: `20`
 
 上下边距
 
+#### isToolbarShow
+Type: `Boolean`<br>
+Required: `false`<br>
+Default: `false`
+
+编辑器工具栏是否显示
+
 #### isModeBtnShow
 Type: `Boolean`<br>
 Required: `false`<br>
 Default: `false`
 
-面板相关按钮是否可见
+编辑器工具栏设计按钮是否可见
 
 ## 方法
 方法通过钩子调用

@@ -1,6 +1,7 @@
 <template>
   <div class="maxeditor-root" :id="maxEditorRootId" style="overflow-x: scroll">
-    <maxeditor-toolbar ref="maxEditorToolbar"
+    <maxeditor-toolbar v-if="isToolbarShow"
+                       :ref="'maxEditorToolbar_'+maxEditorRootId"
                        :width="width"
                        :padding-x="paddingX"
                        :maxeditor_mode="maxeditor_mode"
@@ -9,7 +10,7 @@
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
     <div class="maxeditor-view-port"
-         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px','padding-top':isModeBtnShow?'136px':'48px'}"
+         :style="{'width':width+paddingX*2+30+'px','height':viewPortHeight+'px','padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}"
          style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;">
       <div class="maxeditor-body"
            style="margin:8px"
@@ -203,12 +204,13 @@
   export default {
     name: "maxeditor",
     props: {
-      width: {default: 794},
-      height: {default: 1124},
-      viewPortHeight: {default: 500},
-      paddingX: {default: 20},
-      paddingY: {default: 20},
-      isModeBtnShow: {default: false},//模式控制按钮显示
+      width: {type: Number, default: 794},//报告页面宽高，72dpi显示器下，A4纸的像素大小为794*1024
+      height: {type: Number, default: 1124},
+      viewPortHeight: {type: Number, default: 500},//编辑器的视口高度
+      paddingX: {type: Number, default: 20},//报告页面水平内边距
+      paddingY: {type: Number, default: 20},//报告页面垂直内边距
+      isToolbarShow: {type: Boolean, default: true},//编辑器工具栏是否显示
+      isModeBtnShow: {type: Boolean, default: false},//编辑器工具栏设计按钮是否可见
       maxEditorRootId: {type: String, default: 'maxEditor_00'}
     },
     data() {
@@ -221,8 +223,6 @@
         maxeditor_current_index: undefined,
         maxeditor_current_dropdown: undefined,
         maxeditor_current_tabImg_index: undefined,//维持带数字标记的图片当前操作的标记的索引
-        toolBarFixed: false,
-        toolBarLeft: 0,
       }
     },
     components: {
@@ -236,7 +236,7 @@
         if (this.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:当前模式不可插入板块');
         }
-        if (option.id === '' || option.id === null || option.id === undefined) {
+        if (!this.isExited(option.id)) {
           if (option.type === 'hr') {
             option.id = 'maxeditor-board-hr-' + this.maxeditor_boards.length
           } else {
@@ -303,10 +303,10 @@
         this.$nextTick(function () {
           that.maxeditor_boards.forEach(function (item, index) {
             if (that.isExited(item.content)) {
-              if (item.type === 'normal'){
+              if (item.type === 'normal') {
                 that.$refs[item.id + '_content_' + rootId][0].innerHTML = item.content;
               }
-              if (item.type === 'label'){
+              if (item.type === 'label') {
                 that.$refs[item.id + '_content_' + rootId][0].innerText = item.content;
               }
             }
@@ -350,7 +350,7 @@
           datalist = JSON.parse(datalist)
         }
         this.addBoard({
-          id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 102, datalist: datalist
+          id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 200, datalist: datalist
         })
       },
       updateDropDownList(id, datalist) {
@@ -370,10 +370,11 @@
         temp[index].datalist = datalist;
         this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText = ''
       },
-      changeDropDownState(id) {
+      changeDropDownState(id, index) {
         if (this.isExited(this.maxeditor_current_dropdown)) {
           this.maxeditor_current_dropdown = undefined
         } else {
+          console.log(this.$refs[id + '_' + this.maxEditorRootId]);
           this.maxeditor_current_dropdown = id;
         }
       },
@@ -938,13 +939,6 @@
           }
         });
       },
-      handleToolbarScroll() {
-        if (this.$refs.maxEditorToolbar.isMenuCollapsed)
-          return;
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        let offsetTop = document.getElementById('maxeditor-toolbar-' + this.maxEditorRootId).offsetTop;
-        this.toolBarFixed = scrollTop > offsetTop;
-      },
       //计算文本中汉字个数
       getCharacterNum(text) {
         if (text === undefined || text === null) {
@@ -1056,10 +1050,7 @@
       //console.log(this.maxeditor_boards)
     },
     mounted() {
-      /* window.addEventListener('scroll', this.handleToolbarScroll);
-       window.onresize = () => {
-         this.toolBarLeft = this.$refs.maxEditorBodyInner.getBoundingClientRect().left - 20;
-       }*/
+
     },
     created() {
     },

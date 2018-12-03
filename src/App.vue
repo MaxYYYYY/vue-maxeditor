@@ -45,7 +45,7 @@
 
     <div style="width: 100%;">
       <MaxEditor ref="maxeditor" style="margin-top: 20px"
-                 :is-mode-btn-show="true" :view-port-height="1000"
+                 :is-mode-btn-show="true" :view-port-height="500" :is-toolbar-show="true"
                  :max-editor-root-id="'dddd'" :height="2000"></MaxEditor>
     </div>
 
