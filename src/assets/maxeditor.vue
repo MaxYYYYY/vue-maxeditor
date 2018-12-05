@@ -50,7 +50,7 @@
             @activated="onActivated(index)"
             @deactivated="onDeactivated(index)">
             <!--面板标题-->
-            <template v-if="item.type==='normal'&&item.title!==null&&item.title!==undefined">
+            <template v-if="item.type==='normal'&&isExited(item.title)">
               <div class="maxeditor-board-titile">{{item.title}}:</div>
             </template>
             <!--normal面板-->
@@ -69,21 +69,21 @@
             <!--label标题-->
             <template v-if="item.type === 'label'">
               <p style="height: 25px;margin: 0;position: relative">
-              <span style="float: left;width: 65px;height: 25px"
-                    class="maxeditor-single-line"
-                    @click="onActivated(index)">{{item.label}}
-              </span>
+                <span style="float: left;width: 65px;height: 25px"
+                      class="maxeditor-single-line"
+                      @click="onActivated(index)">{{item.label}}
+                </span>
                 <span style="float: left;margin-right: 5px">:</span>
                 <span
-                  v-bind:contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
+                  class="maxeditor-single-line"
+                  style="float: left;display: inline-block"
+                  :contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
                   :id="item.id+'_content_'+maxEditorRootId"
                   :ref="item.id+'_content_'+maxEditorRootId"
-                  class="maxeditor-single-line"
                   :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                  style="float: left;display: inline-block"
-                  :style="{'width':item.width-75+'px'}"
+                  :style="{'width':item.width-80+'px'}"
                   @click="onActivated(index);maxeditor_current_dropdown = item.id"
-                  @keyup="onActivated(index)"></span>
+                  @keyup="onActivated(index)">{{item.content}}</span>
                 <span class="maxeditor-icon maxeditor-icon-caret-down"
                       style="position: absolute;right: 2px;top: 4px;"
                       v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
@@ -104,18 +104,20 @@
             <template v-if="item.type === 'imgBox'">
               <div style="width: 100%;height: 100%"
                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                   @click="onActivated(index)"
                    :id="item.id+'_imgBox_'+maxEditorRootId"
-                   :ref="item.id+'_imgBox_'+maxEditorRootId">
+                   :ref="item.id+'_imgBox_'+maxEditorRootId"
+                   @click="onActivated(index)">
                 <div style="text-align: center"
                      v-if="isExited(item.imgs)" :ref="item.id+'_imgBox_imgs_'+maxEditorRootId">
                   <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
                     <div style="display: inline-grid">
                       <div style="position: relative;">
-                        <img :src="img.src" :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
+                        <img :src="img.src"
+                             :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
+                             :ref="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                              :style="{'width':item.imgs.length===1?'':'160px',
-                                'height':item.imgs.length===1?item.height+'px':'',
-                                'margin':item.imgs.length===1?'0':'4px'}"/>
+                                      'height':item.imgs.length===1?item.height+'px':'',
+                                      'margin':item.imgs.length===1?'0':'4px'}"/>
                         <!--图片角标-->
                         <div style="position: absolute;
                       margin: 4px 4px 8px;height: 20px;width: 20px;"
@@ -131,7 +133,9 @@
                     </div>
                   </template>
                 </div>
-                <div :id="item.id+'_imgBox_qrCode_'+maxEditorRootId" v-if="!isExited(item.imgs)"></div>
+                <div  v-if="!isExited(item.imgs)"
+                      :ref="item.id+'_imgBox_qrCode_'+maxEditorRootId"
+                      :id="item.id+'_imgBox_qrCode_'+maxEditorRootId"></div>
                 <!--图片标记-->
                 <maxeditor-tab v-if="isExited(item.watchTo)"
                                v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
@@ -217,18 +221,18 @@
       paddingY: {type: Number, default: 20},//报告页面垂直内边距
       isToolbarShow: {type: Boolean, default: true},//编辑器工具栏是否显示
       isModeBtnShow: {type: Boolean, default: false},//编辑器工具栏设计按钮是否可见
-      maxEditorRootId: {type: String, default: 'maxEditor_00'}
+      maxEditorRootId: {type: String, default: 'maxEditor_' + Date.now()}//默认生成时间戳id
     },
     data() {
       return {
         window: window,
-        document: window.document,//
-        maxeditor_boards: [],//
-        maxeditor_mode: 'design',
-        maxeditor_current_id: '',//当前编辑面板，值为id
-        maxeditor_current_index: undefined,
-        maxeditor_current_dropdown: undefined,
-        maxeditor_current_tabImg_index: undefined,//维持带数字标记的图片当前操作的标记的索引
+        document: window.document,
+        maxeditor_boards: [],//面板列表，报告界面根据此列表渲染
+        maxeditor_mode: 'design',//编辑器模式，'design'|'edit'|'readonly '
+        maxeditor_current_id: '',//当前编辑面板id
+        maxeditor_current_index: undefined,//当前编辑面板在maxeditor_boards中的索引值
+        maxeditor_current_dropdown: undefined,//当前正在操作的下拉框（id值）
+        maxeditor_current_tabImg_index: undefined,//当前正在操作的图片标记的索引值
       }
     },
     components: {
@@ -238,6 +242,7 @@
     },
     methods: {
       //全局方法
+      //新增面板
       addBoard(option) {
         if (this.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:当前模式不可插入板块');
@@ -253,45 +258,46 @@
           throw new Error('MaxEditor:id已存在,无法插入板块');
         }, function () {
         });
-
+        //通用属性
         let common = {
           id: this.isExited(option.id) ? option.id : 'maxeditor_default_id_' + this.maxeditor_boards.length + '',
           type: option.type,
           x: this.isExited(option.x) ? option.x : 0,
           y: this.isExited(option.y) ? option.y : 0,
           z: this.isExited(option.z) ? option.z : 100,
-          width: this.isExited(option.width) ? option.width : null,
-          height: this.isExited(option.height) ? option.height : null,
+          width: this.isExited(option.width) ? option.width : 200,
+          height: this.isExited(option.height) ? option.height : 200,
           minWidth: this.isExited(option.minWidth) ? option.minWidth : null,
           minHeight: this.isExited(option.minHeight) ? option.minHeight : null,
         };
-
+        //文本框
         if (option.type === 'normal') {
           //common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
           common.title = this.isExited(option.title) ? option.title : null;
           common.writable = this.isExited(option.writable) ? option.writable : true;
         }
-
+        //标签单行文本
         if (option.type === 'label') {
           common.label = this.isExited(option.label) ? option.label : null;
           common.datalist = this.isExited(option.datalist) ? option.datalist : null;//下拉数组
           common.datalist_current = null;//当前选中项
         }
-
+        //图片容器
         if (option.type === 'imgBox') {
           common.imgs = this.isExited(option.imgs) ? option.imgs : null;
           common.imgTabs = this.isExited(option.imgTabs) ? option.imgTabs : null;
           common.watchTo = null;
           common.watchBy = null;
         }
-
+        //表格
         if (option.type === 'table') {
 
         }
-
         this.maxeditor_boards.push(common);
+        //激活新增面板
         this.onActivated(this.maxeditor_boards.length - 1)
       },
+      //获取面板数组
       getBoards() {
         return this.maxeditor_boards;
       },
@@ -302,7 +308,6 @@
           }
         } catch (e) {
         }
-        this.maxeditor_boards = [];
         this.maxeditor_boards = boards;
         let rootId = this.maxEditorRootId;
         let that = this;
@@ -325,6 +330,7 @@
       addSection(id) {
         this.addBoard({id: id, type: 'normal', z: 100})
       },
+      //该文本框只在设计模式下可编辑，用于大标题以及页脚等
       addReadOnlySection(id) {
         this.addBoard({id: id, type: 'normal', z: 100, writable: false, height: 24, width: this.width})
       },
@@ -439,13 +445,13 @@
           this.maxeditor_boards[index].datalist_current = dItem.id;
           this.maxeditor_boards[index].content = dItem.value;
           this.setDropDownValue(id, dItem.value);
-          this.maxeditor_current_index = index; //设置值后置顶
+          //this.maxeditor_current_index = index; //设置值后置顶
           return;
         }
         throw new Error('MaxEditor:下拉列表中找到不' + itemId);
       },
       setDropDownValue(id, value) {
-        document.getElementById(id + '_content_' + this.maxEditorRootId).innerText = value
+        this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText = value
       },
       addHr() {
         this.addBoard({type: 'hr', z: 101})
@@ -462,15 +468,16 @@
         let temp = this.maxeditor_boards;
         let rootId = this.maxEditorRootId;
         let imgdata;
+        //入参控制
         if (typeof imgs === 'object') {
           imgdata = imgs;
         } else {
           imgdata = JSON.parse(imgs);
         }
         this.checkId(id, function (index) {
-          //TODO 此处不要写死，后期必改
+          //清空容器中二维码
           try {
-            document.getElementById(id + '_imgBox_qrCode_' + this.maxEditorRootId).innerHTML = '';//清空容器中二维码
+            that.$refs[id + '_imgBox_qrCode_' + this.maxEditorRootId][0].innerHTML = '';
           } catch (e) {
           }
           Tindex = index;
@@ -478,11 +485,13 @@
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法插入图片');
         });
+        //触发更新视图
         this.$set(this.maxeditor_boards, temp);
         let doms = [];
+        //返还插入图片的dom数组
         this.$nextTick(function () {
           imgdata.forEach(function (item, idx) {
-            let dom = document.getElementById(id + '_imgDom_' + item.key + '_' + rootId);
+            let dom = that.$refs[id + '_imgDom_' + item.key + '_' + rootId][0];
             doms.push(dom)
           });
           that.justifyImgBoxHeight(Tindex);
@@ -505,15 +514,15 @@
               isExit = true;
             }
           });
+          if (!isExit) {
+            throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
+          }
           that.$nextTick(function () {
             ttemp.forEach((item) => {
               temp[index].imgs.push(item)
             });
-            this.justifyImgBoxHeight(Tindex);
+            that.justifyImgBoxHeight(Tindex);
           });
-          if (!isExit) {
-            throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
-          }
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
         });
@@ -531,7 +540,8 @@
         let that = this;
         let temp = this.maxeditor_boards;
         this.checkId(id, function (index) {
-          if (temp[index].imgs === null || temp[index].imgs === undefined) {
+          //初始化
+          if (!that.isExited(temp[index].imgs)) {
             temp[index].imgs = []
           }
           Tindex = index;
@@ -541,11 +551,12 @@
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
-          let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
+          let imgDom = that.$refs[id + '_imgDom_' + img.key + '_' + this.maxEditorRootId][0];
           that.justifyImgBoxHeight(Tindex);
           cb(imgDom);
         });
       },
+      //获取图片json对象
       getImg(id, key) {
         let temp = this.maxeditor_boards;
         let img = {};
@@ -589,7 +600,7 @@
         });
         this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
-          let imgDom = document.getElementById(id + '_imgDom_' + img.key + '_' + this.maxEditorRootId);
+          let imgDom = that.$refs[id + '_imgDom_' + img.key + '_' + this.maxEditorRootId][0];
           that.justifyImgBoxHeight(Tindex);
           cb(imgDom);
         });
@@ -601,21 +612,25 @@
         let rootId = this.maxEditorRootId;
         this.checkId(id, function (i) {
           try {
-            document.getElementById(id + '_imgBox_qrCode_' + rootId).innerHTML = '';//清空容器中二维码
+            that.$refs[id + '_imgBox_qrCode_' + rootId][0].innerHTML = '';//清空容器中二维码
           } catch (e) {
           }
           Tindex = i;
           temp[i].imgs = null;
         }, function () {
-          throw new Error('MaxEditodr:' + id + '不存在，无法清空图片容器');
+          throw new Error('MaxEditor:' + id + '不存在，无法清空图片容器');
         });
         this.$set(this.maxeditor_boards, temp);
-        this.justifyImgBoxHeight(index)
+        this.justifyImgBoxHeight(Tindex)
       },
       insertQRCode(id, url) {
+        let that = this;
         let rootId = this.maxEditorRootId;
+        if (!that.isExited(url)){
+          throw new Error('MaxEditor:未传入url，无法插入二维码');
+        }
         this.checkId(id, function () {
-          let dom = document.getElementById(id + '_imgBox_qrCode_' + rootId);
+          let dom = that.$refs[id + '_imgBox_qrCode_' + rootId][0];
           dom.innerHTML = '';
           new QRCode(dom, url);
         }, function () {
@@ -671,7 +686,6 @@
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法解除绑定容器');
         });
-
         temp[watcherIndex].watchTo = null;
         temp[changerIndex].watchBy = null;
         this.$set(this.maxeditor_boards, temp);
@@ -688,10 +702,10 @@
         return this.maxeditor_mode
       },
       activeBoard(id) {
-        document.getElementById(id + '_content_' + this.maxEditorRootId).focus();
+        this.$refs[id + '_content_' + this.maxEditorRootId][0].focus();
       },
       deactiveBoard(id) {
-        document.getElementById(id + '_content_' + this.maxEditorRootId).blur();
+        this.$refs[id + '_content_' + this.maxEditorRootId][0].blur();
       },
 
       //图片数字标记拖动时位置大小信息记录
@@ -718,9 +732,7 @@
           this.maxeditor_boards[this.maxeditor_current_index].width = width;
           this.maxeditor_boards[this.maxeditor_current_index].height = height;
         } catch (e) {
-
         }
-        //动态调整
       },
       onDrag(x, y) {
         try {
@@ -737,7 +749,7 @@
         this.maxeditor_current_id = this.maxeditor_boards[index].id;
         this.maxeditor_current_index = index;
         try {
-          this.maxeditor_boards[index].content = document.getElementById(this.maxeditor_current_id + "_content_" + this.maxEditorRootId).innerHTML;
+          this.maxeditor_boards[index].content = this.$refs[this.maxeditor_boards[index].id + "_content_" + this.maxEditorRootId][0].innerHTML;
         } catch (e) {
 
         }
@@ -836,7 +848,6 @@
           console.log('MaxEditor:没有正在编辑的面板');
           return null;
         }
-        //alert(document.getElementById(this.maxeditor_current_id + "_content").innerHTML)
         return this.maxeditor_boards[this.maxeditor_current_index].content
       },
       getCurrentBoardId() {
@@ -854,7 +865,7 @@
         }, function () {
           throw new Error('MaxEditor:id' + id + '不存在，无法获取面板文本内容');
         });
-        return document.getElementById(id + '_content_' + this.maxEditorRootId).innerText;
+        return this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText;
       },
       getBoardContent(id) {
         let index;
@@ -877,7 +888,7 @@
         this.$set(this.maxeditor_boards, temp);
         let rootId = this.maxEditorRootId;
         this.$nextTick(function () {
-          document.getElementById(id + '_content_' + rootId).innerHTML = this.maxeditor_boards[index].content
+          this.$refs[id + '_content_' + rootId][0].innerHTML = this.maxeditor_boards[index].content
         });
       },
 
@@ -1062,6 +1073,7 @@
     },
     watch: {
       maxeditor_mode(n, o) {
+        //文本内部下拉框是否可编辑
         if (n === 'readonly') {
           let list = document.getElementsByClassName('maxeditor-inner-dropdown');
           for (let i = 0; i < list.length; i++) {
