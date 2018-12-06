@@ -119,9 +119,8 @@
                                       'height':item.imgs.length===1?item.height+'px':'',
                                       'margin':item.imgs.length===1?'0':'4px'}"/>
                         <!--图片角标-->
-                        <div style="position: absolute;
-                      margin: 4px 4px 8px;height: 20px;width: 20px;"
-                             v-show="isExited(img.tab)"
+                        <div style="position: absolute;margin: 4px 4px 8px;height: 20px;width: 20px;"
+                             v-if="isExited(img.tab)"
                              :style="{'background-color':isExited(img.tab)?isExited(img.tab)?img.tab.color:'white':'white'}"
                              :class="{'maxeditor-position-tl':isExited(img.tab)&&img.tab.position==='tl',
                                     'maxeditor-position-tr':isExited(img.tab)&&img.tab.position==='tr',
@@ -1010,16 +1009,15 @@
       },
       //自适应图片容器高度
       justifyImgBoxHeight(index) {
-        this.$nextTick(function () {
-          let temp = this.maxeditor_boards;
-          let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
-          let containerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
-          let oldHeight = temp[index].height;//原始高度
-          let newHeight = containerRef[0].offsetHeight;
-          temp[index].height = newHeight;
-          boardRef[0].height = newHeight;
-          this.refreshLayout(index, newHeight - oldHeight)
-        })
+        let temp = this.maxeditor_boards;
+        let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
+        let containerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
+        let lastImgDom = containerRef[0].lastElementChild;
+        let oldHeight = temp[index].height;//原始高度
+        let newHeight = lastImgDom.offsetTop + lastImgDom.offsetHeight;
+        temp[index].height = newHeight;
+        boardRef[0].height = newHeight;
+        this.refreshLayout(index, newHeight - oldHeight)
       },
       //自适应normal容器高度
       justifyNormalBoardHeight(index) {
