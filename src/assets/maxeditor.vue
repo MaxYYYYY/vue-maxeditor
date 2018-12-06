@@ -62,8 +62,7 @@
                    :class="{'maxeditor-board-outline':maxeditor_mode==='readonly'?false:maxeditor_mode==='design'?true:isExited(item.title)}"
                    @focus="onActivated(index)"
                    @click="onActivated(index)"
-                   @keydown="onActivated(index)"
-                   @keyup="justifyNormalBoardHeight(index)">
+                   @keyup="onActivated(index);justifyNormalBoardHeight(index)">
               </div>
             </template>
             <!--label标题-->
@@ -298,6 +297,7 @@
       },
       //获取面板数组
       getBoards() {
+        this.blurAll();
         return this.maxeditor_boards;
       },
       setBoards(boards) {
@@ -1000,12 +1000,18 @@
           this.blurAll()
         }
       },
-      blurAll() {
+      blurAll(cb = () => {
         console.log('释放焦点');
+      }) {
+        let that = this;
+        if (this.isExited(this.maxeditor_current_id)) {
+          that.deactiveBoard(this.maxeditor_current_id);
+        }
         this.maxeditor_current_dropdown = undefined;
         this.maxeditor_current_id = undefined;
         this.maxeditor_current_index = undefined;
         this.maxeditor_current_tabImg_index = undefined;
+        this.$nextTick(cb)
       },
       //自适应图片容器高度
       justifyImgBoxHeight(index) {

@@ -9,6 +9,8 @@
 
 .maxeditor-root {
   position: relative;
+  color:black;
+  line-height: normal;
 }
 
 .maxeditor-hoverable:hover {
