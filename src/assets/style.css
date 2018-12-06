@@ -11,6 +11,7 @@
   position: relative;
   color:black;
   line-height: normal;
+  font-size: 16px;
 }
 
 .maxeditor-hoverable:hover {
