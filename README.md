@@ -143,8 +143,10 @@ export default {
 {"component":"maxeditor-board","id":"4","type":"label","isFluid":false,"title":null,"label":"4","x":475,"z":1025,"width":100,"height":25,"y":75,"w":100,"h":50}]
 ```
 
-#### setBoards(boards)
+#### setBoards(boards, cb)
 设置面板列表，boards为json数组(对象以及字符串皆可)，结构如上
+
+cb为回掉函数，在页面设置完后执行
 
 #### clearBoards()
 清除所有面板

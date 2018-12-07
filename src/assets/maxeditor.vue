@@ -300,7 +300,9 @@
         this.blurAll();
         return this.maxeditor_boards;
       },
-      setBoards(boards) {
+      setBoards(boards, cb = () => {
+        console.log('MaxEditor:setBoards complete.')
+      }) {
         try {
           if (typeof JSON.parse(boards) === "object") {
             boards = JSON.parse(boards)
@@ -321,6 +323,9 @@
               }
             }
           });
+          that.$nextTick(function () {
+            cb();
+          })
         })
       },
       clearBoards() {
