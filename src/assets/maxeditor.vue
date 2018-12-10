@@ -101,22 +101,24 @@
             </template>
             <!--imgBox面板-->
             <template v-if="item.type === 'imgBox'">
-              <div style="width: 100%;height: 100%"
+              <div :style="{'height':isExited(item.height)?item.height+'px':'200px'}"
                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                    :id="item.id+'_imgBox_'+maxEditorRootId"
                    :ref="item.id+'_imgBox_'+maxEditorRootId"
                    @click="onActivated(index)">
+                <!--图片-->
                 <div style="text-align: center"
-                     v-if="isExited(item.imgs)" :ref="item.id+'_imgBox_imgs_'+maxEditorRootId">
+                     v-if="isExited(item.imgs)"
+                     :id="item.id+'_imgBox_imgs_'+maxEditorRootId"
+                     :ref="item.id+'_imgBox_imgs_'+maxEditorRootId">
                   <template v-for="(img, imgIdx) in item.imgs" v-if="isExited(item.imgs)">
                     <div style="display: inline-grid">
                       <div style="position: relative;">
-                        <img :src="img.src"
+                        <img style="margin:4px" :src="img.src"
                              :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                              :ref="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                              :style="{'width':item.imgs.length===1?'':'160px',
-                                      'height':item.imgs.length===1?item.height+'px':'',
-                                      'margin':item.imgs.length===1?'0':'4px'}"/>
+                                      'height':item.imgs.length===1?item.height+'px':''}"/>
                         <!--图片角标-->
                         <div style="position: absolute;margin: 4px 4px 8px;height: 20px;width: 20px;"
                              v-if="isExited(img.tab)"
@@ -131,16 +133,17 @@
                     </div>
                   </template>
                 </div>
-                <div  v-if="!isExited(item.imgs)"
-                      :ref="item.id+'_imgBox_qrCode_'+maxEditorRootId"
-                      :id="item.id+'_imgBox_qrCode_'+maxEditorRootId"></div>
+                <!--二维码-->
+                <div v-if="!isExited(item.imgs)"
+                     :ref="item.id+'_imgBox_qrCode_'+maxEditorRootId"
+                     :id="item.id+'_imgBox_qrCode_'+maxEditorRootId"></div>
                 <!--图片标记-->
                 <maxeditor-tab v-if="isExited(item.watchTo)"
                                v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
                                :x="isExited(i.tabX)?i.tabX:0"
                                :y="isExited(i.tabY)?i.tabY:0"
-                               :w="20"
-                               :h="20"
+                               :w="isExited(i.tabW)?i.tabW:20"
+                               :h="isExited(i.tabH)?i.tabH:20"
                                :minh="15"
                                :minw="15"
                                :parent="true"
@@ -504,31 +507,37 @@
       },
       deleteImg(id, key) {
         let temp = this.maxeditor_boards;
+        let ttemp;
         let that = this;
         let Tindex;
+        let tidx;
         this.checkId(id, function (index) {
           let isExit = false;
-          let ttemp;
           Tindex = index;
+          //当存在多个相同key的图片时，删除最有一张（key的唯一性前端不作控制）
           temp[index].imgs.forEach(function (img, idx) {
             if (img.key === key) {
-              ttemp = temp[index].imgs;
-              ttemp.splice(idx, 1);
-              temp[index].imgs = [];
+              tidx = idx;
               isExit = true;
             }
           });
+          ttemp = temp[index].imgs;
+          ttemp.splice(tidx, 1);
           if (!isExit) {
             throw new Error('MaxEditor:' + id + '中' + key + '不存在，无法删除图片');
           }
-          that.$nextTick(function () {
-            ttemp.forEach((item) => {
-              temp[index].imgs.push(item)
-            });
-            that.justifyImgBoxHeight(Tindex);
+          temp[index].imgs = [];
+          ttemp.forEach((item) => {
+            temp[index].imgs.push(item)
           });
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
+        });
+        this.$set(this.maxeditor_boards, temp)
+        this.$nextTick(function () {
+          if (temp[Tindex].imgs.length!==0){
+            that.justifyImgBoxHeight(Tindex);
+          }
         });
       },
       addImg(id, img, cb = (imgDom) => {
@@ -566,6 +575,9 @@
         let img = {};
         let isExist = false;
         this.checkId(id, function (index) {
+          if (!this.isExited(temp[index].imgs)) {
+            throw new Error('MaxEditor:' + id + '下没有图片')
+          }
           for (let i = 0; i < temp[index].imgs.length; i++) {
             if (temp[index].imgs[i].key === key) {
               img = temp[index].imgs[i];
@@ -630,7 +642,7 @@
       insertQRCode(id, url) {
         let that = this;
         let rootId = this.maxEditorRootId;
-        if (!that.isExited(url)){
+        if (!that.isExited(url)) {
           throw new Error('MaxEditor:未传入url，无法插入二维码');
         }
         this.checkId(id, function () {
@@ -709,7 +721,11 @@
         this.$refs[id + '_content_' + this.maxEditorRootId][0].focus();
       },
       deactiveBoard(id) {
-        this.$refs[id + '_content_' + this.maxEditorRootId][0].blur();
+        try {
+          this.$refs[id + '_content_' + this.maxEditorRootId][0].blur();
+        } catch (e) {
+
+        }
       },
 
       //图片数字标记拖动时位置大小信息记录
@@ -1021,11 +1037,13 @@
       //自适应图片容器高度
       justifyImgBoxHeight(index) {
         let temp = this.maxeditor_boards;
+        if (temp[index].imgs.length===1){
+          return
+        }
         let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
-        let containerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
-        let lastImgDom = containerRef[0].lastElementChild;
+        let containerInnerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
         let oldHeight = temp[index].height;//原始高度
-        let newHeight = lastImgDom.offsetTop + lastImgDom.offsetHeight;
+        let newHeight = containerInnerRef[0].offsetHeight;
         temp[index].height = newHeight;
         boardRef[0].height = newHeight;
         this.refreshLayout(index, newHeight - oldHeight)
@@ -1050,7 +1068,7 @@
       },
       //刷新排版
       refreshLayout(index, translateY) {
-        console.log('refreshlayout');
+        console.log('MaxEditor:refresh layout.');
         let that = this;
         let temp = that.maxeditor_boards;
         let tX = temp[index].x;
@@ -1062,9 +1080,11 @@
           if (i === index) {
             continue;
           }
-          if (temp[i].y > tY) {
-            //水平方向不做调整
-            if (!(temp[i].x < temp[index].x && (temp[i].x + temp[i].width) > (tX + tWidth))) {
+          if (temp[i].y > (tY + tHeight)) {
+            temp[i].y += translateY;
+            that.$refs[temp[i].id + '_' + this.maxEditorRootId][0].top = temp[i].y;
+          } else if (temp[i].y > tY && temp[i].y < (tY + tHeight)) {
+            if (!(temp[i].x > tX + tWidth) && !((temp[i].x + temp[i].width) < tX)) {
               temp[i].y += translateY;
               that.$refs[temp[i].id + '_' + this.maxEditorRootId][0].top = temp[i].y;
             }

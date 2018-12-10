@@ -42,6 +42,9 @@
     <button @click="bindImgTabBox">bindImgTabBox</button>
     <button @click="test2">test2</button>
     <button @click="print">print</button>
+    <br/>
+    <button @click="imgaddtest">imgaddtest</button>
+    <button @click="imgdeletetest">imgdeletetest</button>
 
     <div style="width: 100%;">
       <MaxEditor ref="maxeditor" style="margin-top: 20px"
@@ -68,6 +71,25 @@
       MaxEditor
     },
     methods: {
+      //增删图片测试
+      imgaddtest() {
+        let imgJson = {
+          src: "http://dmt.upload.streakingman.com/test01.jpg",
+          tab: {
+            position: "br",
+            color: "green"
+          },
+          tabX: 0,
+          tabY: 0,
+          key: "pic9",
+          label: "pic9"
+        };
+        this.$refs.maxeditor.addImg('33', imgJson)
+      },
+      imgdeletetest() {
+        this.$refs.maxeditor.deleteImg('33', 'pic9')
+      },
+
       print() {
         this.$refs.maxeditor.print()
       },
