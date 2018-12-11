@@ -574,8 +574,9 @@
         let temp = this.maxeditor_boards;
         let img = {};
         let isExist = false;
+        let that = this;
         this.checkId(id, function (index) {
-          if (!this.isExited(temp[index].imgs)) {
+          if (!that.isExited(temp[index].imgs)) {
             throw new Error('MaxEditor:' + id + '下没有图片')
           }
           for (let i = 0; i < temp[index].imgs.length; i++) {
