@@ -136,7 +136,13 @@
               @click="clearBoards">清空编辑器
       </button>
       <br/>
-
+      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
+              @click="editInsertDatalist">关键词
+      </button>
+      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
+              @click="insertKeyWord">关键词
+      </button>
+      <br/>
       <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
               :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='design'}"
               @click="setMode('design')">设计模式
@@ -219,6 +225,18 @@
       }
     },
     methods: {
+      //关键字
+      insertKeyWord() {
+        let id = prompt('请输入id');
+        let datalist = prompt('请输入datalist');
+        this.$parent.insertKeyWord(id, datalist);
+      },
+      editInsertDatalist() {
+        let id = prompt('请输入id');
+        let datalist = prompt('请输入datalist');
+        this.$parent.editInsertDatalist(id, datalist);
+      },
+
       //表格
 
 

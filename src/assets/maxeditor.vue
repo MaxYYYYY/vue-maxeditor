@@ -15,7 +15,7 @@
          style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;"
          :style="{'width':width+paddingX*2+30+'px',
                   'height':viewPortHeight+'px',
-                  'padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}">
+                  'padding-top':isToolbarShow?isModeBtnShow?'184px':'48px':'0'}">
       <div class="maxeditor-body"
            style="margin:8px"
            :style="{'width':width+'px','height':height+'px',
@@ -88,7 +88,7 @@
                       v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
                       @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
               </p>
-              <div class="maxeditor-dropdown"
+              <div class="maxeditor-dropdown" style="margin-left: 70px"
                    v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
                   <p class="maxeditor-noselect"
@@ -223,6 +223,9 @@
       isToolbarShow: {type: Boolean, default: true},//编辑器工具栏是否显示
       isModeBtnShow: {type: Boolean, default: false},//编辑器工具栏设计按钮是否可见
       maxEditorRootId: {type: String, default: 'maxEditor_' + Date.now()}//默认生成时间戳id
+    },
+    render() {
+
     },
     data() {
       return {
@@ -535,7 +538,7 @@
         });
         this.$set(this.maxeditor_boards, temp)
         this.$nextTick(function () {
-          if (temp[Tindex].imgs.length!==0){
+          if (temp[Tindex].imgs.length !== 0) {
             that.justifyImgBoxHeight(Tindex);
           }
         });
@@ -914,6 +917,40 @@
       },
 
       //文本编辑方法
+      //关键字
+      insertKeyWord(id, datalist) {
+        if (typeof JSON.parse(datalist) === 'object') {
+          datalist = JSON.parse(datalist)
+        }
+        let rootId = this.maxEditorRootId;
+        let li ='';
+        for (let i=0;i<datalist.length;i++){
+          li += '<p onclick="this.parentElement.previousElementSibling.innerHTML=this.getAttribute(\"'+'data-keyWord-value'+'\")"' +
+            ' class="maxeditor-noselect" data-keyWord-value="'+datalist[i].value+'">'+datalist[i].value+'</p>'
+        }
+        let keyWordSpan = '<span></span><span style="position: relative">'+'<span id="' + id + '_keyWord_' + rootId + '" class="maxeditor-board-outline">' +
+          '请选择'+
+          '</span>' +
+          '<div contenteditable="false" style="position: absolute;left: 0;top:25px;visibility: hidden" class="maxeditor-dropdown">' + li +
+          '</div>'+
+          '</span>';
+        document.execCommand('insertHtml', false, keyWordSpan);
+        document.getElementById(id + '_keyWord_' + rootId).onclick = function () {
+          console.log(this.nextElementSibling)
+          if(this.nextElementSibling.style.visibility==='hidden'){
+            console.log(this.nextElementSibling.style.visibility)
+            this.nextElementSibling.style.visibility='visible'
+          }
+          else if(this.nextElementSibling.style.visibility!=='hidden'){
+            console.log(this.nextElementSibling.style.visibility)
+            this.nextElementSibling.style.visibility='hidden'
+          }
+          console.log(this.innerText)
+        }
+
+      },
+      //初始化关键字事件
+
       //光标处插入下拉框
       editInsertDatalist(id, values) {
         if (!this.isExited(values)) {
@@ -922,13 +959,30 @@
         if (typeof values !== 'object') {
           values = JSON.parse(values);
         }
-        let input = '<input id="' + id + 'dropDownInput" list="' + id + 'list" class="maxeditor-inner-dropdown" />';
+        let rootId = this.maxEditorRootId;
+
+        // let select = '<input id="' + id + '_keyWordInput_' + rootId + '" list="' + id + 'list" class="maxeditor-inner-dropdown"/>';
         let option = '';
         for (let i = 0; i < values.length; i++) {
-          option += '<option value="' + values[i].value + '">'
+          //option += '<option value="' + values[i].value + '">'
+          option += '<option value="' + values[i].value + '">' + values[i].value + '</option>'
         }
-        let datalist = '<datalist id="' + id + 'list">' + option + "</datalist>";
-        document.execCommand('insertHtml', false, input + datalist);
+        let select = '<div class="maxeditor-select-editable">' +
+          '<select id="' + id + '_keyWord_' + rootId + '" class="maxeditor-keyword-select" onchange="this.nextElementSibling.value=this.value">' +
+          option +
+          '</select>' +
+          '<input type="text" class="maxeditor-keyword-input" value="" />' +
+          '</div>';
+        //let datalist = '<datalist id="' + id + 'list">' + option + "</datalist>";
+        //document.execCommand('insertHtml', false, input + datalist);
+        document.execCommand('insertHtml', false, select);
+        document.getElementById(id + '_keyWord_' + rootId).onselect = function () {
+
+          console.log(this)
+          let alength = this.value.length;
+          let clength = this.value.match(/[\u4E00-\u9FA5]/g).length;
+          this.style.width = (alength + clength) * 12.5 + 'px';
+        }
       },
       editInsertText(text) {
         if (!this.isExited(text)) {
@@ -938,6 +992,11 @@
       },
 
       //工具
+      //动态调整关键词input宽度
+      changeKeyWordInputWidth(id) {
+        //document.getElementById()
+      },
+      //打印
       print(cb) {
         let oldMode = this.maxeditor_mode;
         this.maxeditor_mode = 'readonly';
@@ -1038,7 +1097,7 @@
       //自适应图片容器高度
       justifyImgBoxHeight(index) {
         let temp = this.maxeditor_boards;
-        if (temp[index].imgs.length===1){
+        if (temp[index].imgs.length === 1) {
           return
         }
         let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
@@ -1105,14 +1164,22 @@
       maxeditor_mode(n, o) {
         //文本内部下拉框是否可编辑
         if (n === 'readonly') {
-          let list = document.getElementsByClassName('maxeditor-inner-dropdown');
-          for (let i = 0; i < list.length; i++) {
-            list[i].setAttribute('readonly', 'true')
+          let list1 = document.getElementsByClassName('maxeditor-keyword-input');
+          for (let i = 0; i < list1.length; i++) {
+            list1[i].setAttribute('readonly', 'true')
+          }
+          let list2 = document.getElementsByClassName('maxeditor-keyword-select');
+          for (let i = 0; i < list2.length; i++) {
+            list2[i].style.visibility = 'hidden'
           }
         } else {
-          let list = document.getElementsByClassName('maxeditor-inner-dropdown');
-          for (let i = 0; i < list.length; i++) {
-            list[i].removeAttribute('readonly')
+          let list1 = document.getElementsByClassName('maxeditor-keyword-input');
+          for (let i = 0; i < list1.length; i++) {
+            list1[i].removeAttribute('readonly')
+          }
+          let list2 = document.getElementsByClassName('maxeditor-keyword-select');
+          for (let i = 0; i < list2.length; i++) {
+            list2[i].style.visibility = 'visible'
           }
         }
 
