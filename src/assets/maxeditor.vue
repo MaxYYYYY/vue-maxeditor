@@ -903,6 +903,7 @@
       setBoardContent(id, content) {
         let temp = this.maxeditor_boards;
         let index = undefined;
+        let that = this;
         this.checkId(id, function (i) {
           temp[i].content = content;
           index = i;
@@ -912,8 +913,16 @@
         this.$set(this.maxeditor_boards, temp);
         let rootId = this.maxEditorRootId;
         this.$nextTick(function () {
-          this.$refs[id + '_content_' + rootId][0].innerHTML = this.maxeditor_boards[index].content
+          that.$refs[id + '_content_' + rootId][0].innerHTML = this.maxeditor_boards[index].content
         });
+        this.$nextTick(function () {
+          if (temp[index].type === 'imgBox') {
+            that.justifyImgBoxHeight(index)
+          }
+          if (temp[index].type==='normal'){
+            that.justifyNormalBoardHeight(index)
+          }
+        })
       },
 
       //文本编辑方法
