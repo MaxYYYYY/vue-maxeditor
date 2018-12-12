@@ -118,7 +118,8 @@
                              :id="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                              :ref="item.id+'_imgDom_'+img.key+'_'+maxEditorRootId"
                              :style="{'width':item.imgs.length===1?'':'160px',
-                                      'height':item.imgs.length===1?item.height+'px':''}"/>
+                                      'height':item.imgs.length===1?item.height+'px':''}"
+                             @load="justifyImgBoxHeight(index)"/>
                         <!--图片角标-->
                         <div style="position: absolute;margin: 4px 4px 8px;height: 20px;width: 20px;"
                              v-if="isExited(img.tab)"
