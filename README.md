@@ -352,7 +352,7 @@ addImg(id, img, function (imgDom) {
 #### editInsertText(text)
 在光标处插入文本，此方法底层为execCommand，所以调用时若焦点转移则无法插入
 
-#### editInsertDatalist(id, values)
+#### editInsertKeyWord(id, values)
 在光标处插入下拉框，values为选项json数组，示例如下
 
 ```json

@@ -920,49 +920,17 @@
           if (temp[index].type === 'imgBox') {
             that.justifyImgBoxHeight(index)
           }
-          if (temp[index].type==='normal'){
+          if (temp[index].type === 'normal') {
             that.justifyNormalBoardHeight(index)
           }
         })
       },
 
       //文本编辑方法
-      //关键字
-      insertKeyWord(id, datalist) {
-        if (typeof JSON.parse(datalist) === 'object') {
-          datalist = JSON.parse(datalist)
-        }
-        let rootId = this.maxEditorRootId;
-        let li ='';
-        for (let i=0;i<datalist.length;i++){
-          li += '<p onclick="this.parentElement.previousElementSibling.innerHTML=this.getAttribute(\"'+'data-keyWord-value'+'\")"' +
-            ' class="maxeditor-noselect" data-keyWord-value="'+datalist[i].value+'">'+datalist[i].value+'</p>'
-        }
-        let keyWordSpan = '<span></span><span style="position: relative">'+'<span id="' + id + '_keyWord_' + rootId + '" class="maxeditor-board-outline">' +
-          '请选择'+
-          '</span>' +
-          '<div contenteditable="false" style="position: absolute;left: 0;top:25px;visibility: hidden" class="maxeditor-dropdown">' + li +
-          '</div>'+
-          '</span>';
-        document.execCommand('insertHtml', false, keyWordSpan);
-        document.getElementById(id + '_keyWord_' + rootId).onclick = function () {
-          console.log(this.nextElementSibling)
-          if(this.nextElementSibling.style.visibility==='hidden'){
-            console.log(this.nextElementSibling.style.visibility)
-            this.nextElementSibling.style.visibility='visible'
-          }
-          else if(this.nextElementSibling.style.visibility!=='hidden'){
-            console.log(this.nextElementSibling.style.visibility)
-            this.nextElementSibling.style.visibility='hidden'
-          }
-          console.log(this.innerText)
-        }
-
-      },
       //初始化关键字事件
 
-      //光标处插入下拉框
-      editInsertDatalist(id, values) {
+      //关键字
+      editInsertKeyWord(id, values) {
         if (!this.isExited(values)) {
           throw new Error('MaxEditor:未传入选项值，无法插入下拉框');
         }
@@ -970,29 +938,17 @@
           values = JSON.parse(values);
         }
         let rootId = this.maxEditorRootId;
-
-        // let select = '<input id="' + id + '_keyWordInput_' + rootId + '" list="' + id + 'list" class="maxeditor-inner-dropdown"/>';
         let option = '';
         for (let i = 0; i < values.length; i++) {
-          //option += '<option value="' + values[i].value + '">'
           option += '<option value="' + values[i].value + '">' + values[i].value + '</option>'
         }
-        let select = '<div class="maxeditor-select-editable">' +
-          '<select id="' + id + '_keyWord_' + rootId + '" class="maxeditor-keyword-select" onchange="this.nextElementSibling.value=this.value">' +
+        let select = '<span class="maxeditor-select-editable">' +
+          '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">-请选择-</span>'+
+          '<select id="' + id + '_keywordSelect_' + rootId + '" class="maxeditor-keyword-select" onchange="this.previousElementSibling.innerHTML = this.value;" >' +
           option +
           '</select>' +
-          '<input type="text" class="maxeditor-keyword-input" value="" />' +
           '</div>';
-        //let datalist = '<datalist id="' + id + 'list">' + option + "</datalist>";
-        //document.execCommand('insertHtml', false, input + datalist);
         document.execCommand('insertHtml', false, select);
-        document.getElementById(id + '_keyWord_' + rootId).onselect = function () {
-
-          console.log(this)
-          let alength = this.value.length;
-          let clength = this.value.match(/[\u4E00-\u9FA5]/g).length;
-          this.style.width = (alength + clength) * 12.5 + 'px';
-        }
       },
       editInsertText(text) {
         if (!this.isExited(text)) {
@@ -1174,22 +1130,24 @@
       maxeditor_mode(n, o) {
         //文本内部下拉框是否可编辑
         if (n === 'readonly') {
-          let list1 = document.getElementsByClassName('maxeditor-keyword-input');
-          for (let i = 0; i < list1.length; i++) {
-            list1[i].setAttribute('readonly', 'true')
+          let keywordList = document.getElementsByClassName('maxeditor-keyword');
+          for (let i = 0; i < keywordList.length; i++) {
+            keywordList[i].setAttribute('contenteditable','false')
+            keywordList[i].classList.remove('maxeditor-board-outline');
           }
-          let list2 = document.getElementsByClassName('maxeditor-keyword-select');
-          for (let i = 0; i < list2.length; i++) {
-            list2[i].style.visibility = 'hidden'
+          let selectList = document.getElementsByClassName('maxeditor-keyword-select');
+          for (let i = 0; i < selectList.length; i++) {
+            selectList[i].style.display = 'none'
           }
         } else {
-          let list1 = document.getElementsByClassName('maxeditor-keyword-input');
-          for (let i = 0; i < list1.length; i++) {
-            list1[i].removeAttribute('readonly')
+          let keywordList = document.getElementsByClassName('maxeditor-keyword');
+          for (let i = 0; i < keywordList.length; i++) {
+            keywordList[i].classList.add('maxeditor-board-outline');
+            keywordList[i].setAttribute('contenteditable','true')
           }
-          let list2 = document.getElementsByClassName('maxeditor-keyword-select');
-          for (let i = 0; i < list2.length; i++) {
-            list2[i].style.visibility = 'visible'
+          let selectList = document.getElementsByClassName('maxeditor-keyword-select');
+          for (let i = 0; i < selectList.length; i++) {
+            selectList[i].style.display = 'block'
           }
         }
 
