@@ -943,7 +943,7 @@
           option += '<option value="' + values[i].value + '">' + values[i].value + '</option>'
         }
         let select = '<span class="maxeditor-select-editable">' +
-          '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">-请选择-</span>'+
+          '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">'+values[0].value+'</span>'+
           '<select id="' + id + '_keywordSelect_' + rootId + '" class="maxeditor-keyword-select" onchange="this.previousElementSibling.innerHTML = this.value;" >' +
           option +
           '</select>' +
