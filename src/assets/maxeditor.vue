@@ -947,7 +947,7 @@
           '<select id="' + id + '_keywordSelect_' + rootId + '" class="maxeditor-keyword-select" onchange="this.previousElementSibling.innerHTML = this.value;" >' +
           option +
           '</select>' +
-          '</div>';
+          '</span>';
         document.execCommand('insertHtml', false, select);
       },
       editInsertText(text) {
@@ -1134,6 +1134,7 @@
           for (let i = 0; i < keywordList.length; i++) {
             keywordList[i].setAttribute('contenteditable','false')
             keywordList[i].classList.remove('maxeditor-board-outline');
+            keywordList[i].classList.remove('maxeditor-keyword-arrow');
           }
           let selectList = document.getElementsByClassName('maxeditor-keyword-select');
           for (let i = 0; i < selectList.length; i++) {
@@ -1143,6 +1144,7 @@
           let keywordList = document.getElementsByClassName('maxeditor-keyword');
           for (let i = 0; i < keywordList.length; i++) {
             keywordList[i].classList.add('maxeditor-board-outline');
+            keywordList[i].classList.add('maxeditor-keyword-arrow');
             keywordList[i].setAttribute('contenteditable','true')
           }
           let selectList = document.getElementsByClassName('maxeditor-keyword-select');
