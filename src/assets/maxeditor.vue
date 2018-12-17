@@ -942,13 +942,14 @@
         for (let i = 0; i < values.length; i++) {
           option += '<option value="' + values[i].value + '">' + values[i].value + '</option>'
         }
-        let select = '<span class="maxeditor-select-editable">' +
+        let select =
           '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">'+values[0].value+'</span>'+
           '<select id="' + id + '_keywordSelect_' + rootId + '" class="maxeditor-keyword-select" onchange="this.previousElementSibling.innerHTML = this.value;" >' +
           option +
-          '</select>' +
-          '</span>';
-        document.execCommand('insertHtml', false, select);
+          '</select>' ;
+        let container = '<b id="' + id + '_keyword_container' + rootId + '" class="maxeditor-select-editable">-插入代码-</b>';
+        document.execCommand('insertHtml', false, container);
+        document.getElementById(id + '_keyword_container' + rootId).innerHTML = select;
       },
       editInsertText(text) {
         if (!this.isExited(text)) {
