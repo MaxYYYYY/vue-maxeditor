@@ -54,6 +54,9 @@
               <div class="maxeditor-board-titile">{{item.title}}:</div>
             </template>
             <!--normal面板-->
+            <!--<maxeditor-board-normal :item="item" :index="index" @isExited(isExited) @onActivated(onActivated) @justifyNormalBoardHeight(justifyNormalBoardHeight)
+                                    :max-editor-root-id="maxEditorRootId"
+                                    :maxeditor_mode="maxeditor_mode"></maxeditor-board-normal>-->
             <template v-if="item.type === 'normal'">
               <div style="width: 100%;height: 100%"
                    v-bind:contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
@@ -212,6 +215,7 @@
   import VueDraggableResizable from 'vue-draggable-resizable';
   import MaxEditorToolbar from './maxeidtor-toolbar.vue';
   import QRCode from 'qrcodeautojs';
+  //import MaxeditorBoardNormal from "./maxeditor-board-normal.vue";
 
   export default {
     name: "maxeditor",
@@ -241,6 +245,7 @@
       }
     },
     components: {
+      //'maxeditor-board-normal':MaxeditorBoardNormal,
       'maxeditor-toolbar': MaxEditorToolbar,
       'maxeditor-board': VueDraggableResizable,
       'maxeditor-tab': VueDraggableResizable
@@ -943,10 +948,10 @@
           option += '<option value="' + values[i].value + '">' + values[i].value + '</option>'
         }
         let select =
-          '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">'+values[0].value+'</span>'+
+          '<span id="' + id + '_keyword_' + rootId + '" contenteditable="true" class="maxeditor-keyword-arrow maxeditor-keyword maxeditor-board-outline">' + values[0].value + '</span>' +
           '<select id="' + id + '_keywordSelect_' + rootId + '" class="maxeditor-keyword-select" onchange="this.previousElementSibling.innerHTML = this.value;" >' +
           option +
-          '</select>' ;
+          '</select>';
         let container = '<b id="' + id + '_keyword_container' + rootId + '" class="maxeditor-select-editable">-插入代码-</b>';
         document.execCommand('insertHtml', false, container);
         document.getElementById(id + '_keyword_container' + rootId).innerHTML = select;
@@ -1071,6 +1076,9 @@
         let containerInnerRef = this.$refs[temp[index].id + '_imgBox_imgs_' + this.maxEditorRootId];
         let oldHeight = temp[index].height;//原始高度
         let newHeight = containerInnerRef[0].offsetHeight;
+        if (newHeight === 0) {
+          return
+        }
         temp[index].height = newHeight;
         boardRef[0].height = newHeight;
         this.refreshLayout(index, newHeight - oldHeight)
@@ -1133,7 +1141,7 @@
         if (n === 'readonly') {
           let keywordList = document.getElementsByClassName('maxeditor-keyword');
           for (let i = 0; i < keywordList.length; i++) {
-            keywordList[i].setAttribute('contenteditable','false')
+            keywordList[i].setAttribute('contenteditable', 'false')
             keywordList[i].classList.remove('maxeditor-board-outline');
             keywordList[i].classList.remove('maxeditor-keyword-arrow');
           }
@@ -1146,7 +1154,7 @@
           for (let i = 0; i < keywordList.length; i++) {
             keywordList[i].classList.add('maxeditor-board-outline');
             keywordList[i].classList.add('maxeditor-keyword-arrow');
-            keywordList[i].setAttribute('contenteditable','true')
+            keywordList[i].setAttribute('contenteditable', 'true')
           }
           let selectList = document.getElementsByClassName('maxeditor-keyword-select');
           for (let i = 0; i < selectList.length; i++) {
