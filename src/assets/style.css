@@ -135,6 +135,7 @@
   box-sizing: content-box;
   padding: 20px;
   position: relative;
+  margin:8px 8px 24px 8px;
   left: 0;
   top: 0;
   box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;

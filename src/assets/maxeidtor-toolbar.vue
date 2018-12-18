@@ -126,6 +126,9 @@
       <button title="插入带标签下拉框" class="maxeditor-toolbar-button"
               @click="addDropDownWithLabel">下拉框（带标签）
       </button>
+      <button title="插入下拉框" class="maxeditor-toolbar-button"
+              @click="addDropDown">下拉框
+      </button>
       <button title="插入图片容器" class="maxeditor-toolbar-button"
               @click="addImgBox">图片容器
       </button>
@@ -271,6 +274,15 @@
         let id = prompt('请输入id');
         let label = prompt('请输入标签');
         this.$parent.addTextWithLabel(id, label)
+      },
+      addDropDown(){
+        if (this.$parent.maxeditor_mode !== 'design') {
+          alert('当前模式不可插入板块');
+          return
+        }
+        let id = prompt('请输入id');
+        let datalist = prompt('请输入下拉数组');
+        this.$parent.addDropDown(id, datalist)
       },
       addDropDownWithLabel() {
         if (this.$parent.maxeditor_mode !== 'design') {

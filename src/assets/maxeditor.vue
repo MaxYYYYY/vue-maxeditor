@@ -17,7 +17,6 @@
                   'height':viewPortHeight+'px',
                   'padding-top':isToolbarShow?isModeBtnShow?'184px':'48px':'0'}">
       <div class="maxeditor-body"
-           style="margin:8px"
            :style="{'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
@@ -71,19 +70,20 @@
             <!--label标题-->
             <template v-if="item.type === 'label'">
               <p style="height: 25px;margin: 0;position: relative">
-                <span style="float: left;width: 65px;height: 25px"
+                <span v-if="isExited(item.label)"
+                      style="float: left;width: 65px;height: 25px"
                       class="maxeditor-single-line"
                       @click="onActivated(index)">{{item.label}}
                 </span>
-                <span style="float: left;margin-right: 5px">:</span>
+                <span v-if="isExited(item.label)" style="float: left;margin-right: 5px">:</span>
                 <span
                   class="maxeditor-single-line"
                   style="float: left;display: inline-block"
-                  :contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&!isExited(item.datalist)"
+                  :contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                   :id="item.id+'_content_'+maxEditorRootId"
                   :ref="item.id+'_content_'+maxEditorRootId"
                   :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
-                  :style="{'width':item.width-80+'px'}"
+                  :style="{'width':isExited(item.label)?item.width-80+'px':item.width-10+'px'}"
                   @click="onActivated(index);maxeditor_current_dropdown = item.id"
                   @keyup="onActivated(index)">{{item.content}}</span>
                 <span class="maxeditor-icon maxeditor-icon-caret-down"
@@ -91,7 +91,8 @@
                       v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
                       @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
               </p>
-              <div class="maxeditor-dropdown" style="margin-left: 70px"
+              <div class="maxeditor-dropdown"
+                   :style="{'margin-left':isExited(item.label)?'70px':'0'}"
                    v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
                   <p class="maxeditor-noselect"
@@ -206,6 +207,15 @@
           </maxeditor-board>
         </div>
       </div>
+      <template v-for="n in maxeditor_pages">
+        <div class="maxeditor-body"
+             :style="{'width':width+'px','height':height+'px',
+                  'padding-left':paddingX+'px','padding-right':paddingX+'px',
+                  'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
+             @click="handleBodyClick">
+          {{n+1}}
+        </div>
+      </template>
     </div>
   </div>
 
@@ -242,6 +252,7 @@
         maxeditor_current_index: undefined,//当前编辑面板在maxeditor_boards中的索引值
         maxeditor_current_dropdown: undefined,//当前正在操作的下拉框（id值）
         maxeditor_current_tabImg_index: undefined,//当前正在操作的图片标记的索引值
+        maxeditor_pages: 0//增加的页数
       }
     },
     components: {
@@ -366,6 +377,17 @@
       },
       addTable(id) {
         this.addBoard({id: id, type: 'table', width: 600, z: 100})
+      },
+      addDropDown(id, datalist) {
+        if (!this.isExited(datalist)) {
+          datalist = [];
+        }
+        if (typeof datalist !== 'object') {
+          datalist = JSON.parse(datalist)
+        }
+        this.addBoard({
+          id: id, label: null, type: 'label', width: 150, height: 25, x: 75, z: 200, datalist: datalist
+        })
       },
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {

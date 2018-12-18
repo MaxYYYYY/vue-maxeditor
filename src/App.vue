@@ -49,7 +49,7 @@
     <div style="width: 100%;">
       <MaxEditor ref="maxeditor" style="margin-top: 20px"
                  :is-mode-btn-show="true" :view-port-height="500" :is-toolbar-show="true"
-                 :height="2000"></MaxEditor>
+                 :height="300"></MaxEditor>
     </div>
 
     <div id="temp" contenteditable="true"></div>
