@@ -50,7 +50,12 @@
             @deactivated="onDeactivated(index)">
             <!--面板标题-->
             <template v-if="item.type==='normal'&&isExited(item.title)">
-              <div class="maxeditor-board-titile">{{item.title}}:</div>
+              <div class="maxeditor-board-titile"
+                   :ref="item.id+'_title_'+maxEditorRootId"
+                   :contenteditable="maxeditor_mode==='design'"
+                   @focus="setTitleHTML(index)"
+                   @click="setTitleHTML(index)"
+                   @keyup="setTitleHTML(index)" >{{item.title}}:</div>
             </template>
             <!--normal面板-->
             <!--<maxeditor-board-normal :item="item" :index="index" @isExited(isExited) @onActivated(onActivated) @justifyNormalBoardHeight(justifyNormalBoardHeight)
@@ -73,7 +78,11 @@
                 <span v-if="isExited(item.label)"
                       style="float: left;width: 65px;height: 25px"
                       class="maxeditor-single-line"
-                      @click="onActivated(index)">{{item.label}}
+                      :ref="item.id+'_label_'+maxEditorRootId"
+                      :contenteditable="maxeditor_mode==='design'"
+                      @focus="setLabelHTML(index)"
+                      @click="onActivated(index);setLabelHTML(index)"
+                      @keyup="setLabelHTML(index)">{{item.label}}
                 </span>
                 <span v-if="isExited(item.label)" style="float: left;margin-right: 5px">:</span>
                 <span
@@ -297,7 +306,7 @@
           common.title = this.isExited(option.title) ? option.title : null;
           common.writable = this.isExited(option.writable) ? option.writable : true;
         }
-        //标签单行文本
+        //标签单行文本、下拉框
         if (option.type === 'label') {
           common.label = this.isExited(option.label) ? option.label : null;
           common.datalist = this.isExited(option.datalist) ? option.datalist : null;//下拉数组
@@ -317,6 +326,13 @@
         this.maxeditor_boards.push(common);
         //激活新增面板
         this.onActivated(this.maxeditor_boards.length - 1)
+      },
+      //标题、标签等html代码保存
+      setLabelHTML(index){
+        this.maxeditor_boards[index].labelHTML = this.$refs[this.maxeditor_boards[index].id+'_label_'+this.maxEditorRootId][0].innerHTML;
+      },
+      setTitleHTML(index){
+        this.maxeditor_boards[index].titleHTML = this.$refs[this.maxeditor_boards[index].id+'_title_'+this.maxEditorRootId][0].innerHTML;
       },
       //获取面板数组
       getBoards() {
@@ -344,6 +360,12 @@
               if (item.type === 'label') {
                 that.$refs[item.id + '_content_' + rootId][0].innerText = item.content;
               }
+            }
+            if (that.isExited(item.titleHTML)) {
+              that.$refs[item.id + '_title_' + rootId][0].innerHTML = item.titleHTML;
+            }
+            if (that.isExited(item.labelHTML)) {
+              that.$refs[item.id + '_label_' + rootId][0].innerHTML = item.labelHTML;
             }
           });
           that.$nextTick(function () {
