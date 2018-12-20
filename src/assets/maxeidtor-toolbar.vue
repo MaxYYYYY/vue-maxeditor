@@ -105,7 +105,7 @@
     </div>
     <a class="maxeditor-toolbar-item" @click="showMenu" :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        style="width: 100px;display: none">显示菜单</a>
-    <div v-show="isModeBtnShow"
+    <div v-if="isModeBtnShow"
          class="maxeditor-p-b-10 maxeditor-p-t-10"
          :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
@@ -236,14 +236,14 @@
 
       addHr() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入分隔线');
           return
         }
         this.$parent.addHr();
       },
       addSection() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入文本框');
           return
         }
         let id = prompt('请输入id');
@@ -251,7 +251,7 @@
       },
       addReadOnlySection() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入不可编辑文本');
           return
         }
         let id = prompt('请输入id');
@@ -259,7 +259,7 @@
       },
       addSectionWithTitle() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入标题文本');
           return
         }
         let id = prompt('请输入id');
@@ -268,16 +268,16 @@
       },
       addTextWithLabel() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入标签文本');
           return
         }
         let id = prompt('请输入id');
         let label = prompt('请输入标签');
         this.$parent.addTextWithLabel(id, label)
       },
-      addDropDown(){
+      addDropDown() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入下拉框');
           return
         }
         let id = prompt('请输入id');
@@ -286,7 +286,7 @@
       },
       addDropDownWithLabel() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入标签下拉框');
           return
         }
         let id = prompt('请输入id');
@@ -296,7 +296,7 @@
       },
       addImgBox() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入图片容器');
           return
         }
         let id = prompt('请输入id');
@@ -304,7 +304,7 @@
       },
       addTable() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          alert('当前模式不可插入板块');
+          throw new Error ('MaxEditor:非设计模式不可插入标题');
           return
         }
         let id = prompt('请输入id');
