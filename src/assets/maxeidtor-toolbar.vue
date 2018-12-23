@@ -1,10 +1,11 @@
 <template>
   <div class="maxeditor-toolbar maxeditor-toolbar-responsive"
        :id="'maxeditor-toolbar-'+maxeditorRootId"
-       ref="maxEditorToolbar"
+       :ref="'maxeditor-toolbar-'+maxeditorRootId"
        style=""
        :style="{'width': width+paddingX*2+'px'}">
-    <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
+    <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'"
+         :ref="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
       <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
       <a title="粗体" class="maxeditor-toolbar-item" :class="{'maxeditor-bgcolor-gainsboro':command.bold}"
          @click="document.execCommand('bold', false, null)"><span
@@ -103,11 +104,14 @@
         class="maxeditor-icon maxeditor-icon-align-right"></span></a>
       <a class="maxeditor-toolbar-item-separator"></a>
     </div>
-    <a class="maxeditor-toolbar-item" @click="showMenu" :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
+    <a class="maxeditor-toolbar-item" @click="showMenu"
+       :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
+       :ref="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        style="width: 100px;display: none">显示菜单</a>
     <div v-if="isModeBtnShow"
          class="maxeditor-p-b-10 maxeditor-p-t-10"
-         :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
+         :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'"
+         :ref="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
               @click="addHr">分隔线
       </button>
@@ -196,7 +200,7 @@
       paddingX: '',
       maxeditor_mode: '',
       maxeditorRootId: '',
-      isModeBtnShow: '',
+      isModeBtnShow: {type: Boolean, default: true},
       maxeditor_current_board: {
         type: Object,
         default() {
@@ -214,13 +218,13 @@
         current_pop_menu: '',
         isMenuCollapsed: false,
         command: {
-          bold: false,
-          italic: false,
-          underline: false,
-          strikeThrough: false,
-          justifycenter: false,
-          justifyleft: false,
-          justifyright: false,
+          bold: false,//加粗
+          italic: false,//斜体
+          underline: false,//下划线
+          strikeThrough: false,//删除线
+          justifycenter: false,//居中对齐
+          justifyleft: false,//左对齐
+          justifyright: false,//右对齐
         }
       }
     },
@@ -236,31 +240,27 @@
 
       addHr() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入分隔线');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入分隔线');
         }
         this.$parent.addHr();
       },
       addSection() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入文本框');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入文本框');
         }
         let id = prompt('请输入id');
         this.$parent.addSection(id)
       },
       addReadOnlySection() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入不可编辑文本');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入不可编辑文本');
         }
         let id = prompt('请输入id');
         this.$parent.addReadOnlySection(id)
       },
       addSectionWithTitle() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入标题文本');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入标题文本');
         }
         let id = prompt('请输入id');
         let title = prompt('请输入标题');
@@ -268,8 +268,7 @@
       },
       addTextWithLabel() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入标签文本');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入标签文本');
         }
         let id = prompt('请输入id');
         let label = prompt('请输入标签');
@@ -277,8 +276,7 @@
       },
       addDropDown() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入下拉框');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入下拉框');
         }
         let id = prompt('请输入id');
         let datalist = prompt('请输入下拉数组');
@@ -286,8 +284,7 @@
       },
       addDropDownWithLabel() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入标签下拉框');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入标签下拉框');
         }
         let id = prompt('请输入id');
         let label = prompt('请输入标签');
@@ -296,16 +293,14 @@
       },
       addImgBox() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入图片容器');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入图片容器');
         }
         let id = prompt('请输入id');
         this.$parent.addImgBox(id)
       },
       addTable() {
         if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error ('MaxEditor:非设计模式不可插入标题');
-          return
+          throw new Error('MaxEditor:非设计模式不可插入标题');
         }
         let id = prompt('请输入id');
         this.$parent.addTable(id);
@@ -335,41 +330,39 @@
 
       //隐藏、显示菜单
       hideMenu() {
+        let that = this;
         this.isMenuCollapsed = true;
-        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-a').style.display = 'none';
-        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-showbtn').style.display = 'block';
+        this.$refs['maxeditor-toolbar-' + this.maxeditorRootId + '-a'].style.display = 'none';
+        this.$refs['maxeditor-toolbar-' + this.maxeditorRootId + '-showbtn'].style.display = 'block';
         try {
           if (this.isModeBtnShow)
-            document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId + '-b').style.display = 'none';
+            that.$refs['maxeditor-toolbar-' + that.maxeditorRootId + '-b'].style.display = 'none';
         } catch (e) {
+          console.log(e)
         }
-        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = '100px';
+        this.$refs['maxeditor-toolbar-' + this.maxeditorRootId].style.width = '100px';
       },
       showMenu() {
-        this.isMenuCollapsed = false;
-        document.getElementById('maxeditor-toolbar-' + this.maxeditorRootId).style.width = this.width + this.paddingX * 2 + 'px';
         let that = this;
         let isModeBtnShow = this.isModeBtnShow;
+        this.isMenuCollapsed = false;
+        this.$refs['maxeditor-toolbar-' + this.maxeditorRootId].style.width = this.width + this.paddingX * 2 + 'px';
         setTimeout(function () {
-          document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-a').style.display = 'block';
-          document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-showbtn').style.display = 'none';
+          that.$refs['maxeditor-toolbar-' + that.maxeditorRootId + '-a'].style.display = 'block';
+          that.$refs['maxeditor-toolbar-' + that.maxeditorRootId + '-showbtn'].style.display = 'none';
           try {
             if (isModeBtnShow)
-              document.getElementById('maxeditor-toolbar-' + that.maxeditorRootId + '-b').style.display = 'block';
+              that.$refs['maxeditor-toolbar-' + that.maxeditorRootId + '-b'].style.display = 'block';
           } catch (e) {
+            console.log(e)
           }
         }, 300)
-
       },
 
-      //弹出菜单
+      //隐藏所有弹出菜单弹出菜单
       hidePopMenu(event) {
-        try {
-          if (event.target.className !== 'maxeditor-toolbar-item') {
-            this.current_pop_menu = '';
-          }
-        } catch (e) {
-
+        if (event.target.className !== 'maxeditor-toolbar-item' && event.target.parentElement.className !== 'maxeditor-toolbar-item') {
+          this.current_pop_menu = '';
         }
       },
 
@@ -440,6 +433,7 @@
     mounted() {
       //监听选区改变，高频事件
       let command = this.command;
+      let that = this;
       document.onselectionchange = function (e) {
         command.bold = document.queryCommandState('bold');
         command.italic = document.queryCommandState('italic');
@@ -449,8 +443,10 @@
         command.justifyleft = document.queryCommandState('justifyleft');
         command.justifyright = document.queryCommandState('justifyright');
       };
-      //点击弹出菜单外部是隐藏弹出菜单
-      document.addEventListener('click', this.hidePopMenu(event))
+      //点击弹出菜单外部时隐藏弹出菜单
+      document.addEventListener('click', function (event) {
+        that.hidePopMenu(event)
+      })
     },
     created() {
 
