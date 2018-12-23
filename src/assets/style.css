@@ -56,8 +56,8 @@
 }
 
 .maxeditor-select-editable {
-  position:relative;
-  border:none;
+  position: relative;
+  border: none;
 }
 
 .maxeditor-keyword-arrow:before {
@@ -66,17 +66,17 @@
 
 .maxeditor-select-editable select {
   opacity: 0;
-  position:absolute;
-  top:0;
-  left:0;
-  font-size:16px;
-  border:none;
-  width:20px;
-  margin:0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+  border: none;
+  width: 20px;
+  margin: 0;
 }
 
 .maxeditor-select-editable select:focus, .select-editable input:focus {
-  outline:none;
+  outline: none;
 }
 
 .maxeditor-inner-dropdown {
@@ -135,7 +135,7 @@
   box-sizing: content-box;
   padding: 20px;
   position: relative;
-  margin:8px 8px 24px 8px;
+  margin: 8px 8px 24px 8px;
   left: 0;
   top: 0;
   box-shadow: 0 0 0 1px #d1d1d1, 0 0 3px 1px #ccc;
@@ -199,7 +199,8 @@
   z-index: 999;
   transition: 0.3s;
   text-align: left;
-  outline: gray auto 5px;
+  border: gray 1px solid;
+  border-radius: 10px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -312,6 +313,27 @@
 
 .maxeditor-p-b-10 {
   padding-bottom: 10px;
+}
+
+.maxeditor-toolbar-dialog {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  top: 100px;
+  width: 400px;
+  position: absolute;
+  left: 50%;
+  margin-left: -200px;
+}
+
+.maxeditor-toolbar-dialog-bg {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  z-index: 1000;
 }
 
 .maxeditor-toolbar-item {
@@ -502,4 +524,85 @@
 
 .maxeditor-icon-uncheck:before {
   content: '\f024'
+}
+
+.maxeditor-switch {
+  width: 52px;
+  height: 31px;
+  position: relative;
+  border: 1px solid #dfdfdf;
+  background-color: #fdfdfd;
+  box-shadow: #dfdfdf 0 0 0 0 inset;
+  border-radius: 20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-clip: content-box;
+  display: inline-block;
+  -webkit-appearance: none;
+  user-select: none;
+  outline: none;
+}
+
+.maxeditor-switch:before {
+  content: '';
+  width: 29px;
+  height: 29px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.maxeditor-switch:checked {
+  border-color: #39f;
+  box-shadow: #39f 0 0 0 16px inset;
+  background-color: #39f;
+}
+
+.maxeditor-switch:checked:before {
+  left: 21px;
+}
+
+.maxeditor-switch.maxeditor-switch-animbg {
+  transition: background-color ease 0.4s;
+}
+
+.maxeditor-switch.maxeditor-switch-animbg:before {
+  transition: left 0.3s;
+}
+
+.maxeditor-switch.maxeditor-switch-animbg:checked {
+  box-shadow: #dfdfdf 0 0 0 0 inset;
+  background-color: #39f;
+  transition: border-color 0.4s, background-color ease 0.4s;
+}
+
+.maxeditor-switch.maxeditor-switch-animbg:checked:before {
+  transition: left 0.3s;
+}
+
+.maxeditor-switch.maxeditor-switch-anim {
+  transition: border cubic-bezier(0, 0, 0, 1) 0.4s, box-shadow cubic-bezier(0, 0, 0, 1) 0.4s;
+}
+
+.maxeditor-switch.maxeditor-switch-anim:before {
+  transition: left 0.3s;
+}
+
+.maxeditor-switch.maxeditor-switch-anim:checked {
+  box-shadow: #39f 0 0 0 16px inset;
+  background-color: #39f;
+  transition: border ease 0.4s, box-shadow ease 0.4s, background-color ease 1.2s;
+}
+
+.maxeditor-switch.maxeditor-switch-anim:checked:before {
+  transition: left 0.3s;
 }

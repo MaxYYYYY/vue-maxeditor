@@ -45,6 +45,7 @@
     <br/>
     <button @click="imgaddtest">imgaddtest</button>
     <button @click="imgdeletetest">imgdeletetest</button>
+    <input/>
 
     <div style="width: 100%;">
       <MaxEditor ref="maxeditor" style="margin-top: 20px"

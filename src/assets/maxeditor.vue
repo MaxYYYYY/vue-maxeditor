@@ -7,6 +7,7 @@
                        :padding-x="paddingX"
                        :maxeditor_mode="maxeditor_mode"
                        :maxeditor_current_board="maxeditor_boards[maxeditor_current_index]"
+                       :view-port-height="viewPortHeight"
                        :is-mode-btn-show="isModeBtnShow"
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
@@ -154,6 +155,7 @@
                 <!--图片标记-->
                 <maxeditor-tab v-if="isExited(item.watchTo)"
                                v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
+                               :key="item.id+'_imgTabs_'+idx+'_'+maxEditorRootId"
                                :x="isExited(i.tabX)?i.tabX:0"
                                :y="isExited(i.tabY)?i.tabY:0"
                                :w="isExited(i.tabW)?i.tabW:20"

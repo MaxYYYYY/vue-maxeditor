@@ -112,6 +112,7 @@
          class="maxeditor-p-b-10 maxeditor-p-t-10"
          :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'"
          :ref="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
+      <button style="display: none"></button>
       <button title="插入分隔线" class="maxeditor-toolbar-button maxeditor-m-l-15"
               @click="addHr">分隔线
       </button>
@@ -159,8 +160,6 @@
               :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
               @click="setMode('readonly')">只读模式
       </button>
-
-
       <div class="maxeditor-float-r maxeditor-m-t-10"
            v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
          ||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'||maxeditor_current_board.type==='table')">
@@ -188,6 +187,47 @@
         </button>
       </div>
     </div>
+    <!--弹出框-->
+    <div v-if="isDialogShow"
+         class="maxeditor-toolbar-dialog-bg"
+         :style="{'height':viewPortHeight+183+'px'}">
+      <div class="maxeditor-toolbar-dialog">
+        <span class="maxeditor-icon maxeditor-icon-times"
+              style="position: absolute;right: 10px;top: 8px;font-size: 20px"
+              @click="isDialogShow=false"></span>
+        <div style="font-size: 25px;text-align: center">插入组件-{{dialog_title}}</div>
+        <div style="margin-top: 20px">
+          <span class="maxeditor-single-line" style="width: 75px;">ID</span><span class="maxeditor-single-line">:</span>
+          <input contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
+                 v-model="dialog_data.id"
+                 style="width: 200px"/>
+          <span style="color:red;font-size:20px">*</span>
+        </div>
+        <div class="maxeditor-m-t-10">
+          <span class="maxeditor-single-line" style="width: 75px;">标题</span><span class="maxeditor-single-line">:</span>
+          <span contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
+                style="width: 200px"></span>
+        </div>
+        <div class="maxeditor-m-t-10">
+          <span class="maxeditor-single-line" style="width: 75px;">标签</span><span class="maxeditor-single-line">:</span>
+          <span contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
+                style="width: 200px"></span>
+        </div>
+        <div class="maxeditor-m-t-10">
+          <span class="maxeditor-single-line" style="width: 75px;">可编辑</span><span
+          class="maxeditor-single-line">:</span>
+          <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -5px"
+                        type="checkbox"
+                        v-model="dialog_data.writable"></label>
+        </div>
+        <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="float: right;width: 100px"
+                @click="confirmDialog(dialog_command)">确认
+        </button>
+        <button class="maxeditor-toolbar-button maxeditor-m-t-10 maxeditor-m-r-15"
+                style="float: right;width: 100px;background-color: grey" @click="hideDialog">取消
+        </button>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -200,6 +240,7 @@
       paddingX: '',
       maxeditor_mode: '',
       maxeditorRootId: '',
+      viewPortHeight: {type: Number, default: 500},//编辑器的视口高度
       isModeBtnShow: {type: Boolean, default: true},
       maxeditor_current_board: {
         type: Object,
@@ -217,6 +258,7 @@
         menu_normal_show: false,
         current_pop_menu: '',
         isMenuCollapsed: false,
+        isDialogShow: false,
         command: {
           bold: false,//加粗
           italic: false,//斜体
@@ -225,10 +267,36 @@
           justifycenter: false,//居中对齐
           justifyleft: false,//左对齐
           justifyright: false,//右对齐
+        },
+        dialog_title: '',
+        dialog_command: '',
+        dialog_data: {
+          id: '',
+          label: '',
+          title: '',
+          writable: '',
         }
       }
     },
     methods: {
+      //弹出窗封装
+      hideDialog() {
+        this.dialog_data.id = '';
+        this.dialog_data.label = '';
+        this.dialog_data.title = '';
+        this.dialog_data.writable = '';
+        this.isDialogShow = false;
+      },
+      confirmDialog(command) {
+        let that = this;
+        if (command === 'addSection') {
+          console.log(that.dialog_data.id)
+          that.$parent.addSection(that.dialog_data.id)
+        }
+        this.isDialogShow = false;
+      },
+
+
       //关键字
       editInsertKeyWord() {
         let id = prompt('请输入id');
@@ -245,11 +313,14 @@
         this.$parent.addHr();
       },
       addSection() {
+        this.dialog_title = '文本框';
+        this.dialog_command = 'addSection';
+        this.isDialogShow = true;
         if (this.$parent.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:非设计模式不可插入文本框');
         }
-        let id = prompt('请输入id');
-        this.$parent.addSection(id)
+        //let id = prompt('请输入id');
+        //this.$parent.addSection(id)
       },
       addReadOnlySection() {
         if (this.$parent.maxeditor_mode !== 'design') {
@@ -361,8 +432,12 @@
 
       //隐藏所有弹出菜单弹出菜单
       hidePopMenu(event) {
-        if (event.target.className !== 'maxeditor-toolbar-item' && event.target.parentElement.className !== 'maxeditor-toolbar-item') {
-          this.current_pop_menu = '';
+        try {
+          if (event.target.className !== 'maxeditor-toolbar-item' && event.target.parentElement.className !== 'maxeditor-toolbar-item') {
+            this.current_pop_menu = '';
+          }
+        } catch (e) {
+          console.log(e)
         }
       },
 
