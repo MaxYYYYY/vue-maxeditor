@@ -18,6 +18,17 @@
   background-color: gainsboro;
 }
 
+.maxeditor-hover-rotate {
+  transform: rotate(0deg);
+  transition: transform 0.3s;
+}
+
+.maxeditor-hover-rotate:hover {
+  transition: transform 0.3s;
+  transition-timing-function: ease;
+  transform: rotate(180deg);
+}
+
 .maxeditor-btn-menu-fontsize {
   width: 120px;
   position: relative;

@@ -56,7 +56,8 @@
                    :contenteditable="maxeditor_mode==='design'"
                    @focus="setTitleHTML(index)"
                    @click="setTitleHTML(index)"
-                   @keyup="setTitleHTML(index)" >{{item.title}}:</div>
+                   @keyup="setTitleHTML(index)">{{item.title}}:
+              </div>
             </template>
             <!--normal面板-->
             <!--<maxeditor-board-normal :item="item" :index="index" @isExited(isExited) @onActivated(onActivated) @justifyNormalBoardHeight(justifyNormalBoardHeight)
@@ -300,7 +301,7 @@
           width: this.isExited(option.width) ? option.width : 200,
           height: this.isExited(option.height) ? option.height : 200,
           minWidth: this.isExited(option.minWidth) ? option.minWidth : null,
-          minHeight: this.isExited(option.minHeight) ? option.minHeight : null,
+          minHeight: this.isExited(option.minHeight) ? option.minHeight : this.isExited(option.height) ? option.height : 200,
         };
         //文本框
         if (option.type === 'normal') {
@@ -330,11 +331,11 @@
         this.onActivated(this.maxeditor_boards.length - 1)
       },
       //标题、标签等html代码保存
-      setLabelHTML(index){
-        this.maxeditor_boards[index].labelHTML = this.$refs[this.maxeditor_boards[index].id+'_label_'+this.maxEditorRootId][0].innerHTML;
+      setLabelHTML(index) {
+        this.maxeditor_boards[index].labelHTML = this.$refs[this.maxeditor_boards[index].id + '_label_' + this.maxEditorRootId][0].innerHTML;
       },
-      setTitleHTML(index){
-        this.maxeditor_boards[index].titleHTML = this.$refs[this.maxeditor_boards[index].id+'_title_'+this.maxEditorRootId][0].innerHTML;
+      setTitleHTML(index) {
+        this.maxeditor_boards[index].titleHTML = this.$refs[this.maxeditor_boards[index].id + '_title_' + this.maxEditorRootId][0].innerHTML;
       },
       //获取面板数组
       getBoards() {
@@ -807,6 +808,7 @@
           this.maxeditor_boards[this.maxeditor_current_index].y = y;
           this.maxeditor_boards[this.maxeditor_current_index].width = width;
           this.maxeditor_boards[this.maxeditor_current_index].height = height;
+          this.maxeditor_boards[this.maxeditor_current_index].minHeight = height;
         } catch (e) {
         }
       },
@@ -1125,6 +1127,9 @@
         if (newHeight === 0) {
           return
         }
+        if (newHeight<temp[index].minHeight){
+          console.log('--------------------------------')
+        }
         temp[index].height = newHeight;
         boardRef[0].height = newHeight;
         this.refreshLayout(index, newHeight - oldHeight)
@@ -1140,11 +1145,14 @@
         let boardHeight = temp[index].height;
         if (lastLineDom !== null) {
           let contentHeight = lastLineDom.offsetTop + lastLineDom.offsetHeight;
-          if (contentHeight > boardHeight || ((contentHeight < boardHeight) && boardHeight > 200)) {
-            temp[index].height = contentHeight;
-            boardRef[0].height = contentHeight;
-            that.refreshLayout(index, contentHeight - oldHeight);
+          if (contentHeight < temp[index].minHeight){
+            return;
           }
+          temp[index].height = contentHeight;
+          boardRef[0].height = contentHeight;
+          that.refreshLayout(index, contentHeight - oldHeight);
+        }else{
+          console.log('MaxEditor:文本框内没有最后一行元素')
         }
       },
       //刷新排版
