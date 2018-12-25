@@ -16,7 +16,7 @@
          style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;"
          :style="{'width':width+paddingX*2+30+'px',
                   'height':viewPortHeight+'px',
-                  'padding-top':isToolbarShow?isModeBtnShow?'184px':'48px':'0'}">
+                  'padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}">
       <div class="maxeditor-body"
            :style="{'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',

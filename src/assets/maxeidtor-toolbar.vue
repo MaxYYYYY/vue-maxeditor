@@ -109,7 +109,7 @@
        :ref="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        style="width: 100px;display: none">显示菜单</a>
     <div v-if="isModeBtnShow"
-         class="maxeditor-p-b-10 maxeditor-p-t-10"
+         class="maxeditor-p-b-10"
          :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'"
          :ref="'maxeditor-toolbar-'+maxeditorRootId+'-b'">
       <button style="display: none"></button>
@@ -117,34 +117,25 @@
               @click="addHr">分隔线
       </button>
       <button title="插入文本框" class="maxeditor-toolbar-button"
-              @click="addSection">文本框
-      </button>
-      <button title="插入不可编辑文本" class="maxeditor-toolbar-button"
-              @click="addReadOnlySection">不可编辑文本
-      </button>
-      <button title="插入带标题文本框" class="maxeditor-toolbar-button"
-              @click="addSectionWithTitle">文本框（带标题）
+              @click="openDialog('文本框')">文本框
       </button>
       <button title="插入带标签文本" class="maxeditor-toolbar-button"
-              @click="addTextWithLabel">文本（带标签）
-      </button>
-      <button title="插入带标签下拉框" class="maxeditor-toolbar-button"
-              @click="addDropDownWithLabel">下拉框（带标签）
+              @click="openDialog('标签文本')">标签文本
       </button>
       <button title="插入下拉框" class="maxeditor-toolbar-button"
-              @click="addDropDown">下拉框
+              @click="openDialog('下拉框')">下拉框
       </button>
       <button title="插入图片容器" class="maxeditor-toolbar-button"
-              @click="addImgBox">图片容器
+              @click="openDialog('图片框')">图片框
       </button>
       <button title="插入表格" class="maxeditor-toolbar-button"
-              @click="addTable">表格
+              @click="openDialog('表格')">表格
       </button>
       <button title="清空编辑器" class="maxeditor-toolbar-button"
               @click="clearBoards">清空编辑器
       </button>
-      <br/>
-      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
+
+      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-t-10"
               @click="editInsertKeyWord">关键词
       </button>
       <br/>
@@ -188,46 +179,81 @@
       </div>
     </div>
     <!--弹出框-->
-    <div v-if="isDialogShow"
-         class="maxeditor-toolbar-dialog-bg"
-         :style="{'height':viewPortHeight+183+'px'}">
-      <div class="maxeditor-toolbar-dialog">
+    <transition name="animation">
+      <div v-if="isDialogShow"
+           class="maxeditor-toolbar-dialog-bg"
+           :style="{'height':viewPortHeight+183+'px'}">
+        <div class="maxeditor-toolbar-dialog">
         <span class="maxeditor-icon maxeditor-icon-times maxeditor-hover-rotate"
-              style="position: absolute;right: 10px;top: 8px;font-size: 20px"
-              @click="isDialogShow=false"></span>
-        <div style="font-size: 25px;text-align: center">插入组件-{{dialog_title}}</div>
-        <div style="margin-top: 20px">
-          <span class="maxeditor-single-line" style="width: 75px;">ID</span><span class="maxeditor-single-line">:</span>
-          <input contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
-                 v-model="dialog_data.id"
-                 style="width: 200px"/>
-          <span style="color:red;font-size:20px">*</span>
+              style="position: absolute;right: 10px;top: 8px;font-size: 20px;color: grey;"
+              @click="closeDialog"></span>
+          <div style="font-size: 25px;text-align: center">插入组件-{{dialog_title}}</div>
+          <transition name="animation">
+            <div v-if="dialog_error" class="maxeditor-m-t-10" style="color: red;">{{dialog_error}}</div>
+          </transition>
+          <div class="maxeditor-m-t-10">
+            <span style="width: 75px;display: inline-block">ID</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model="dialog_data.id"
+                   style="width: 200px;border: none;height: 20px;font-size: 16px"/>
+            <span style="color:red;">*</span>
+          </div>
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='文本框'">
+            <span style="width: 75px;display: inline-block"
+                  :style="{'color':this.dialog_data.writable?'':'grey'}">标题</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline" :disabled="!dialog_data.writable"
+                   v-model="dialog_data.title"
+                   style="width: 200px;border: none;height: 20px;font-size: 16px"/>
+          </div>
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='文本框'">
+            <span style="width: 75px;display: inline-block">可编辑</span>
+            <span style="display: inline-block">:</span>
+            <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -10px"
+                          type="checkbox"
+                          v-model="dialog_data.writable"></label>
+          </div>
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='标签文本'||dialog_title==='下拉框'">
+            <span style="width: 75px;display: inline-block">标签</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model="dialog_data.label"
+                   style="width: 200px;border: none;height: 20px;font-size: 16px"/>
+          </div>
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='下拉框'">
+            <div style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">选项id</div>
+            <div style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">选项value</div>
+
+            <template v-for="(item, idx) in dialog_data.droplist">
+              <div class="maxeditor-m-t-10">
+                <input class="maxeditor-board-outline"
+                       v-model="item.id"
+                       style="width: 30%;border: none;height: 20px;font-size: 16px"/>
+                <input class="maxeditor-board-outline"
+                       v-model="item.value"
+                       style="width: 30%;border: none;height: 20px;font-size: 16px"/>
+                <button class="maxeditor-toolbar-button" style="width: 75px;background-color: grey"
+                        @click="dialog_data.droplist.splice(idx,1)">删除选项
+                </button>
+
+              </div>
+            </template>
+            <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="width: 75px;display: block"
+                    @click="dialog_data.droplist.push({id:'',value:''})">增加选项
+            </button>
+          </div>
+
+          <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="float: right;width: 100px"
+                  @click="confirmDialog()">确认
+          </button>
+          <button class="maxeditor-toolbar-button maxeditor-m-t-10 maxeditor-m-r-15"
+                  style="float: right;width: 100px;background-color: grey" @click="closeDialog">取消
+          </button>
         </div>
-        <div class="maxeditor-m-t-10">
-          <span class="maxeditor-single-line" style="width: 75px;">标题</span><span class="maxeditor-single-line">:</span>
-          <span contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
-                style="width: 200px"></span>
-        </div>
-        <div class="maxeditor-m-t-10">
-          <span class="maxeditor-single-line" style="width: 75px;">标签</span><span class="maxeditor-single-line">:</span>
-          <span contenteditable="true" class="maxeditor-single-line maxeditor-board-outline"
-                style="width: 200px"></span>
-        </div>
-        <div class="maxeditor-m-t-10">
-          <span class="maxeditor-single-line" style="width: 75px;">可编辑</span><span
-          class="maxeditor-single-line">:</span>
-          <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -5px"
-                        type="checkbox"
-                        v-model="dialog_data.writable"></label>
-        </div>
-        <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="float: right;width: 100px"
-                @click="confirmDialog(dialog_command)">确认
-        </button>
-        <button class="maxeditor-toolbar-button maxeditor-m-t-10 maxeditor-m-r-15"
-                style="float: right;width: 100px;background-color: grey" @click="hideDialog">取消
-        </button>
       </div>
-    </div>
+    </transition>
+
 
   </div>
 </template>
@@ -269,34 +295,117 @@
           justifyright: false,//右对齐
         },
         dialog_title: '',
-        dialog_command: '',
+        dialog_error: '',
         dialog_data: {
           id: '',
           label: '',
           title: '',
-          writable: '',
+          writable: true,
+          droplist: [],//下拉框数组
         }
       }
     },
     methods: {
       //弹出窗封装
-      hideDialog() {
+      closeDialog() {
+        this.dialog_title = '';
+        this.dialog_error = '';
         this.dialog_data.id = '';
         this.dialog_data.label = '';
         this.dialog_data.title = '';
-        this.dialog_data.writable = '';
+        this.dialog_data.writable = true;
+        this.dialog_data.droplist = [];
         this.isDialogShow = false;
       },
-      confirmDialog(command) {
-        let that = this;
-        if (command === 'addSection') {
-          console.log(that.dialog_data.id)
-          that.$parent.addSection(that.dialog_data.id)
+      openDialog(title) {
+        if (this.$parent.maxeditor_mode !== 'design') {
+          throw new Error('MaxEditor:非设计模式不可插入文本框');
         }
-        this.isDialogShow = false;
+        this.dialog_title = title;
+        this.isDialogShow = true;
       },
 
-
+      confirmDialog() {
+        let that = this;
+        if (!this.dialog_data.id) {
+          this.dialog_error = 'ID不能为空';
+          return
+        }
+        switch (this.dialog_title) {
+          case '文本框':
+            if (!this.dialog_data.writable) {
+              try {
+                this.$parent.addReadOnlySection(this.dialog_data.id);
+              } catch (e) {
+                this.dialog_error = e.message;
+                return
+              }
+            } else if (this.dialog_data.title) {
+              try {
+                this.$parent.addSectionWithTitle(this.dialog_data.id, this.dialog_data.title);
+              } catch (e) {
+                this.dialog_error = e.message;
+                return
+              }
+            } else {
+              try {
+                this.$parent.addSection(this.dialog_data.id);
+              } catch (e) {
+                this.dialog_error = e.message;
+                return
+              }
+            }
+            break;
+          case '标签文本':
+            try {
+              this.$parent.addTextWithLabel(this.dialog_data.id, this.dialog_data.label);
+            } catch (e) {
+              this.dialog_error = e.message;
+              return
+            }
+            break;
+          case '下拉框':
+            if (0===this.dialog_data.droplist.length) {
+              this.dialog_error = '下拉选项不能为空';
+              return
+            }
+            if(this.dialog_data.label){
+              try {
+                this.$parent.addDropDownWithLabel(this.dialog_data.id,this.dialog_data.label,this.dialog_data.droplist)
+              } catch (e) {
+                this.dialog_error = e.message;
+                return
+              }
+            }else {
+              try {
+                this.$parent.addDropDown(this.dialog_data.id,this.dialog_data.droplist)
+              } catch (e) {
+                this.dialog_error = e.message;
+                return
+              }
+            }
+            break;
+          case '图片框':
+            try {
+              this.$parent.addImgBox(this.dialog_data.id)
+            } catch (e) {
+              this.dialog_error = e.message;
+              return
+            }
+            break;
+          case '表格':
+            try {
+              this.$parent.addTable(this.dialog_data.id)
+            } catch (e) {
+              this.dialog_error = e.message;
+              return
+            }
+            break;
+          default:
+            break;
+        }
+        this.closeDialog();
+      },
       //关键字
       editInsertKeyWord() {
         let id = prompt('请输入id');
@@ -306,76 +415,14 @@
 
       //表格
 
+
       addHr() {
         if (this.$parent.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:非设计模式不可插入分隔线');
         }
         this.$parent.addHr();
       },
-      addSection() {
-        this.dialog_title = '文本框';
-        this.dialog_command = 'addSection';
-        this.isDialogShow = true;
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入文本框');
-        }
-        //let id = prompt('请输入id');
-        //this.$parent.addSection(id)
-      },
-      addReadOnlySection() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入不可编辑文本');
-        }
-        let id = prompt('请输入id');
-        this.$parent.addReadOnlySection(id)
-      },
-      addSectionWithTitle() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入标题文本');
-        }
-        let id = prompt('请输入id');
-        let title = prompt('请输入标题');
-        this.$parent.addSectionWithTitle(id, title)
-      },
-      addTextWithLabel() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入标签文本');
-        }
-        let id = prompt('请输入id');
-        let label = prompt('请输入标签');
-        this.$parent.addTextWithLabel(id, label)
-      },
-      addDropDown() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入下拉框');
-        }
-        let id = prompt('请输入id');
-        let datalist = prompt('请输入下拉数组');
-        this.$parent.addDropDown(id, datalist)
-      },
-      addDropDownWithLabel() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入标签下拉框');
-        }
-        let id = prompt('请输入id');
-        let label = prompt('请输入标签');
-        let datalist = prompt('请输入下拉数组');
-        this.$parent.addDropDownWithLabel(id, label, datalist)
-      },
-      addImgBox() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入图片容器');
-        }
-        let id = prompt('请输入id');
-        this.$parent.addImgBox(id)
-      },
-      addTable() {
-        if (this.$parent.maxeditor_mode !== 'design') {
-          throw new Error('MaxEditor:非设计模式不可插入标题');
-        }
-        let id = prompt('请输入id');
-        this.$parent.addTable(id);
-      },
+
       setMode(mode) {
         this.$parent.maxeditor_mode = mode
       },
@@ -531,5 +578,11 @@
 </script>
 
 <style scoped>
+  .animation-enter-active, .animation-leave-active {
+    transition: opacity .3s;
+  }
 
+  .animation-enter, .animation-leave-to {
+    opacity: 0;
+  }
 </style>
