@@ -182,7 +182,7 @@
     <transition name="animation">
       <div v-if="isDialogShow"
            class="maxeditor-toolbar-dialog-bg"
-           :style="{'height':viewPortHeight+183+'px'}">
+           :style="{'height':viewPortHeight+134+'px'}">
         <div class="maxeditor-toolbar-dialog">
         <span class="maxeditor-icon maxeditor-icon-times maxeditor-hover-rotate"
               style="position: absolute;right: 10px;top: 8px;font-size: 20px;color: grey;"
