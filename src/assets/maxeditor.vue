@@ -702,13 +702,15 @@
         if (!that.isExited(url)) {
           throw new Error('MaxEditor:未传入url，无法插入二维码');
         }
-        this.checkId(id, function () {
-          let dom = that.$refs[id + '_imgBox_qrCode_' + rootId][0];
-          dom.innerHTML = '';
-          new QRCode(dom, url);
-        }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
-        });
+        this.$nextTick(function () {
+          that.checkId(id, function () {
+            let dom = that.$refs[id + '_imgBox_qrCode_' + rootId][0];
+            dom.innerHTML = '';
+            new QRCode(dom, url);
+          }, function () {
+            throw new Error('MaxEditor:' + id + '不存在，无法插入二维码');
+          });
+        })
       },
 
       bindImgTabBox(changerBoxId, watcherBoxId) {
