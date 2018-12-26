@@ -1144,11 +1144,13 @@
         let boardRef = this.$refs[temp[index].id + '_' + this.maxEditorRootId];
         let boardContentRef = this.$refs[temp[index].id + '_content_' + this.maxEditorRootId];
         let lastLineDom = boardContentRef[0].lastElementChild;//最后一行
-        let boardHeight = temp[index].height;
         if (lastLineDom !== null) {
           let contentHeight = lastLineDom.offsetTop + lastLineDom.offsetHeight;
-          if (contentHeight < temp[index].minHeight) {
+          if (contentHeight < temp[index].minHeight && that.maxeditor_mode === 'edit') {
             return;
+          }
+          if (contentHeight < 50 && that.maxeditor_mode === 'design') {
+            return
           }
           temp[index].height = contentHeight;
           boardRef[0].height = contentHeight;
@@ -1168,16 +1170,16 @@
         let tWidth = temp[index].width;
 
         let a = that.getTotalHeight();
-        let b = that.height * (1 + that.maxeditor_pages) + (that.paddingY*2 + 24) * that.maxeditor_pages;
-        let c = that.height * that.maxeditor_pages + (that.paddingY*2 + 24) * (that.maxeditor_pages - 1);
-        console.log(a+';'+b);
-        console.log(a+';'+c);
+        let b = that.height * (1 + that.maxeditor_pages) + (that.paddingY * 2 + 24) * that.maxeditor_pages;
+        let c = that.height * that.maxeditor_pages + (that.paddingY * 2 + 24) * (that.maxeditor_pages - 1);
+        console.log(a + ';' + b);
+        console.log(a + ';' + c);
         //判断是否需要分页
-        if (that.getTotalHeight() > that.height * (1 + that.maxeditor_pages) + (that.paddingY*2 + 24) * that.maxeditor_pages) {
+        if (that.getTotalHeight() > that.height * (1 + that.maxeditor_pages) + (that.paddingY * 2 + 24) * that.maxeditor_pages) {
 
           that.addPage();
 
-        } else if (that.getTotalHeight() < that.height * that.maxeditor_pages + (that.paddingY*2 + 24) * (that.maxeditor_pages - 1)) {
+        } else if (that.getTotalHeight() < that.height * that.maxeditor_pages + (that.paddingY * 2 + 24) * (that.maxeditor_pages - 1)) {
 
           that.deletePage();
 
@@ -1202,7 +1204,7 @@
 
       //分页
       addPage() {
-        if (this.maxeditor_mode==='design'){
+        if (this.maxeditor_mode === 'design') {
           return
         }
         console.log('MaxEditor:add page.');
@@ -1210,7 +1212,7 @@
 
       },
       deletePage() {
-        if (this.maxeditor_mode==='design'){
+        if (this.maxeditor_mode === 'design') {
           return
         }
         console.log('MaxEditor:delete page.');
