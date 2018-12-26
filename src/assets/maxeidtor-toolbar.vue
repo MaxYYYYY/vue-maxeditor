@@ -341,6 +341,10 @@
                 return
               }
             } else if (this.dialog_data.title) {
+              if(this.dialog_data.title.match(/^\s+$/)){
+                this.dialog_error = '标题不可为空格字符';
+                return
+              }
               try {
                 this.$parent.addSectionWithTitle(this.dialog_data.id, this.dialog_data.title);
               } catch (e) {
@@ -357,6 +361,10 @@
             }
             break;
           case '标签文本':
+            if(this.dialog_data.label.match(/^\s+$/)){
+              this.dialog_error = '标签不可为空格字符';
+              return
+            }
             try {
               this.$parent.addTextWithLabel(this.dialog_data.id, this.dialog_data.label);
             } catch (e) {
@@ -365,11 +373,11 @@
             }
             break;
           case '下拉框':
-            if (0===this.dialog_data.droplist.length) {
-              this.dialog_error = '下拉选项不能为空';
-              return
-            }
             if(this.dialog_data.label){
+              if(this.dialog_data.label.match(/^\s+$/)){
+                this.dialog_error = '标签不可为空格字符';
+                return
+              }
               try {
                 this.$parent.addDropDownWithLabel(this.dialog_data.id,this.dialog_data.label,this.dialog_data.droplist)
               } catch (e) {

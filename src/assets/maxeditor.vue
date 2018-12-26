@@ -41,6 +41,7 @@
             :w="item.type==='hr'?width:isExited(item.width)?item.width:200"
             :h="item.type==='hr'?20:isExited(item.height)?item.height:200"
             :minh="14"
+            :minw="item.type==='label'?100:50"
             :drag-handle="'.maxeditor-icon-move'"
             :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
             :axis="item.type==='hr'?'y':'both'"
@@ -89,7 +90,7 @@
                 <span v-if="isExited(item.label)" style="float: left;margin-right: 5px">:</span>
                 <span
                   class="maxeditor-single-line"
-                  style="float: left;display: inline-block"
+                  style="float: left;display: inline-block;height: 25px"
                   :contenteditable="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')"
                   :id="item.id+'_content_'+maxEditorRootId"
                   :ref="item.id+'_content_'+maxEditorRootId"
@@ -225,7 +226,6 @@
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
              @click="handleBodyClick">
-          {{n+1}}
         </div>
       </template>
     </div>
@@ -1127,7 +1127,7 @@
         if (newHeight === 0) {
           return
         }
-        if (newHeight<temp[index].minHeight){
+        if (newHeight < temp[index].minHeight) {
           console.log('--------------------------------')
         }
         temp[index].height = newHeight;
@@ -1145,13 +1145,13 @@
         let boardHeight = temp[index].height;
         if (lastLineDom !== null) {
           let contentHeight = lastLineDom.offsetTop + lastLineDom.offsetHeight;
-          if (contentHeight < temp[index].minHeight){
+          if (contentHeight < temp[index].minHeight) {
             return;
           }
           temp[index].height = contentHeight;
           boardRef[0].height = contentHeight;
           that.refreshLayout(index, contentHeight - oldHeight);
-        }else{
+        } else {
           console.log('MaxEditor:文本框内没有最后一行元素')
         }
       },
@@ -1165,7 +1165,24 @@
         let tHeight = temp[index].height;
         let tWidth = temp[index].width;
 
+        let a = that.getTotalHeight();
+        let b = that.height * (1 + that.maxeditor_pages) + (that.paddingY*2 + 24) * that.maxeditor_pages;
+        let c = that.height * that.maxeditor_pages + (that.paddingY*2 + 24) * (that.maxeditor_pages - 1);
+        console.log(a+';'+b);
+        console.log(a+';'+c);
+        //判断是否需要分页
+        if (that.getTotalHeight() > that.height * (1 + that.maxeditor_pages) + (that.paddingY*2 + 24) * that.maxeditor_pages) {
+
+          that.addPage();
+
+        } else if (that.getTotalHeight() < that.height * that.maxeditor_pages + (that.paddingY*2 + 24) * (that.maxeditor_pages - 1)) {
+
+          that.deletePage();
+
+        }
+
         for (let i = 0; i < temp.length; i++) {
+          //跳过自身
           if (i === index) {
             continue;
           }
@@ -1179,6 +1196,37 @@
             }
           }
         }
+      },
+
+      //分页
+      addPage() {
+        if (this.maxeditor_mode==='design'){
+          return
+        }
+        console.log('MaxEditor:add page.');
+        this.maxeditor_pages += 1;
+
+      },
+      deletePage() {
+        if (this.maxeditor_mode==='design'){
+          return
+        }
+        console.log('MaxEditor:delete page.');
+        if (this.maxeditor_pages > 0) {
+          this.maxeditor_pages -= 1;
+        }
+
+      },
+
+      //获取页面最大高度（最后一个面板离顶部高度）
+      getTotalHeight() {
+        let height = 0;
+        this.maxeditor_boards.forEach(function (item, index) {
+          if (item.y + item.height > height) {
+            height = item.y + item.height
+          }
+        });
+        return height;
       }
     },
     updated() {
