@@ -107,7 +107,7 @@
                    :style="{'margin-left':isExited(item.label)?'70px':'0'}"
                    v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
-                  <p class="maxeditor-noselect"
+                  <p class="maxeditor-noselect maxeditor-hoverable"
                      @click="setDropDownValue(item.id,t.value);
                    maxeditor_current_dropdown = undefined;
                    maxeditor_boards[index].datalist_current = t.id;
@@ -985,7 +985,8 @@
       //初始化关键字事件
 
       //关键字
-      editInsertKeyWord(id, values) {
+      editInsertKeyWord(values) {
+        let id = Date.now()
         if (!this.isExited(values)) {
           throw new Error('MaxEditor:未传入选项值，无法插入下拉框');
         }

@@ -131,12 +131,11 @@
       <button title="插入表格" class="maxeditor-toolbar-button"
               @click="openDialog('表格')">表格
       </button>
+      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-t-10"
+              @click="openDialog('关键词')">关键词
+      </button>
       <button title="清空编辑器" class="maxeditor-toolbar-button"
               @click="clearBoards">清空编辑器
-      </button>
-
-      <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-t-10"
-              @click="editInsertKeyWord">关键词
       </button>
       <br/>
       <button title="设计模式" class="maxeditor-toolbar-button maxeditor-m-l-15 maxeditor-m-t-10"
@@ -191,7 +190,7 @@
           <transition name="animation">
             <div v-if="dialog_error" class="maxeditor-m-t-10" style="color: red;">{{dialog_error}}</div>
           </transition>
-          <div class="maxeditor-m-t-10">
+          <div class="maxeditor-m-t-10" v-if="dialog_title!=='关键词'">
             <span style="width: 75px;display: inline-block">ID</span>
             <span style="display: inline-block">:</span>
             <input class="maxeditor-board-outline"
@@ -222,10 +221,15 @@
                    style="width: 200px;border: none;height: 20px;font-size: 16px"/>
           </div>
           <div class="maxeditor-m-t-10" v-if="dialog_title==='下拉框'">
-            <div style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">选项id</div>
-            <div style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">选项value</div>
-
-            <template v-for="(item, idx) in dialog_data.droplist">
+            <div
+              style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">
+              选项id
+            </div>
+            <div
+              style="width: 30%;text-align: center;display: inline-block;background-color: rgba(104, 166, 243, 0.34)">
+              选项value
+            </div>
+            <template v-for="(item, idx) in dialog_data.dropList">
               <div class="maxeditor-m-t-10">
                 <input class="maxeditor-board-outline"
                        v-model="item.id"
@@ -234,13 +238,30 @@
                        v-model="item.value"
                        style="width: 30%;border: none;height: 20px;font-size: 16px"/>
                 <button class="maxeditor-toolbar-button" style="width: 75px;background-color: grey"
-                        @click="dialog_data.droplist.splice(idx,1)">删除选项
+                        @click="dialog_data.dropList.splice(idx,1)">删除选项
                 </button>
 
               </div>
             </template>
             <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="width: 75px;display: block"
-                    @click="dialog_data.droplist.push({id:'',value:''})">增加选项
+                    @click="dialog_data.dropList.push({id:'',value:''})">增加选项
+            </button>
+          </div>
+
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='关键词'">
+            <template v-for="(item, idx) in dialog_data.keyWordList">
+              <div class="maxeditor-m-t-10">
+                <input class="maxeditor-board-outline"
+                       v-model="item.value"
+                       style="width: 30%;border: none;height: 20px;font-size: 16px"/>
+                <button class="maxeditor-toolbar-button" style="width: 75px;background-color: grey"
+                        @click="dialog_data.keyWordList.splice(idx,1)">删除选项
+                </button>
+
+              </div>
+            </template>
+            <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="width: 75px;display: block"
+                    @click="dialog_data.keyWordList.push({value:''})">增加选项
             </button>
           </div>
 
@@ -281,6 +302,7 @@
     data() {
       return {
         document: window.document,
+        range: undefined,
         menu_normal_show: false,
         current_pop_menu: '',
         isMenuCollapsed: false,
@@ -301,7 +323,8 @@
           label: '',
           title: '',
           writable: true,
-          droplist: [],//下拉框数组
+          dropList: [],//下拉框数组
+          keyWordList: [],//关键词数组
         }
       }
     },
@@ -314,12 +337,29 @@
         this.dialog_data.label = '';
         this.dialog_data.title = '';
         this.dialog_data.writable = true;
-        this.dialog_data.droplist = [];
+        this.dialog_data.dropList = [];
+        this.dialog_data.keyWordList = [];
         this.isDialogShow = false;
       },
       openDialog(title) {
         if (this.$parent.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:非设计模式不可插入文本框');
+        }
+        //插入关键词时保存选区
+        if (title === '关键词') {
+          try {
+            this.range = window.getSelection().getRangeAt(0);
+            console.log(this.range)
+          }catch (e) {
+            console.log(e);
+            return
+          }
+          //光标不在文本框内时不可插入关键词
+          if (this.range.startContainer.className!=='maxeditor-board-outline'){
+            if (this.range.startContainer.parentNode.className!=='maxeditor-board-outline') {
+              return
+            }
+          }
         }
         this.dialog_title = title;
         this.isDialogShow = true;
@@ -327,7 +367,7 @@
 
       confirmDialog() {
         let that = this;
-        if (!this.dialog_data.id) {
+        if (!this.dialog_data.id && this.dialog_title !== '关键词') {
           this.dialog_error = 'ID不能为空';
           return
         }
@@ -341,7 +381,7 @@
                 return
               }
             } else if (this.dialog_data.title) {
-              if(this.dialog_data.title.match(/^\s+$/)){
+              if (this.dialog_data.title.match(/^\s+$/)) {
                 this.dialog_error = '标题不可为空格字符';
                 return
               }
@@ -361,7 +401,7 @@
             }
             break;
           case '标签文本':
-            if(this.dialog_data.label.match(/^\s+$/)){
+            if (this.dialog_data.label.match(/^\s+$/)) {
               this.dialog_error = '标签不可为空格字符';
               return
             }
@@ -373,24 +413,39 @@
             }
             break;
           case '下拉框':
-            if(this.dialog_data.label){
-              if(this.dialog_data.label.match(/^\s+$/)){
+            if (this.dialog_data.label) {
+              if (this.dialog_data.label.match(/^\s+$/)) {
                 this.dialog_error = '标签不可为空格字符';
                 return
               }
               try {
-                this.$parent.addDropDownWithLabel(this.dialog_data.id,this.dialog_data.label,this.dialog_data.droplist)
+                this.$parent.addDropDownWithLabel(this.dialog_data.id, this.dialog_data.label, this.dialog_data.dropList)
               } catch (e) {
                 this.dialog_error = e.message;
                 return
               }
-            }else {
+            } else {
               try {
-                this.$parent.addDropDown(this.dialog_data.id,this.dialog_data.droplist)
+                this.$parent.addDropDown(this.dialog_data.id, this.dialog_data.dropList)
               } catch (e) {
                 this.dialog_error = e.message;
                 return
               }
+            }
+            break;
+          case '关键词':
+            if (0===this.dialog_data.keyWordList.length) {
+              this.dialog_error = '请添加关键词';
+              return
+            }
+            try {
+              let sel = window.getSelection();
+              sel.removeAllRanges();
+              sel.addRange(this.range);
+              this.$parent.editInsertKeyWord(this.dialog_data.keyWordList);
+            } catch (e) {
+              this.dialog_error = e.message;
+              return
             }
             break;
           case '图片框':
@@ -416,9 +471,8 @@
       },
       //关键字
       editInsertKeyWord() {
-        let id = prompt('请输入id');
         let values = prompt('values');
-        this.$parent.editInsertKeyWord(id, values);
+        this.$parent.editInsertKeyWord(values);
       },
 
       //表格
@@ -453,6 +507,21 @@
       clearBoards() {
         this.$parent.clearBoards();
       },
+
+      // 保存选定区
+      saveSelectionRange() {
+        if (window.getSelection) {
+          let sel = window.getSelection();
+          if (sel.rangeCount > 0) return sel.getRangeAt(0);
+        }
+        else if (document.selection) {
+          let sel = document.selection;
+          return sel.createRange();
+        }
+        return null;
+      },
+
+
 
       //隐藏、显示菜单
       hideMenu() {
