@@ -51,7 +51,7 @@
             @activated="onActivated(index)"
             @deactivated="onDeactivated(index)">
             <!--面板标题-->
-            <template v-if="item.type==='normal'&&isExited(item.title)">
+            <template v-if="item.type==='normal'&&isExited(item.title)&&item.writable">
               <div class="maxeditor-board-titile"
                    :ref="item.id+'_title_'+maxEditorRootId"
                    :contenteditable="maxeditor_mode==='design'"
@@ -199,23 +199,22 @@
             </template>
             <!--hr面板-->
             <template v-if="item.type === 'hr'">
-              <div style="height: 20px;width: 100%" @click="onActivated(index)">
+              <div style="width: 100%;padding-top: 10px;padding-bottom: 10px" @click="onActivated(index)">
                 <hr/>
               </div>
             </template>
             <!--面板工具栏-->
             <div class="maxeditor-board-toolbar"
-                 v-show="maxeditor_mode==='design'"
+                 v-if="maxeditor_mode==='design'"
                  :style="{'margin-left':item.type==='hr'?'325px':''}"
                  :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
-              <span class="maxeditor-icon-move"></span>
-              <span class="maxeditor-icon-delete" @click="deleteBoard(index)"></span>
-              <span class="maxeditor-icon maxeditor-icon-upzindex" @click="upZindex(index)"
-                    title="上移一层"></span>
-              <span class="maxeditor-icon maxeditor-icon-downzindex" @click="downZindex(index)"
-                    title="下移一层"></span>
-              <span class="maxeditor-icon">id:{{item.id}}</span>
-              <span class="maxeditor-icon">z-index:{{item.z}}</span>
+              <span class="maxeditor-icon-move" title="移动缩放"></span>
+              <span class="maxeditor-icon-delete" title="删除面板" @click="deleteBoard(index)"></span>
+              <span class="maxeditor-icon maxeditor-icon-mark"
+                    style="vertical-align: super"
+                    title="修改面板" v-if="item.type!=='hr'" @click="openUpdateDialog(item)"></span>
+              <span style="vertical-align: super">id:{{item.id}}</span>
+
             </div>
           </maxeditor-board>
         </div>
@@ -305,7 +304,7 @@
         };
         //文本框
         if (option.type === 'normal') {
-          //common.isSingleLine = this.isExited(option.isSingleLine) ? option.isSingleLine : false;
+          common.y = 20;
           common.title = this.isExited(option.title) ? option.title : null;
           common.writable = this.isExited(option.writable) ? option.writable : true;
         }
@@ -905,6 +904,26 @@
         temp[index].z = zindex;
         this.$set(this.maxeditor_boards, temp);
       },
+      //更新面板（当前编辑）
+      updateBoard(board) {
+        let that = this;
+        console.log(board.id)
+        this.checkId(board.id, function (i) {
+          if (i === that.maxeditor_current_index) {
+            Object.keys(board).forEach(function (key) {
+              that.maxeditor_boards[i][key] = board[key]
+            });
+            console.log(that.maxeditor_boards[i])
+          } else {
+            throw new Error('MaxEditor:id' + id + '已存在，无法更新面板');
+          }
+        }, function () {
+          Object.keys(board).forEach(function (key) {
+            that.maxeditor_boards[that.maxeditor_current_index][key] = board[key]
+          });
+          console.log(that.maxeditor_boards[that.maxeditor_current_index])
+        })
+      },
       getBoard(id) {
         let temp = this.maxeditor_boards;
         let index = undefined;
@@ -915,6 +934,7 @@
         });
         return temp[index];
       },
+      //TODO 业务混淆，待修改
       setBoard(boardObject) {
         let temp = this.maxeditor_boards;
         boardObject.id = boardObject.id + "_copy" + this.maxeditor_boards.length;
@@ -1232,7 +1252,29 @@
           }
         });
         return height;
-      }
+      },
+
+      //修改面板
+      openUpdateDialog(item) {
+        let title;
+        let that = this;
+        if (item.type === 'normal') {
+          title = '文本框'
+        }
+        if (item.type === 'label') {
+          title = '标签文本';
+          if (that.isExited(item.datalist)) {
+            title = '下拉框';
+          }
+        }
+        if (item.type === 'imgBox') {
+          title = '图片框'
+        }
+        if (item.type === 'table') {
+          title = '表格'
+        }
+        this.$refs['maxEditorToolbar_' + this.maxEditorRootId].openUpdateDialog(title);
+      },
     },
     updated() {
       //console.log(this.maxeditor_boards)

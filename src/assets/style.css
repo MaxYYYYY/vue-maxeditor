@@ -172,6 +172,8 @@
 }
 
 .maxeditor-board-toolbar {
+  height: 24px;
+  margin-top: 10px;
   min-width: 280px;
   display: none;
   border-radius: 4px;
@@ -184,10 +186,8 @@
 
 .maxeditor-board-toolbar span {
   cursor: pointer;
-  font-size: 12px;
-  text-align: center;
-  margin-left: 8px;
-  height: 12px;
+  padding: 4px;
+  height: 16px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -211,7 +211,7 @@
   transition: 0.3s;
   text-align: left;
   border: gray 1px solid;
-  border-radius: 10px;
+  border-radius: 4px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -328,7 +328,7 @@
 
 .maxeditor-toolbar-dialog {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 20px;
   top: 100px;
   width: 400px;
@@ -342,8 +342,8 @@
   position: absolute;
   top: 0;
   background-color: rgba(0, 0, 0, 0.3);
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
   z-index: 1000;
 }
 

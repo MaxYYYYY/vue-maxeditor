@@ -150,32 +150,6 @@
               :class="{'maxeditor-toolbar-button-disable':maxeditor_mode!=='readonly'}"
               @click="setMode('readonly')">只读模式
       </button>
-      <div class="maxeditor-float-r maxeditor-m-t-10"
-           v-show="maxeditor_mode==='design'&&(maxeditor_current_board.type==='normal'
-         ||maxeditor_current_board.type==='label'||maxeditor_current_board.type==='imgBox'||maxeditor_current_board.type==='table')">
-        <!-- <button title="修改z-index"
-                 class="maxeditor-toolbar-button maxeditor-float-r"
-                 @click="updateZ">修改z-index:{{maxeditor_current_board.z}}
-         </button>-->
-        <button title="修改title"
-                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-                v-if="maxeditor_current_board.type==='normal'"
-                @click="updateTitle">修改title:{{maxeditor_current_board.title}}
-        </button>
-        <button title="修改label"
-                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-                v-if="maxeditor_current_board.type==='label'"
-                @click="updateLabel">修改label:{{maxeditor_current_board.label}}
-        </button>
-        <button title="修改id"
-                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15"
-                @click="updateId">修改id:{{maxeditor_current_board.id}}
-        </button>
-        <button title="面板类型"
-                class="maxeditor-toolbar-button maxeditor-float-r maxeditor-m-r-15">
-          面板类型:{{maxeditor_current_board.type}}
-        </button>
-      </div>
     </div>
     <!--弹出框-->
     <transition name="animation">
@@ -186,7 +160,7 @@
         <span class="maxeditor-icon maxeditor-icon-times maxeditor-hover-rotate"
               style="position: absolute;right: 10px;top: 8px;font-size: 20px;color: grey;"
               @click="closeDialog"></span>
-          <div style="font-size: 25px;text-align: center">插入组件-{{dialog_title}}</div>
+          <div style="font-size: 25px;text-align: center">{{isUpdateDialog?'修改组件':'插入组件'}}-{{dialog_title}}</div>
           <transition name="animation">
             <div v-if="dialog_error" class="maxeditor-m-t-10" style="color: red;">{{dialog_error}}</div>
           </transition>
@@ -265,8 +239,39 @@
             </button>
           </div>
 
+
+          <!--更新数值-->
+          <!--<div class="maxeditor-m-t-10" v-if="isUpdateDialog">
+            <span style="width: 25px;display: inline-block">x</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model.number="dialog_data.x" type="number"
+                   style="width: 50px;border: none;height: 20px;font-size: 16px"/>
+            <span style="width: 25px;display: inline-block">y</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model.number="dialog_data.y" type="number"
+                   style="width: 50px;border: none;height: 20px;font-size: 16px"/>
+            <span style="width: 25px;display: inline-block">z</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model.number="dialog_data.z" type="number"
+                   style="width: 50px;border: none;height: 20px;font-size: 16px"/>
+            <br/>
+            <span style="width: 25px;display: inline-block">width</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model.number="dialog_data.width" type="number"
+                   style="width: 50px;border: none;height: 20px;font-size: 16px"/>
+            <span style="width: 25px;display: inline-block">height</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline"
+                   v-model.number="dialog_data.height" type="number"
+                   style="width: 50px;border: none;height: 20px;font-size: 16px"/>
+          </div>-->
+
           <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="float: right;width: 100px"
-                  @click="confirmDialog()">确认
+                  @click="confirmDialog">{{isUpdateDialog?'保存修改':'确认'}}
           </button>
           <button class="maxeditor-toolbar-button maxeditor-m-t-10 maxeditor-m-r-15"
                   style="float: right;width: 100px;background-color: grey" @click="closeDialog">取消
@@ -274,8 +279,6 @@
         </div>
       </div>
     </transition>
-
-
   </div>
 </template>
 
@@ -306,6 +309,7 @@
         menu_normal_show: false,
         current_pop_menu: '',
         isMenuCollapsed: false,
+        isUpdateDialog: false,//弹出框是否为修改模式
         isDialogShow: false,
         command: {
           bold: false,//加粗
@@ -322,6 +326,13 @@
           id: '',
           label: '',
           title: '',
+          x: '',
+          y: '',
+          z: '',
+          width: '',
+          height: '',
+          isHeader: '',//页眉标记
+          isFooter: '',//页脚标记
           writable: true,
           dropList: [],//下拉框数组
           keyWordList: [],//关键词数组
@@ -340,6 +351,7 @@
         this.dialog_data.dropList = [];
         this.dialog_data.keyWordList = [];
         this.isDialogShow = false;
+        this.isUpdateDialog = false;
       },
       openDialog(title) {
         if (this.$parent.maxeditor_mode !== 'design') {
@@ -350,13 +362,13 @@
           try {
             this.range = window.getSelection().getRangeAt(0);
             console.log(this.range)
-          }catch (e) {
+          } catch (e) {
             console.log(e);
             return
           }
           //光标不在文本框内时不可插入关键词
-          if (this.range.startContainer.className!=='maxeditor-board-outline'){
-            if (this.range.startContainer.parentNode.className!=='maxeditor-board-outline') {
+          if (this.range.startContainer.className !== 'maxeditor-board-outline') {
+            if (this.range.startContainer.parentNode.className !== 'maxeditor-board-outline') {
               return
             }
           }
@@ -364,9 +376,48 @@
         this.dialog_title = title;
         this.isDialogShow = true;
       },
+      openUpdateDialog(title) {
+        this.isUpdateDialog = true;
+        this.isDialogShow = true;
+        this.dialog_title = title;
+        let currentBoard = this.maxeditor_current_board;
+        this.dialog_data.id = currentBoard.id;
+        this.dialog_data.title = currentBoard.title;
+        this.dialog_data.label = currentBoard.label;
+        this.dialog_data.writable = currentBoard.writable;
+        this.dialog_data.x = currentBoard.x;
+        this.dialog_data.y = currentBoard.y;
+        this.dialog_data.z = currentBoard.z;
+        this.dialog_data.width = currentBoard.width;
+        this.dialog_data.height = currentBoard.height;
+        this.dialog_data.dropList = currentBoard.datalist;
+      },
 
       confirmDialog() {
         let that = this;
+        let dialogData = this.dialog_data;
+        if (this.isUpdateDialog) {
+          try {
+            let board = {};
+            board.id = dialogData.id;
+            board.title = dialogData.title;
+            board.label = dialogData.label;
+            board.writable = dialogData.writable;
+            board.x = dialogData.x;
+            board.y = dialogData.y;
+            board.z = dialogData.z;
+            board.width = dialogData.width;
+            board.height = dialogData.height;
+            board.datalist = dialogData.dropList;
+            that.$parent.updateBoard(board);
+            that.closeDialog();
+          } catch (e) {
+            console.log(e)
+            this.dialog_error = e.message;
+          }
+          return;
+        }
+
         if (!this.dialog_data.id && this.dialog_title !== '关键词') {
           this.dialog_error = 'ID不能为空';
           return
@@ -434,7 +485,7 @@
             }
             break;
           case '关键词':
-            if (0===this.dialog_data.keyWordList.length) {
+            if (0 === this.dialog_data.keyWordList.length) {
               this.dialog_error = '请添加关键词';
               return
             }
@@ -488,40 +539,9 @@
       setMode(mode) {
         this.$parent.maxeditor_mode = mode
       },
-      updateId() {
-        let id = prompt('请输入id', '');
-        this.$parent.updateId(this.maxeditor_current_board.id, id);
-      },
-      updateTitle() {
-        let title = prompt('请输入title');
-        this.$parent.updateTitle(this.maxeditor_current_board.id, title);
-      },
-      updateZ() {
-        let z = prompt('请输入z-index');
-        this.$parent.updateZ(this.maxeditor_current_board.id, z);
-      },
-      updateLabel() {
-        let label = prompt('请输入label');
-        this.$parent.updateLabel(this.maxeditor_current_board.id, label);
-      },
       clearBoards() {
         this.$parent.clearBoards();
       },
-
-      // 保存选定区
-      saveSelectionRange() {
-        if (window.getSelection) {
-          let sel = window.getSelection();
-          if (sel.rangeCount > 0) return sel.getRangeAt(0);
-        }
-        else if (document.selection) {
-          let sel = document.selection;
-          return sel.createRange();
-        }
-        return null;
-      },
-
-
 
       //隐藏、显示菜单
       hideMenu() {
