@@ -187,6 +187,18 @@
                           type="checkbox"
                           v-model="dialog_data.writable"></label>
           </div>
+          <div class="maxeditor-m-t-10" v-if="isUpdateDialog">
+            <span style="width: 75px;display: inline-block">页眉</span>
+            <span style="display: inline-block">:</span>
+            <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -10px"
+                          type="checkbox" @change="dialog_data.isHeader?dialog_data.isFooter=false:dialog_data.isFooter;"
+                          v-model="dialog_data.isHeader"></label>
+            <span style="width: 75px;display: inline-block">页脚</span>
+            <span style="display: inline-block">:</span>
+            <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -10px"
+                          type="checkbox" @change="dialog_data.isFooter?dialog_data.isHeader=false:dialog_data.isHeader;"
+                          v-model="dialog_data.isFooter"></label>
+          </div>
           <div class="maxeditor-m-t-10" v-if="dialog_title==='标签文本'||dialog_title==='下拉框'">
             <span style="width: 75px;display: inline-block">标签</span>
             <span style="display: inline-block">:</span>
@@ -347,6 +359,13 @@
         this.dialog_data.id = '';
         this.dialog_data.label = '';
         this.dialog_data.title = '';
+        this.dialog_data.x = '';
+        this.dialog_data.y = '';
+        this.dialog_data.z = '';
+        this.dialog_data.width = '';
+        this.dialog_data.height = '';
+        this.dialog_data.isHeader = '';
+        this.dialog_data.isFooter = '';
         this.dialog_data.writable = true;
         this.dialog_data.dropList = [];
         this.dialog_data.keyWordList = [];
@@ -390,12 +409,15 @@
         this.dialog_data.z = currentBoard.z;
         this.dialog_data.width = currentBoard.width;
         this.dialog_data.height = currentBoard.height;
+        this.dialog_data.isHeader = currentBoard.isHeader;
+        this.dialog_data.isFooter = currentBoard.isFooter;
         this.dialog_data.dropList = currentBoard.datalist;
       },
 
       confirmDialog() {
         let that = this;
         let dialogData = this.dialog_data;
+        //更新
         if (this.isUpdateDialog) {
           try {
             let board = {};
@@ -408,11 +430,14 @@
             board.z = dialogData.z;
             board.width = dialogData.width;
             board.height = dialogData.height;
+            board.isHeader = dialogData.isHeader;
+            board.isFooter = dialogData.isFooter;
             board.datalist = dialogData.dropList;
+            console.log(board)
             that.$parent.updateBoard(board);
             that.closeDialog();
           } catch (e) {
-            console.log(e)
+            console.log(e);
             this.dialog_error = e.message;
           }
           return;
