@@ -66,7 +66,6 @@
                                     :maxeditor_mode="maxeditor_mode"></maxeditor-board-normal>-->
             <template v-if="item.type === 'normal'">
               <div style="width: 100%;height: 100%"
-                   v-html="item.content"
                    :contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
                    :id="item.id+'_content_'+maxEditorRootId"
                    :ref="item.id+'_content_'+maxEditorRootId"

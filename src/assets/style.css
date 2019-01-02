@@ -185,6 +185,7 @@
 }
 
 .maxeditor-board-toolbar span {
+  box-sizing: content-box;
   cursor: pointer;
   padding: 4px;
   height: 16px;

@@ -155,7 +155,8 @@
     <transition name="animation">
       <div v-if="isDialogShow"
            class="maxeditor-toolbar-dialog-bg"
-           :style="{'height':viewPortHeight+134+'px'}">
+           :style="{'height':viewPortHeight+134+'px',
+                    'width':width+paddingX*2+'px'}">
         <div class="maxeditor-toolbar-dialog">
         <span class="maxeditor-icon maxeditor-icon-times maxeditor-hover-rotate"
               style="position: absolute;right: 10px;top: 8px;font-size: 20px;color: grey;"
@@ -318,9 +319,9 @@
       return {
         document: window.document,
         range: undefined,
-        menu_normal_show: false,
-        current_pop_menu: '',
-        isMenuCollapsed: false,
+        current_pop_menu: '',//当前的弹出菜单（字体大小，字体颜色，背景颜色）
+        isMenuCollapsed: false,//菜单栏是否折叠
+        isMenuCollapsed_t: false,//菜单栏折叠状态额外标记，用于在打开修改弹出窗时记录状态
         isUpdateDialog: false,//弹出框是否为修改模式
         isDialogShow: false,
         command: {
@@ -371,6 +372,11 @@
         this.dialog_data.keyWordList = [];
         this.isDialogShow = false;
         this.isUpdateDialog = false;
+        //若打开窗口前，菜单栏处于折叠状态，则回复折叠
+        if (this.isMenuCollapsed_t){
+          this.hideMenu();
+          this.isMenuCollapsed_t = false;
+        }
       },
       openDialog(title) {
         if (this.$parent.maxeditor_mode !== 'design') {
@@ -412,6 +418,9 @@
         this.dialog_data.isHeader = currentBoard.isHeader;
         this.dialog_data.isFooter = currentBoard.isFooter;
         this.dialog_data.dropList = currentBoard.datalist;
+        //餐单栏设置为显示状态，防止界面变形
+        this.showMenu();
+        this.isMenuCollapsed_t = true;
       },
 
       confirmDialog() {
