@@ -61,9 +61,6 @@
               </div>
             </template>
             <!--normal面板-->
-            <!--<maxeditor-board-normal :item="item" :index="index" @isExited(isExited) @onActivated(onActivated) @justifyNormalBoardHeight(justifyNormalBoardHeight)
-                                    :max-editor-root-id="maxEditorRootId"
-                                    :maxeditor_mode="maxeditor_mode"></maxeditor-board-normal>-->
             <template v-if="item.type === 'normal'">
               <div style="width: 100%;height: 100%"
                    :contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
@@ -203,9 +200,9 @@
                 <hr/>
               </div>
             </template>
-            <!--面板工具栏-->
+            <!--面板工具栏：不可用v-if渲染，会导致文本框文字丢失-->
             <div class="maxeditor-board-toolbar"
-                 v-if="maxeditor_mode==='design'"
+                 v-show="maxeditor_mode==='design'"
                  :style="{'margin-left':item.type==='hr'?'325px':''}"
                  :class="{'maxeditor-board-toolbar-active':item.id===maxeditor_current_id}">
               <span class="maxeditor-icon-move" title="移动缩放"></span>
@@ -214,11 +211,11 @@
                     style="vertical-align: super"
                     title="修改面板" v-if="item.type!=='hr'" @click="openUpdateDialog(item)"></span>
               <span style="vertical-align: super">id:{{item.id}}</span>
-
             </div>
           </maxeditor-board>
         </div>
       </div>
+      <!--分页：超过1页时通过此模板渲染增加的页面-->
       <template v-for="n in maxeditor_pages">
         <div class="maxeditor-body"
              :style="{'width':width+'px','height':height+'px',
@@ -236,7 +233,6 @@
   import VueDraggableResizable from 'vue-draggable-resizable';
   import MaxEditorToolbar from './maxeidtor-toolbar.vue';
   import QRCode from 'qrcodeautojs';
-  //import MaxeditorBoardNormal from "./maxeditor-board-normal.vue";
 
   export default {
     name: "maxeditor",

@@ -29,11 +29,18 @@
 $ npm install --save vue-draggable-resizable
 ```
 安装qrcodeautojs,在package.json中写入配置后进行安装(qrcodeautojs项目fork自qrcodejs，仅修改了两行代码以让生成的二维码自适应容器宽高)
-```json
+```
 "dependencies":{
   "qrcodeautojs": "git+https://github.com/MaxYYYYY/qrcodejs.git"
 }
 ```
+或者使用软连接安装
+```
+"dependencies":{
+  "qrcodeautojs": "file:"
+}
+```
+
 ```bash
 npm install 
 ```

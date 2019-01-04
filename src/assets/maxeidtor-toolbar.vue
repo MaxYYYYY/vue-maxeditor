@@ -128,9 +128,9 @@
       <button title="插入图片容器" class="maxeditor-toolbar-button"
               @click="openDialog('图片框')">图片框
       </button>
-      <button title="插入表格" class="maxeditor-toolbar-button"
+      <!--<button title="插入表格" class="maxeditor-toolbar-button"
               @click="openDialog('表格')">表格
-      </button>
+      </button>-->
       <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-t-10"
               @click="openDialog('关键词')">关键词
       </button>
@@ -375,7 +375,7 @@
         //若打开窗口前，菜单栏处于折叠状态，则回复折叠
         if (this.isMenuCollapsed_t){
           this.hideMenu();
-          this.isMenuCollapsed_t = false;
+          this.isMenuCollapsed_t = true;
         }
       },
       openDialog(title) {
@@ -394,6 +394,7 @@
           //光标不在文本框内时不可插入关键词
           if (this.range.startContainer.className !== 'maxeditor-board-outline') {
             if (this.range.startContainer.parentNode.className !== 'maxeditor-board-outline') {
+              console.log('光标不在文本框内时不可插入关键词');
               return
             }
           }
@@ -419,8 +420,9 @@
         this.dialog_data.isFooter = currentBoard.isFooter;
         this.dialog_data.dropList = currentBoard.datalist;
         //餐单栏设置为显示状态，防止界面变形
+        let t = this.isMenuCollapsed_t;
         this.showMenu();
-        this.isMenuCollapsed_t = true;
+        this.isMenuCollapsed_t = t;
       },
 
       confirmDialog() {
@@ -581,6 +583,7 @@
       hideMenu() {
         let that = this;
         this.isMenuCollapsed = true;
+        this.isMenuCollapsed_t = true;
         this.$refs['maxeditor-toolbar-' + this.maxeditorRootId + '-a'].style.display = 'none';
         this.$refs['maxeditor-toolbar-' + this.maxeditorRootId + '-showbtn'].style.display = 'block';
         try {
@@ -595,6 +598,7 @@
         let that = this;
         let isModeBtnShow = this.isModeBtnShow;
         this.isMenuCollapsed = false;
+        this.isMenuCollapsed_t = false;
         this.$refs['maxeditor-toolbar-' + this.maxeditorRootId].style.width = this.width + this.paddingX * 2 + 'px';
         setTimeout(function () {
           that.$refs['maxeditor-toolbar-' + that.maxeditorRootId + '-a'].style.display = 'block';
