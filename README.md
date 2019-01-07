@@ -142,13 +142,7 @@ export default {
 ## 全局方法
 
 #### getBoards()
-获取面板列表，返回值为json数组，示例如下
-
-```json
-[{"component":"maxeditor-board","id":"3","type":"label","isFluid":false,"title":null,"label":"3","x":75,"z":1025,"width":100,"height":25,"y":75,"w":100,"h":50},
-{"component":"maxeditor-board","id":"1","type":"label","isFluid":false,"title":null,"label":"1","x":275,"z":1025,"width":100,"height":25,"y":75,"w":100,"h":50},
-{"component":"maxeditor-board","id":"4","type":"label","isFluid":false,"title":null,"label":"4","x":475,"z":1025,"width":100,"height":25,"y":75,"w":100,"h":50}]
-```
+获取面板列表，返回值为json数组
 
 #### setBoards(boards, cb)
 设置面板列表，boards为json数组(对象以及字符串皆可)，结构如上

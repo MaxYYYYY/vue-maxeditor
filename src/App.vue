@@ -213,11 +213,6 @@
         let id = prompt('请输入id');
         document.getElementById('temp').innerText = JSON.stringify(this.$refs.maxeditor.getBoard(id))
       },
-      setBoard() {
-        let boardObjectStr = prompt('boardObjectStr');
-        //let boardObject = JSON.parse(boardObjectStr);
-        console.log(this.$refs.maxeditor.setBoard(boardObjectStr));
-      },
       insertQRCode() {
         let id = prompt('请输入id');
         let url = prompt('请输入url');

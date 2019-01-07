@@ -11,20 +11,24 @@
                        :is-mode-btn-show="isModeBtnShow"
                        :maxeditor-root-id="maxEditorRootId">
     </maxeditor-toolbar>
-    <!--视口-->
+    <!--编辑器视口，超出视口宽高部分滚动显示-->
     <div class="maxeditor-view-port"
          style="overflow-y: scroll;margin: 0 auto;padding-left: 15px;"
          :style="{'width':width+paddingX*2+30+'px',
                   'height':viewPortHeight+'px',
                   'padding-top':isToolbarShow?isModeBtnShow?'136px':'48px':'0'}">
+      <!--编辑器背景，实现页面效果-->
       <div class="maxeditor-body"
            :style="{'width':width+'px','height':height+'px',
                   'padding-left':paddingX+'px','padding-right':paddingX+'px',
                   'padding-top':paddingY+'px','padding-bottom':paddingY+'px'}"
            @click="handleBodyClick">
+        <!--真正的内容区，通过列表渲染-->
         <div class="maxeditor-body-inner"
              :ref="'maxeditor-body-inner-'+maxEditorRootId"
              :id="'maxeditor-body-inner-'+maxEditorRootId">
+          <!--面板基础模板，调用vue-draggable-resizable,用于实现拖拽缩放效果
+              各参数配置详见官方文档https://github.com/mauricius/vue-draggable-resizable-->
           <maxeditor-board
             class="maxeditor-board"
             v-for="(item, index) in maxeditor_boards"
@@ -50,7 +54,13 @@
             @dragging="onDrag"
             @activated="onActivated(index)"
             @deactivated="onDeactivated(index)">
-            <!--面板标题-->
+
+            <!--以下为各种不同类型的面板的内容区，根据type属性渲染不同的布局，
+            type属性主要分为normal（长文本）,label（标签文本、下拉框）,imgBox（图片容器）,hr（分隔线）-->
+
+            <!--当normal面板包含title属性，并且可编辑时，渲染标题
+                当标题本身文本的样式被更改时，写入一个新的titleHTML，内容为html代码，
+                初始化时会判断titleHTML的存在性来设置innerHTML-->
             <template v-if="item.type==='normal'&&isExited(item.title)&&item.writable">
               <div class="maxeditor-board-titile"
                    :ref="item.id+'_title_'+maxEditorRootId"
@@ -60,7 +70,8 @@
                    @keyup="setTitleHTML(index)">{{item.title}}:
               </div>
             </template>
-            <!--normal面板-->
+
+            <!--normal面板，负责文本框的显示，初始化时将设置content中的内容到innerHTML,非只读模式下可编辑-->
             <template v-if="item.type === 'normal'">
               <div style="width: 100%;height: 100%"
                    v-html="item.isHeader||item.isFooter?item.content:''"
@@ -73,9 +84,12 @@
                    @keyup="onActivated(index);justifyNormalBoardHeight(index)">
               </div>
             </template>
-            <!--label标题-->
+
+            <!--label面板，负责标签文本，带标签的下拉框以及纯下拉框的显示-->
             <template v-if="item.type === 'label'">
               <p style="height: 25px;margin: 0;position: relative">
+                <!--标签，当标签本身文本的样式被更改时，写入一个新的labelHTML，内容为html代码，
+                    初始化时会判断labelHTML的存在性来设置innerHTML-->
                 <span v-if="isExited(item.label)"
                       style="float: left;width: 65px;height: 25px"
                       class="maxeditor-single-line"
@@ -86,6 +100,7 @@
                       @keyup="setLabelHTML(index)">{{item.label}}
                 </span>
                 <span v-if="isExited(item.label)" style="float: left;margin-right: 5px">:</span>
+                <!--输入区-->
                 <span
                   class="maxeditor-single-line"
                   style="float: left;display: inline-block;height: 25px"
@@ -96,15 +111,18 @@
                   :style="{'width':isExited(item.label)?item.width-80+'px':item.width-10+'px'}"
                   @click="onActivated(index);maxeditor_current_dropdown = item.id"
                   @keyup="onActivated(index)">{{item.content}}</span>
+                <!--下拉箭头，当包含了datalist属性时显示-->
                 <span class="maxeditor-icon maxeditor-icon-caret-down"
                       style="position: absolute;right: 2px;top: 4px;"
                       v-if="(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)"
                       @click="changeDropDownState(item.id);maxeditor_current_index=index"></span>
               </p>
+              <!--下拉列表，通过datalist列表渲染，datalist不存在时不予显示-->
               <div class="maxeditor-dropdown"
                    :style="{'margin-left':isExited(item.label)?'70px':'0'}"
                    v-if="maxeditor_current_dropdown===item.id&&(maxeditor_mode === 'design'||maxeditor_mode === 'edit')&&isExited(item.datalist)">
                 <template v-for="(t, i) in item.datalist" v-if="isExited(item.datalist)">
+                  <!--选点点击时设置输入框为相应的内容-->
                   <p class="maxeditor-noselect maxeditor-hoverable"
                      @click="setDropDownValue(item.id,t.value);
                    maxeditor_current_dropdown = undefined;
@@ -113,14 +131,15 @@
                 </template>
               </div>
             </template>
-            <!--imgBox面板-->
+
+            <!--imgBox面板，负责各种图片以及二维码的显示，当imgs属性存在时，默认显示图片的容器，不存在时则会显示二维码的容器-->
             <template v-if="item.type === 'imgBox'">
               <div :style="{'height':isExited(item.height)?item.height+'px':'200px'}"
                    :class="{'maxeditor-board-outline':maxeditor_mode==='design'}"
                    :id="item.id+'_imgBox_'+maxEditorRootId"
                    :ref="item.id+'_imgBox_'+maxEditorRootId"
                    @click="onActivated(index)">
-                <!--图片-->
+                <!--图片列表容器，根据imgs列表渲染-->
                 <div style="text-align: center"
                      v-if="isExited(item.imgs)"
                      :id="item.id+'_imgBox_imgs_'+maxEditorRootId"
@@ -148,11 +167,11 @@
                     </div>
                   </template>
                 </div>
-                <!--二维码-->
+                <!--二维码容器-->
                 <div v-if="!isExited(item.imgs)"
                      :ref="item.id+'_imgBox_qrCode_'+maxEditorRootId"
                      :id="item.id+'_imgBox_qrCode_'+maxEditorRootId"></div>
-                <!--图片标记-->
+                <!--图片（即示意图）的可拖动的标记，标记的数量为其所配对的图片（扫描图）容器中的图片数量-->
                 <maxeditor-tab v-if="isExited(item.watchTo)"
                                v-for="(i, idx) in (isExited(item.watchTo)?maxeditor_boards[item.watchTo].imgs:[])"
                                :key="item.id+'_imgTabs_'+idx+'_'+maxEditorRootId"
@@ -176,6 +195,7 @@
                 </maxeditor-tab>
               </div>
             </template>
+
             <!--表格面板-->
             <template v-if="item.type === 'table'">
               <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
@@ -195,12 +215,14 @@
                 </tbody>
               </table>
             </template>
-            <!--hr面板-->
+
+            <!--分隔线-->
             <template v-if="item.type === 'hr'">
               <div style="width: 100%;padding-top: 10px;padding-bottom: 10px" @click="onActivated(index)">
                 <hr/>
               </div>
             </template>
+
             <!--面板工具栏：不可用v-if渲染，会导致文本框文字丢失-->
             <div class="maxeditor-board-toolbar"
                  v-show="maxeditor_mode==='design'"
@@ -216,6 +238,7 @@
           </maxeditor-board>
         </div>
       </div>
+
       <!--分页：超过1页时通过此模板渲染增加的页面-->
       <template v-for="n in maxeditor_pages">
         <div class="maxeditor-body"
@@ -233,7 +256,7 @@
 <script>
   import VueDraggableResizable from 'vue-draggable-resizable';
   import MaxEditorToolbar from './maxeidtor-toolbar.vue';
-  import QRCode from 'qrcodeautojs';
+  import QRCode from 'qrcodeautojs';//二维码，该模块可通过添加指向./lib/qrcodeautojs的软连接安装
 
   export default {
     name: "maxeditor",
@@ -245,7 +268,7 @@
       paddingY: {type: Number, default: 20},//报告页面垂直内边距
       isToolbarShow: {type: Boolean, default: true},//编辑器工具栏是否显示
       isModeBtnShow: {type: Boolean, default: false},//编辑器工具栏设计按钮是否可见
-      maxEditorRootId: {type: String, default: 'maxEditor_' + Date.now()}//默认生成时间戳id
+      maxEditorRootId: {type: String, default: 'maxEditor_' + Date.now()}//根,默认生成时间戳id
     },
     render() {
 
@@ -258,20 +281,20 @@
         maxeditor_mode: 'design',//编辑器模式，'design'|'edit'|'readonly '
         maxeditor_current_id: '',//当前编辑面板id
         maxeditor_current_index: undefined,//当前编辑面板在maxeditor_boards中的索引值
-        maxeditor_current_dropdown: undefined,//当前正在操作的下拉框（id值）
+        maxeditor_current_dropdown: undefined,//当前正在操作的下拉框（id值），控制下拉列表的显示
         maxeditor_current_tabImg_index: undefined,//当前正在操作的图片标记的索引值
         maxeditor_pages: 0//增加的页数
       }
     },
     components: {
-      //'maxeditor-board-normal':MaxeditorBoardNormal,
       'maxeditor-toolbar': MaxEditorToolbar,
       'maxeditor-board': VueDraggableResizable,
       'maxeditor-tab': VueDraggableResizable
     },
     methods: {
       //全局方法
-      //新增面板
+
+      //新增面板，该方法为基础方法，后面的具体分类是对该方法的细化
       addBoard(option) {
         if (this.maxeditor_mode !== 'design') {
           throw new Error('MaxEditor:当前模式不可插入板块');
@@ -286,6 +309,7 @@
         this.checkId(option.id, function () {
           throw new Error('MaxEditor:id已存在,无法插入板块');
         }, function () {
+          console.log('MaxEditor:id可用，继续操作')
         });
         //通用属性
         let common = {
@@ -326,18 +350,14 @@
         //激活新增面板
         this.onActivated(this.maxeditor_boards.length - 1)
       },
-      //标题、标签等html代码保存
-      setLabelHTML(index) {
-        this.maxeditor_boards[index].labelHTML = this.$refs[this.maxeditor_boards[index].id + '_label_' + this.maxEditorRootId][0].innerHTML;
-      },
-      setTitleHTML(index) {
-        this.maxeditor_boards[index].titleHTML = this.$refs[this.maxeditor_boards[index].id + '_title_' + this.maxEditorRootId][0].innerHTML;
-      },
-      //获取面板数组
+
+      //获取所有面板，返回一个数组
       getBoards() {
         this.blurAll();
         return this.maxeditor_boards;
       },
+
+      //设置面板，接受一个完整的面板数组
       setBoards(boards, cb = () => {
         console.log('MaxEditor:setBoards complete.')
       }) {
@@ -346,10 +366,12 @@
             boards = JSON.parse(boards)
           }
         } catch (e) {
+          console.log(e.message)
         }
         this.maxeditor_boards = boards;
         let rootId = this.maxEditorRootId;
         let that = this;
+        //下一帧时设置样式修改过后的html内容代码，包括文本内容，标题、标签内容
         this.$nextTick(function () {
           that.maxeditor_boards.forEach(function (item, index) {
             if (that.isExited(item.content)) {
@@ -372,23 +394,40 @@
           })
         })
       },
+
+      //清空编辑器中所有面板
       clearBoards() {
         this.maxeditor_boards = [];
         this.maxeditor_pages = 0;
       },
+
+      //标题、标签等html代码保存
+      setLabelHTML(index) {
+        this.maxeditor_boards[index].labelHTML = this.$refs[this.maxeditor_boards[index].id + '_label_' + this.maxEditorRootId][0].innerHTML;
+      },
+      setTitleHTML(index) {
+        this.maxeditor_boards[index].titleHTML = this.$refs[this.maxeditor_boards[index].id + '_title_' + this.maxEditorRootId][0].innerHTML;
+      },
+
+      //文本框
       addSection(id) {
         this.addBoard({id: id, type: 'normal', z: 100})
       },
-      //该文本框只在设计模式下可编辑，用于大标题以及页脚等
+
+      //只读文本框，该文本框只在设计模式下可编辑，用于大标题以及页脚等
       addReadOnlySection(id) {
         this.addBoard({id: id, type: 'normal', z: 100, writable: false, height: 24, width: this.width})
       },
+
+      //带标题文本框
       addSectionWithTitle(id, title) {
         if (!this.isExited(title)) {
           throw new Error('MaxEditor:插入带标题文本框时未得到标题');
         }
         this.addBoard({id: id, title: title, type: 'normal', width: this.width, height: 200, z: 100})
       },
+
+      //文本标签
       addTextWithLabel(id, label) {
         if (!this.isExited(label)) {
           throw new Error('MaxEditor:插入带标签文本时未得到标签');
@@ -397,9 +436,13 @@
           id: id, label: label, type: 'label', width: 125, height: 25, x: 75, z: 101
         })
       },
+
+      //表格
       addTable(id) {
         this.addBoard({id: id, type: 'table', width: 600, z: 100})
       },
+
+      //纯下拉框
       addDropDown(id, datalist) {
         if (!this.isExited(datalist)) {
           datalist = [];
@@ -411,6 +454,8 @@
           id: id, label: null, type: 'label', width: 150, height: 25, x: 75, z: 200, datalist: datalist
         })
       },
+
+      //带标签下拉框
       addDropDownWithLabel(id, label, datalist) {
         if (!this.isExited(label)) {
           throw new Error('MaxEditor:插入带标签下拉框时未得到标签');
@@ -425,6 +470,7 @@
           id: id, label: label, type: 'label', width: 150, height: 25, x: 75, z: 200, datalist: datalist
         })
       },
+      //更新下拉框列表
       updateDropDownList(id, datalist) {
         if (!this.isExited(datalist)) {
           throw new Error('MaxEditor:未传入下拉列表，无法更新下拉框');
@@ -442,6 +488,7 @@
         temp[index].datalist = datalist;
         this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText = ''
       },
+      //改变下拉框状态，控制下拉列表是否弹出，点击下拉箭头时触发，点击编辑器空白或者列表选项时隐藏
       changeDropDownState(id, index) {
         if (this.isExited(this.maxeditor_current_dropdown)) {
           this.maxeditor_current_dropdown = undefined
@@ -450,6 +497,7 @@
           this.maxeditor_current_dropdown = id;
         }
       },
+      //获取下拉列表
       getDropDownList(id) {
         let temp = this.maxeditor_boards;
         let list;
@@ -464,6 +512,7 @@
           return list;
         }
       },
+      //获取下拉列表当前选中项
       getDropDownCurrentItem(id) {
         let item;
         let temp = this.maxeditor_boards;
@@ -483,6 +532,7 @@
           console.log('MaxEditor:下拉框当前未选中选项')
         }
       },
+      //设置下拉框当前选中项
       setDropDownCurrentItem(id, itemId) {
         let temp = this.maxeditor_boards;
         let dItem;
@@ -510,16 +560,21 @@
         }
         throw new Error('MaxEditor:下拉列表中找到不' + itemId);
       },
+      //设置下拉框的值，该值为下拉框的输入框的innerText,可再次编辑
       setDropDownValue(id, value) {
         this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText = value
       },
+
+      //分隔线
       addHr() {
         this.addBoard({type: 'hr', z: 101})
       },
 
+      //图片容器
       addImgBox(id) {
         this.addBoard({id: id, type: 'imgBox', z: 101})
       },
+      //插入多张图片
       insertImg(id, imgs, cb = (imgDomList) => {
         console.log(imgDomList)
       }) {
@@ -558,6 +613,7 @@
           cb(doms)
         })
       },
+      //删除图片
       deleteImg(id, key) {
         let temp = this.maxeditor_boards;
         let ttemp;
@@ -586,13 +642,14 @@
         }, function () {
           throw new Error('MaxEditor:' + id + '不存在，无法删除图片');
         });
-        this.$set(this.maxeditor_boards, temp)
+        this.$set(this.maxeditor_boards, temp);
         this.$nextTick(function () {
           if (temp[Tindex].imgs.length !== 0) {
-            that.justifyImgBoxHeight(Tindex);
+            that.justifyImgBoxHeight(Tindex);//调整容器高度
           }
         });
       },
+      //添加单张图片
       addImg(id, img, cb = (imgDom) => {
         console.log(imgDom)
       }) {
@@ -639,7 +696,7 @@
             }
           }
         }, function () {
-          throw new Error('MaxEditor:' + id + '不存在，无法获取扫描图')
+          throw new Error('MaxEditor:' + id + '不存在，无法获取图片信息')
         });
         if (isExist) {
           return img;
@@ -675,6 +732,7 @@
           cb(imgDom);
         });
       },
+      //清空图片容器所有内容
       clearImgBoxContent(id) {
         let that = this;
         let Tindex;
@@ -684,6 +742,7 @@
           try {
             that.$refs[id + '_imgBox_qrCode_' + rootId][0].innerHTML = '';//清空容器中二维码
           } catch (e) {
+            console.log(e.message)
           }
           Tindex = i;
           temp[i].imgs = null;
@@ -693,6 +752,7 @@
         this.$set(this.maxeditor_boards, temp);
         this.justifyImgBoxHeight(Tindex)
       },
+      //向图片容器中插入二维码，注意该操作替换了dom,不可逆（不可继续插入普通图片）
       insertQRCode(id, url) {
         let that = this;
         let rootId = this.maxEditorRootId;
@@ -709,7 +769,7 @@
           });
         })
       },
-
+      //绑定两个图片容器，添加属性后，其中一个容器根据另一个容器的图片数量来实时渲染相应数量的标记
       bindImgTabBox(changerBoxId, watcherBoxId) {
         let temp = this.maxeditor_boards;
         let changerIndex = null;
@@ -737,6 +797,7 @@
         this.$set(this.maxeditor_boards, temp);
         console.log('MaxEditor:绑定了' + changerBoxId + '和' + watcherBoxId)
       },
+      //解绑两个图片容器，解绑后不再联动
       unBindImgTabBox(changerBoxId, watcherBoxId) {
         let temp = this.maxeditor_boards;
         let changerIndex = null;
@@ -763,28 +824,34 @@
         this.$set(this.maxeditor_boards, temp);
       },
 
+      //删除面板
       deleteBoard(index) {
         this.maxeditor_boards.splice(index, 1)
       },
 
+      //设置编辑器模式，可设置为 design edit readonly
       setMode(mode) {
         this.maxeditor_mode = mode
       },
+      //获取编辑器当前模式
       getMode() {
         return this.maxeditor_mode
       },
+
+      //激活面板编辑区
       activeBoard(id) {
         this.$refs[id + '_content_' + this.maxEditorRootId][0].focus();
       },
+      //
       deactiveBoard(id) {
         try {
           this.$refs[id + '_content_' + this.maxEditorRootId][0].blur();
         } catch (e) {
-
+          //
         }
       },
 
-      //图片数字标记拖动时位置大小信息记录
+      //图片数字标记拖动时位置以及大小信息记录
       onImgTabDrag(x, y) {
         if (this.isExited(this.maxeditor_boards[this.maxeditor_current_index].watchTo)) {
           this.maxeditor_boards[this.maxeditor_boards[this.maxeditor_current_index].watchTo].imgs[this.maxeditor_current_tabImg_index].tabX = x;
@@ -800,7 +867,8 @@
          }*/
       },
 
-      //面板方法
+      //面板基础方法
+      //缩放时触发
       onResize(x, y, width, height) {
         try {
           this.maxeditor_boards[this.maxeditor_current_index].x = x;
@@ -811,6 +879,7 @@
         } catch (e) {
         }
       },
+      //拖动时触发
       onDrag(x, y) {
         try {
           this.maxeditor_boards[this.maxeditor_current_index].x = x;
@@ -821,22 +890,25 @@
              this.maxeditor_boards[this.maxeditor_current_index].x = 25
          }*/
       },
+      //激活时触发
       onActivated(index) {
-        console.log('onActivated' + index);
+        console.log('MaxEditor:onActivated' + index);
         this.maxeditor_current_id = this.maxeditor_boards[index].id;
         this.maxeditor_current_index = index;
         try {
           this.maxeditor_boards[index].content = this.$refs[this.maxeditor_boards[index].id + "_content_" + this.maxEditorRootId][0].innerHTML;
         } catch (e) {
-
+          //
         }
       },
+      //灭活时触发
       onDeactivated(index) {
-        console.log('onDeactivated' + index);
+        console.log('MaxEditor:onDeactivated' + index);
         this.maxeditor_current_id = '';
         this.maxeditor_current_index = undefined;
         this.maxeditor_current_dropdown = undefined;
       },
+      //更新基础属性值
       upZindex(index) {
         this.maxeditor_boards[index].z += 1;
       },
@@ -902,10 +974,10 @@
         temp[index].z = zindex;
         this.$set(this.maxeditor_boards, temp);
       },
-      //更新面板（当前编辑）
+
+      //更新当前正在编辑的面板，调用该方法时需要维持一个当前正在编辑的面板，否则会报错（暂未解耦）
       updateBoard(board) {
         let that = this;
-        console.log(board.id)
         this.checkId(board.id, function (i) {
           if (i === that.maxeditor_current_index) {
             Object.keys(board).forEach(function (key) {
@@ -922,6 +994,8 @@
           console.log(that.maxeditor_boards[that.maxeditor_current_index])
         })
       },
+
+      //获取面板
       getBoard(id) {
         let temp = this.maxeditor_boards;
         let index = undefined;
@@ -932,13 +1006,8 @@
         });
         return temp[index];
       },
-      //TODO 业务混淆，待修改
-      setBoard(boardObject) {
-        let temp = this.maxeditor_boards;
-        boardObject.id = boardObject.id + "_copy" + this.maxeditor_boards.length;
-        temp.push(boardObject);
-        this.$set(this.maxeditor_boards, temp)
-      },
+
+      //获取当前编辑面板的内容
       getCurrentBoardContent() {
         let index = this.maxeditor_current_index;
         let id = this.maxeditor_current_id;
@@ -948,6 +1017,7 @@
         }
         return this.maxeditor_boards[this.maxeditor_current_index].content
       },
+      //获取当前编辑面板的id
       getCurrentBoardId() {
         if (!this.isExited(this.maxeditor_current_id)) {
           console.log('MaxEditor:没有正在编辑的面板');
@@ -955,9 +1025,11 @@
         }
         return this.maxeditor_current_id;
       },
+      //获取当前编辑面板的类型
       getCurrentBoardType() {
         return this.maxeditor_boards[this.maxeditor_current_index].type;
       },
+      //获取当前编辑面板内容区的innerText
       getBoardContentText(id) {
         this.checkId(id, function (i) {
         }, function () {
@@ -965,6 +1037,8 @@
         });
         return this.$refs[id + '_content_' + this.maxEditorRootId][0].innerText;
       },
+
+      //获取面板内容
       getBoardContent(id) {
         let index;
         this.checkId(id, function (i) {
@@ -974,6 +1048,7 @@
         });
         return this.maxeditor_boards[index].content;
       },
+      //设置面板内容
       setBoardContent(id, content) {
         let temp = this.maxeditor_boards;
         let index = undefined;
@@ -1000,11 +1075,9 @@
       },
 
       //文本编辑方法
-      //初始化关键字事件
-
-      //关键字
+      //光标处插入关键字
       editInsertKeyWord(values) {
-        let id = Date.now()
+        let id = Date.now();
         if (!this.isExited(values)) {
           throw new Error('MaxEditor:未传入选项值，无法插入下拉框');
         }
@@ -1025,6 +1098,7 @@
         document.execCommand('insertHtml', false, container);
         document.getElementById(id + '_keyword_container' + rootId).innerHTML = select;
       },
+      //光标处插入文本
       editInsertText(text) {
         if (!this.isExited(text)) {
           throw new Error('MaxEditor:未传入文本，无法插入');
@@ -1037,6 +1111,7 @@
       changeKeyWordInputWidth(id) {
         //document.getElementById()
       },
+
       //打印
       print(cb) {
         let oldMode = this.maxeditor_mode;
@@ -1077,6 +1152,7 @@
           }
         });
       },
+
       //计算文本中汉字个数
       getCharacterNum(text) {
         if (text === undefined || text === null) {
@@ -1094,6 +1170,7 @@
         }
         return text.match(/[\u4E00-\u9FA5]/g).length;
       },
+
       //存在性检验
       isExited(sth) {
         if (undefined === sth || null === sth || '' === sth) {
@@ -1103,6 +1180,7 @@
         }
         return true
       },
+
       //id检查
       checkId(id, cb1, cb2) {
         if (!this.isExited(id)) {
@@ -1116,14 +1194,17 @@
         }
         cb2();//id不存在回调函数
       },
+
       //焦点释放
       handleBodyClick(event) {
         if (event.target.className === 'maxeditor-body-inner') {
           this.blurAll()
         }
       },
+
+      //释放所有焦点
       blurAll(cb = () => {
-        console.log('释放焦点');
+        console.log('MaxEidtor:释放焦点');
       }) {
         let that = this;
         if (this.isExited(this.maxeditor_current_id)) {
@@ -1135,6 +1216,7 @@
         this.maxeditor_current_tabImg_index = undefined;
         this.$nextTick(cb)
       },
+
       //自适应图片容器高度
       justifyImgBoxHeight(index) {
         let temp = this.maxeditor_boards;
@@ -1149,12 +1231,13 @@
           return
         }
         if (newHeight < temp[index].minHeight) {
-          console.log('--------------------------------')
+          console.log('MaxEditor:面板新高度小于最小高度')
         }
         temp[index].height = newHeight;
         boardRef[0].height = newHeight;
         this.refreshLayout(index, newHeight - oldHeight)
       },
+
       //自适应normal容器高度
       justifyNormalBoardHeight(index) {
         let that = this;
@@ -1178,6 +1261,7 @@
           console.log('MaxEditor:文本框内没有最后一行元素')
         }
       },
+
       //刷新排版
       refreshLayout(index, translateY) {
         console.log('MaxEditor:refresh layout.');
@@ -1195,19 +1279,14 @@
         console.log(a + ';' + c);
         //判断是否需要分页
         if (that.getTotalHeight() > that.height * (1 + that.maxeditor_pages) + (that.paddingY * 2 + 24) * that.maxeditor_pages) {
-
           that.addPage();
-
         } else if (that.getTotalHeight() < that.height * that.maxeditor_pages + (that.paddingY * 2 + 24) * (that.maxeditor_pages - 1)) {
-
           that.deletePage();
-
         }
-
         //将面板往下挤
         for (let i = 0; i < temp.length; i++) {
           //跳过自身
-          if (i === index||that.isExited(temp[i].page)) {
+          if (i === index || that.isExited(temp[i].page)) {
             continue;
           }
           if (temp[i].y > (tY + tHeight)) {
@@ -1233,18 +1312,15 @@
         let that = this;
         this.maxeditor_boards.forEach(function (item, index) {
           if (item.isHeader || item.isFooter) {
-            if (!item.page){
+            if (!item.page) {
               let t = JSON.parse(JSON.stringify(item));
-              t.y = item.y + that.height+that.paddingY*2+24;
+              t.y = item.y + that.height + that.paddingY * 2 + 24;
               t.page = that.maxeditor_pages;
-              t.id = item.id + '_copy_page_'+that.maxeditor_pages;
+              t.id = item.id + '_copy_page_' + that.maxeditor_pages;
               that.maxeditor_boards.push(t)
             }
-
           }
-
         })
-
       },
       deletePage() {
         /*if (this.maxeditor_mode === 'design') {
@@ -1253,9 +1329,9 @@
         console.log('MaxEditor:delete page.');
         let that = this;
         this.maxeditor_boards.forEach(function (item, index) {
-          if (that.isExited(item.page)){
-            if (item.page===that.maxeditor_pages){
-              that.maxeditor_boards.splice(index,0)
+          if (that.isExited(item.page)) {
+            if (item.page === that.maxeditor_pages) {
+              that.maxeditor_boards.splice(index, 0)
             }
           }
         });
@@ -1268,8 +1344,9 @@
       getTotalHeight() {
         let height = 0;
         let that = this;
-        this.maxeditor_boards.forEach(function (item, index) {
+        this.maxeditor_boards.forEach(function (item) {
           if (item.y + item.height > height) {
+            //不计算添加的页眉页脚
             if (!that.isExited(item.page)) {
               height = item.y + item.height
             }
@@ -1278,7 +1355,7 @@
         return height;
       },
 
-      //修改面板
+      //打开修改面板弹出框，该方法调用maxeditor-toolbar中的方法
       openUpdateDialog(item) {
         let title;
         let that = this;
@@ -1309,12 +1386,13 @@
     created() {
     },
     watch: {
-      maxeditor_mode(n, o) {
-        //文本内部下拉框是否可编辑
+      //模式改变时的相关操作
+      maxeditor_mode(n) {
+        //只读模式下关键字设为不可编辑
         if (n === 'readonly') {
           let keywordList = document.getElementsByClassName('maxeditor-keyword');
           for (let i = 0; i < keywordList.length; i++) {
-            keywordList[i].setAttribute('contenteditable', 'false')
+            keywordList[i].setAttribute('contenteditable', 'false');
             keywordList[i].classList.remove('maxeditor-board-outline');
             keywordList[i].classList.remove('maxeditor-keyword-arrow');
           }
@@ -1334,7 +1412,6 @@
             selectList[i].style.display = 'block'
           }
         }
-
         if (n !== 'design') {
           this.blurAll()
         }
