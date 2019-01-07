@@ -37,10 +37,10 @@ $ npm install --save vue-draggable-resizable
 或者使用软连接安装
 ```
 "dependencies":{
-  "qrcodeautojs": "file:"
+  "qrcodeautojs": "file:maxeditor在项目中的路径/lib/qrcodeautojs"
 }
 ```
-
+添加后安装
 ```bash
 npm install 
 ```

@@ -63,6 +63,7 @@
             <!--normal面板-->
             <template v-if="item.type === 'normal'">
               <div style="width: 100%;height: 100%"
+                   v-html="item.isHeader||item.isFooter?item.content:''"
                    :contenteditable="isExited(item.writable)?item.writable?maxeditor_mode!=='readonly':maxeditor_mode==='design':true"
                    :id="item.id+'_content_'+maxEditorRootId"
                    :ref="item.id+'_content_'+maxEditorRootId"
@@ -209,7 +210,7 @@
               <span class="maxeditor-icon-delete" title="删除面板" @click="deleteBoard(index)"></span>
               <span class="maxeditor-icon maxeditor-icon-mark"
                     style="vertical-align: super"
-                    title="修改面板" v-if="item.type!=='hr'" @click="openUpdateDialog(item)"></span>
+                    title="修改面板" @click="openUpdateDialog(item)"></span>
               <span style="vertical-align: super">id:{{item.id}}</span>
             </div>
           </maxeditor-board>
@@ -373,6 +374,7 @@
       },
       clearBoards() {
         this.maxeditor_boards = [];
+        this.maxeditor_pages = 0;
       },
       addSection(id) {
         this.addBoard({id: id, type: 'normal', z: 100})
@@ -1202,9 +1204,10 @@
 
         }
 
+        //将面板往下挤
         for (let i = 0; i < temp.length; i++) {
           //跳过自身
-          if (i === index) {
+          if (i === index||that.isExited(temp[i].page)) {
             continue;
           }
           if (temp[i].y > (tY + tHeight)) {
@@ -1221,30 +1224,55 @@
 
       //分页
       addPage() {
-        if (this.maxeditor_mode === 'design') {
+        /*if (this.maxeditor_mode === 'design') {
           return
-        }
+        }*/
         console.log('MaxEditor:add page.');
         this.maxeditor_pages += 1;
+        let adds = [];
+        let that = this;
+        this.maxeditor_boards.forEach(function (item, index) {
+          if (item.isHeader || item.isFooter) {
+            if (!item.page){
+              let t = JSON.parse(JSON.stringify(item));
+              t.y = item.y + that.height+that.paddingY*2+24;
+              t.page = that.maxeditor_pages;
+              t.id = item.id + '_copy_page_'+that.maxeditor_pages;
+              that.maxeditor_boards.push(t)
+            }
+
+          }
+
+        })
 
       },
       deletePage() {
-        if (this.maxeditor_mode === 'design') {
+        /*if (this.maxeditor_mode === 'design') {
           return
-        }
+        }*/
         console.log('MaxEditor:delete page.');
+        let that = this;
+        this.maxeditor_boards.forEach(function (item, index) {
+          if (that.isExited(item.page)){
+            if (item.page===that.maxeditor_pages){
+              that.maxeditor_boards.splice(index,0)
+            }
+          }
+        });
         if (this.maxeditor_pages > 0) {
           this.maxeditor_pages -= 1;
         }
-
       },
 
       //获取页面最大高度（最后一个面板离顶部高度）
       getTotalHeight() {
         let height = 0;
+        let that = this;
         this.maxeditor_boards.forEach(function (item, index) {
           if (item.y + item.height > height) {
-            height = item.y + item.height
+            if (!that.isExited(item.page)) {
+              height = item.y + item.height
+            }
           }
         });
         return height;
