@@ -978,12 +978,15 @@
       //更新当前正在编辑的面板，调用该方法时需要维持一个当前正在编辑的面板，否则会报错（暂未解耦）
       updateBoard(board) {
         let that = this;
+        let rootId = this.maxEditorRootId;
         this.checkId(board.id, function (i) {
           if (i === that.maxeditor_current_index) {
             Object.keys(board).forEach(function (key) {
               that.maxeditor_boards[i][key] = board[key]
             });
-            console.log(that.maxeditor_boards[i])
+            that.$nextTick(function () {
+              that.$refs[id + '_content_' + rootId][0].innerHTML = that.maxeditor_boards[i].content
+            });
           } else {
             throw new Error('MaxEditor:id' + id + '已存在，无法更新面板');
           }
@@ -991,7 +994,9 @@
           Object.keys(board).forEach(function (key) {
             that.maxeditor_boards[that.maxeditor_current_index][key] = board[key]
           });
-          console.log(that.maxeditor_boards[that.maxeditor_current_index])
+          that.$nextTick(function () {
+            that.$refs[id + '_content_' + rootId][0].innerHTML = that.maxeditor_boards[that.maxeditor_current_index].content
+          });
         })
       },
 
