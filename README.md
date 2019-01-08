@@ -1,6 +1,6 @@
 # vue-maxeditor
 
-![MaxEditor](./doc/preview.png)
+![MaxEditor](./doc/preview.gif)
 
 > 基于vue-draggable-resizable的电子病历编辑器
 
