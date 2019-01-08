@@ -1,6 +1,6 @@
 <template>
   <div class="maxeditor-root" :id="maxEditorRootId" style="overflow-x: scroll">
-    <!--编辑器工具栏-->
+    <!--编辑器工具栏-test-->
     <maxeditor-toolbar v-if="isToolbarShow"
                        :ref="'maxEditorToolbar_'+maxEditorRootId"
                        :width="width"
