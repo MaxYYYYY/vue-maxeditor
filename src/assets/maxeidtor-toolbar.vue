@@ -4,6 +4,7 @@
        :ref="'maxeditor-toolbar-'+maxeditorRootId"
        style=""
        :style="{'width': width+paddingX*2+'px'}">
+    <!--文本编辑按钮-->
     <div :id="'maxeditor-toolbar-'+maxeditorRootId+'-a'"
          :ref="'maxeditor-toolbar-'+maxeditorRootId+'-a'">
       <a class="maxeditor-toolbar-item" style="width: 100px" @click="hideMenu">隐藏菜单</a>
@@ -104,10 +105,12 @@
         class="maxeditor-icon maxeditor-icon-align-right"></span></a>
       <a class="maxeditor-toolbar-item-separator"></a>
     </div>
+    <!--显示/隐藏菜单按钮-->
     <a class="maxeditor-toolbar-item" @click="showMenu"
        :id="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        :ref="'maxeditor-toolbar-'+maxeditorRootId+'-showbtn'"
        style="width: 100px;display: none">显示菜单</a>
+    <!--控件操作按钮-->
     <div v-if="isModeBtnShow"
          class="maxeditor-p-b-10"
          :id="'maxeditor-toolbar-'+maxeditorRootId+'-b'"

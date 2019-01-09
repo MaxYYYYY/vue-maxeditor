@@ -1336,7 +1336,7 @@
         this.maxeditor_boards.forEach(function (item, index) {
           if (that.isExited(item.page)) {
             if (item.page === that.maxeditor_pages) {
-              that.maxeditor_boards.splice(index, 0)
+              that.maxeditor_boards.splice(index, 1)
             }
           }
         });
@@ -1349,7 +1349,7 @@
       getTotalHeight() {
         let height = 0;
         let that = this;
-        this.maxeditor_boards.forEach(function (item) {
+        that.maxeditor_boards.forEach(function (item) {
           if (item.y + item.height > height) {
             //不计算添加的页眉页脚
             if (!that.isExited(item.page)) {
@@ -1357,6 +1357,7 @@
             }
           }
         });
+
         return height;
       },
 
