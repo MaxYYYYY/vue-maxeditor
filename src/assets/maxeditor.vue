@@ -47,7 +47,7 @@
             :minh="14"
             :minw="item.type==='label'?100:50"
             :drag-handle="'.maxeditor-icon-move'"
-            :handles="(item.type==='hr'||item.type==='table')?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
+            :handles="item.type==='hr'?[]:item.type==='label'?['ml','mr']:['tl','tm','tr','ml','mr','bl','bm','br']"
             :axis="item.type==='hr'?'y':'both'"
             @click="onActivated(index)"
             @resizing="onResize"
@@ -198,21 +198,25 @@
 
             <!--表格面板-->
             <template v-if="item.type === 'table'">
-              <table class="maxeditor-table" contenteditable="true" @click="onActivated(index)">
-                <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
+              <table class="maxeditor-table"
+                     @mousemove="tableMouseMove"
+                     @mousedown="tableMouseDown"
+                     :class="{'maxeditor-cursor-n-resize':table_n_resize,'maxeditor-cursor-e-resize':table_e_resize}"
+                     contenteditable="true"
+                     @click="onActivated(index)">
+                <colgroup v-if="isExited(item.table.colWidth)">
+                  <template v-for="width in item.table.colwidth">
+                    <col :width="width+'px'">
+                  </template>
+                </colgroup>
+                <tr v-for="n in item.table.rows">
+                  <td v-for="n in item.table.cols" >
+                    <div @mouseenter="tableCellMouseEnter" class="maxeditor-table-cell" style="position: relative;height: 100%;width: 100%">
+                      <maxeditor-tab :parent="true" :w="20" :h="20">{{n}}</maxeditor-tab>
+                    </div>
+
+                  </td>
                 </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                </tbody>
               </table>
             </template>
 
@@ -283,15 +287,51 @@
         maxeditor_current_index: undefined,//当前编辑面板在maxeditor_boards中的索引值
         maxeditor_current_dropdown: undefined,//当前正在操作的下拉框（id值），控制下拉列表的显示
         maxeditor_current_tabImg_index: undefined,//当前正在操作的图片标记的索引值
-        maxeditor_pages: 0//增加的页数
+        maxeditor_pages: 0,//增加的页数
+
+        //一些开关
+        table_n_resize: false,
+        table_e_resize: false,
       }
     },
     components: {
       'maxeditor-toolbar': MaxEditorToolbar,
       'maxeditor-board': VueDraggableResizable,
-      'maxeditor-tab': VueDraggableResizable
+      'maxeditor-tab': VueDraggableResizable,
+      'maxeditor-cell': VueDraggableResizable//表格单元格
     },
     methods: {
+      //表格拖动
+      tableCellMouseEnter(event){
+        console.log(event.className)
+        event.preventDefault()
+      },
+
+      tableMouseMove(event) {
+        console.log(event)
+        let data = this.maxeditor_boards[this.maxeditor_current_index];
+        let cellWidth = (data.width - 1) / data.table.cols;
+        let offsetX = event.offsetX;
+        let offsetY = event.offsetY;
+        console.log(event.offsetX + ',' + event.offsetY);
+        if (offsetX % cellWidth >= (cellWidth - 7) || offsetX % cellWidth <= 3) {
+          this.table_e_resize = true;
+        } else {
+          this.table_e_resize = false;
+        }
+      },
+
+      tableMouseDown(event) {
+        let data = this.maxeditor_boards[this.maxeditor_current_index];
+        if (this.table_e_resize) {
+          console.log('ttt')
+        }
+      },
+
+      tableMouseUp(event) {
+
+      },
+
       //全局方法
 
       //新增面板，该方法为基础方法，后面的具体分类是对该方法的细化
@@ -344,6 +384,8 @@
         }
         //表格
         if (option.type === 'table') {
+          console.log(option)
+          common.table = option.table
 
         }
         this.maxeditor_boards.push(common);
@@ -438,8 +480,8 @@
       },
 
       //表格
-      addTable(id) {
-        this.addBoard({id: id, type: 'table', width: 600, z: 100})
+      addTable(id, table) {
+        this.addBoard({id: id, table: table, type: 'table', width: 600, z: 100})
       },
 
       //纯下拉框

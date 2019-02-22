@@ -131,9 +131,9 @@
       <button title="插入图片容器" class="maxeditor-toolbar-button"
               @click="openDialog('图片框')">图片框
       </button>
-      <!--<button title="插入表格" class="maxeditor-toolbar-button"
+      <button title="插入表格" class="maxeditor-toolbar-button"
               @click="openDialog('表格')">表格
-      </button>-->
+      </button>
       <button title="插入关键词" class="maxeditor-toolbar-button maxeditor-m-t-10"
               @click="openDialog('关键词')">关键词
       </button>
@@ -195,12 +195,14 @@
             <span style="width: 75px;display: inline-block">页眉</span>
             <span style="display: inline-block">:</span>
             <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -10px"
-                          type="checkbox" @change="dialog_data.isHeader?dialog_data.isFooter=false:dialog_data.isFooter;"
+                          type="checkbox"
+                          @change="dialog_data.isHeader?dialog_data.isFooter=false:dialog_data.isFooter;"
                           v-model="dialog_data.isHeader"></label>
             <span style="width: 75px;display: inline-block">页脚</span>
             <span style="display: inline-block">:</span>
             <label><input class="maxeditor-switch maxeditor-switch-anim" style="margin-bottom: -10px"
-                          type="checkbox" @change="dialog_data.isFooter?dialog_data.isHeader=false:dialog_data.isHeader;"
+                          type="checkbox"
+                          @change="dialog_data.isFooter?dialog_data.isHeader=false:dialog_data.isHeader;"
                           v-model="dialog_data.isFooter"></label>
           </div>
           <div class="maxeditor-m-t-10" v-if="dialog_title==='标签文本'||dialog_title==='下拉框'">
@@ -253,6 +255,16 @@
             <button class="maxeditor-toolbar-button maxeditor-m-t-10" style="width: 75px;display: block"
                     @click="dialog_data.keyWordList.push({value:''})">增加选项
             </button>
+          </div>
+
+          <div class="maxeditor-m-t-10" v-if="dialog_title==='表格'">
+            <span style="width: 75px;display: inline-block">行*列</span>
+            <span style="display: inline-block">:</span>
+            <input class="maxeditor-board-outline" type="number" min="1" v-model.number="dialog_data.table.rows"
+                   style="width: 36px;border: none;height: 20px;font-size: 16px"/>
+            <span style="display: inline-block">*</span>
+            <input class="maxeditor-board-outline" type="number" min="1" v-model.number="dialog_data.table.cols"
+                   style="width: 36px;border: none;height: 20px;font-size: 16px"/>
           </div>
 
 
@@ -352,6 +364,7 @@
           writable: true,
           dropList: [],//下拉框数组
           keyWordList: [],//关键词数组
+          table: {/*rows:'',cols:''*/}//表格
         }
       }
     },
@@ -373,10 +386,11 @@
         this.dialog_data.writable = true;
         this.dialog_data.dropList = [];
         this.dialog_data.keyWordList = [];
+        this.dialog_data.table = {};
         this.isDialogShow = false;
         this.isUpdateDialog = false;
         //若打开窗口前，菜单栏处于折叠状态，则回复折叠
-        if (this.isMenuCollapsed_t){
+        if (this.isMenuCollapsed_t) {
           this.hideMenu();
           this.isMenuCollapsed_t = true;
         }
@@ -422,6 +436,7 @@
         this.dialog_data.isHeader = currentBoard.isHeader;
         this.dialog_data.isFooter = currentBoard.isFooter;
         this.dialog_data.dropList = currentBoard.datalist;
+        this.dialog_data.table = currentBoard.table;
         //餐单栏设置为显示状态，防止界面变形
         let t = this.isMenuCollapsed_t;
         this.showMenu();
@@ -447,6 +462,9 @@
             board.isHeader = dialogData.isHeader;
             board.isFooter = dialogData.isFooter;
             board.datalist = dialogData.dropList;
+            board.table = dialogData.table;
+            //board.table.rows = dialogData.table.rows;
+            //board.table.cols = dialogData.table.cols;
             console.log(board)
             that.$parent.updateBoard(board);
             that.closeDialog();
@@ -548,8 +566,9 @@
             break;
           case '表格':
             try {
-              this.$parent.addTable(this.dialog_data.id)
+              this.$parent.addTable(this.dialog_data.id, this.dialog_data.table)
             } catch (e) {
+              console.log(e)
               this.dialog_error = e.message;
               return
             }
